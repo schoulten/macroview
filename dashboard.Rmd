@@ -23,12 +23,8 @@ options(OutDec = ",")
 knitr::opts_knit$set(progress = TRUE)
 
 
-library(rmarkdown)
-library(D3plusR)
-library(tidyverse)
-library(flexdashboard)
-library(htmlwidgets)
-library(kableExtra)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("rmarkdown","D3plusR","tidyverse","flexdashboard","htmlwidgets", "kableExtra")
 
 
 # Icons made by Freepik from www.flaticon.com
