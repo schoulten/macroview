@@ -1309,7 +1309,7 @@ risco %>%
 
 ```{r}
 dic_estoque_div <- list(periodo = "Mês",
-                        valor_real = "Valor",
+                        valor = "Valor",
                         isolar = "Selecionar",
                         ocultar = "Esconder")
 
