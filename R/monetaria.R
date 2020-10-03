@@ -7,12 +7,8 @@
 
 # Pacotes necessários --------------------------------------------------
 
-library(tidyverse)
-library(rbcb)
-library(ecoseries)
-library(lubridate)
-library(zoo)
-library(sidrar)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("tidyverse","rbcb","ecoseries","lubridate","zoo", "sidrar")
 
 
 

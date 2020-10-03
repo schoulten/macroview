@@ -7,11 +7,9 @@
 
 # Pacotes necessários -----------------------------------------------------
 
-library(tidyverse)
-library(sidrar)
-library(readxl)
-library(rbcb)
-library(zoo)
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load("tidyverse","sidrar","readxl","readxl","rbcb", "zoo")
 
 
 

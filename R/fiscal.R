@@ -7,18 +7,15 @@
 
 # Pacotes necessários -----------------------------------------------------
 
-library(readxl)
-library(tidyverse)
-library(rbcb)
-library(sidrar)
-library(zoo)
-library(janitor)
-
-options(scipen = 999)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("readxl","tidyverse","rbcb","sidrar","zoo", "janitor")
 
 
 
 # Importação de dados -----------------------------------------------------
+
+options(scipen = 999)
+
 
 download.file("http://sisweb.tesouro.gov.br/apex/cosis/thot/link/rtn/serie-historica?conteudo=cdn",
               destfile = "../data/resultado.xlsx",

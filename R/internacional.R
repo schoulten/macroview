@@ -7,8 +7,8 @@
 
 # Pacotes necessários --------------------------------------------------
 
-library(OECD)
-library(tidyverse)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("OECD","tidyverse")
 
 
 

@@ -7,9 +7,8 @@
 
 # Pacotes necessários --------------------------------------------------
 
-library(sidrar)
-library(tidyverse)
-library(rbcb)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("sidrar","tidyverse","rbcb")
 
 
 

@@ -7,13 +7,8 @@
 
 # Pacotes necessários --------------------------------------------------
 
-library(PNADcIBGE)
-library(tidyverse)
-library(lubridate)
-library(sidrar)
-library(janitor)
-library(survey)
-library(convey)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("PNADcIBGE","tidyverse","lubridate","sidrar","janitor","survey","convey")
 
 
 
