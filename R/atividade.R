@@ -26,7 +26,7 @@ dados_pib_valores <- get_sidra(api = "/t/1846/n1/all/v/all/p/all/c11255/90687,90
 
 url_icva <- "https://apicatalog.mziq.com/filemanager/v2/d/4d1ebe73-b068-4443-992a-3d72d573238c/3e864198-0b72-c970-1771-80cd8c338a30?origin=2"
 download.file(url = url_icva, destfile = "icva.xlsx", mode = "wb") %>%
-  file.copy(from = "./icva.xlsx", to   = "../data")
+  file.copy(from = "./icva.xlsx", to   = "../data", overwrite = TRUE)
 file.remove("./icva.xlsx")
 dados_icva <- read_excel("../data/icva.xlsx")
 
