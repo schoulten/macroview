@@ -17,7 +17,7 @@ pacman::p_load("readxl","tidyverse","rbcb","sidrar","zoo", "janitor")
 options(scipen = 999)
 
 
-download.file("http://sisweb.tesouro.gov.br/apex/cosis/thot/link/rtn/serie-historica?conteudo=cdn",
+download.file("https://sisweb.tesouro.gov.br/apex/cosis/thot/transparencia/anexo/9906:429799:inline",
               destfile = "../data/resultado.xlsx",
               mode = "wb")
 dados_resultado_tn <- as_tibble(t(read_xlsx("../data/resultado.xlsx",
