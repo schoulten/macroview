@@ -18,7 +18,7 @@ variaveis_pnadc <- c("Ano", "Trimestre", "UF", "V1028", "V2007", "V2009", "V2010
                             "VD4001", "VD4002", "VD4009", "VD4020", "VD4035")
 
 dados_pnadc <- get_pnadc(year = format(Sys.Date(), format = "%Y"),
-                         quarter = quarter(Sys.Date())-1,
+                         quarter = 2,
                          vars = variaveis_pnadc,
                          design = FALSE) ### atualizável
 
