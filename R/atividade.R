@@ -9,9 +9,7 @@
 
 if (!require("pacman")) install.packages("pacman")
 
-pacman::p_load("tidyverse","sidrar","readxl","readxl","rbcb", "zoo")
-
-
+pacman::p_load("tidyverse","sidrar","readxl","readxl","rbcb", "zoo","mgsub")
 
 # Importação de dados -----------------------------------------------------
 

@@ -17,8 +17,8 @@ pacman::p_load("PNADcIBGE","tidyverse","lubridate","sidrar","janitor","survey","
 variaveis_pnadc <- c("Ano", "Trimestre", "UF", "V1028", "V2007", "V2009", "V2010", "V3007",
                             "VD4001", "VD4002", "VD4009", "VD4020", "VD4035")
 
-dados_pnadc <- get_pnadc(year = format(Sys.Date(), format = "%Y"),
-                         quarter = 2,
+dados_pnadc <- get_pnadc(year = 2020,
+                         quarter = 3,
                          vars = variaveis_pnadc,
                          design = FALSE) ### atualizável
 

@@ -8,7 +8,7 @@
 # Pacotes necessários -----------------------------------------------------
 
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("readxl","tidyverse","rbcb","sidrar","zoo", "janitor")
+pacman::p_load("readxl","tidyverse","rbcb","sidrar","zoo", "janitor", "rio")
 
 
 

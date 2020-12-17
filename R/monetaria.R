@@ -8,7 +8,7 @@
 # Pacotes necessários --------------------------------------------------
 
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("tidyverse","rbcb","ecoseries","lubridate","zoo", "sidrar")
+pacman::p_load("tidyverse","rbcb","ecoseries","lubridate","zoo", "sidrar", "GetTDData", "quantmod", "tibbletime")
 
 
 
