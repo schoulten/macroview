@@ -1,182 +1,450 @@
-### Política Fiscal
+### Fiscal Policy ###
 
 
-## Rotina de extração e tratamento de dados
+# This R code provides the extraction and data wrangling of macroeconomic
+# variables referring to the Brazilian fiscal policy.
 
 
+# Packages ----------------------------------------------------------------
 
-# Pacotes necessários -----------------------------------------------------
 
+# Install/load packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("readxl","tidyverse","rbcb","sidrar","zoo", "janitor", "rio")
+pacman::p_load(
+  "readxl", 
+  "tidyverse",
+  "sidrar",
+  "GetBCBData",
+  "zoo",
+  "janitor", 
+  "rio",
+  "deflateBR", 
+  "lubridate"
+  )
+
+
+# Set the default language of date in R
+Sys.setlocale("LC_TIME", "English")
 
 
 
-# Importação de dados -----------------------------------------------------
+# Parameters --------------------------------------------------------------
 
+
+# Parameters used in the code to import, download or cleaning data
+
+
+# Load useful functions
+source("./R/utils.R")
+
+
+# Disable scientific notation
 options(scipen = 999)
 
 
-download.file("https://sisweb.tesouro.gov.br/apex/cosis/thot/transparencia/anexo/9906:429799:inline",
-              destfile = "../data/resultado.xlsx",
-              mode = "wb")
-dados_resultado_tn <- as_tibble(t(read_xlsx("../data/resultado.xlsx",
-                                      sheet = "1.1-A",
-                                      col_names = FALSE,
-                                      skip = 5,
-                                      n_max = 74)))
+# List of URLs to get data from different sources
+url_list <- list(
+  
+  # Central Government Primary Balance (URL to download spreadsheet data from National Treasury)
+  url_treasury = "http://sisweb.tesouro.gov.br/apex/cosis/thot/link/rtn/serie-historica?conteudo=cdn",
+  
+  
+  # General government net and gross debt (URL to download spreadsheet data from Central Bank)
+  url_debt = "https://www.bcb.gov.br/content/estatisticas/Documents/Tabelas_especiais/Divggnp.xls",
+  
+  
+  # Federal Public Debt stock (URL to download spreadsheet data from National Treasury)
+  url_debt_stock = "https://www.tesourotransparente.gov.br/ckan/dataset/0998f610-bc25-4ce3-b32c-a873447500c2/
+resource/0402cb77-5e4c-4414-966f-0e87d802a29a/download/2.1.xlsx",
+  
+  
+  # Debt Risk Rating History (URL to download spreadsheet data from National Treasury)
+  url_rating = "https://sisweb.tesouro.gov.br/apex/f?p=2810:2::CSV:NO:RP::"
+  
+  )
 
 
-dados_pib_fiscal <- get_series(c("valor" = 4382), start_date = "1997-01-01") %>%
-  mutate(periodo = paste0(format(date, format = "%Y/%m"), "/27")) %>%
-  select(periodo, valor)
+# List of parameters to get data from SIDRA/IBGE website
+api_sidra <- list(
+  
+  # Consumer Price Index - IPCA
+  api_ipca_index = "/t/1737/n1/all/v/2266/p/all/d/v2266%2013"
+  
+  )
 
 
-download.file("https://www.bcb.gov.br/content/estatisticas/Documents/Tabelas_especiais/Divggnp.xls",
-              destfile = "../data/divida.xls",
-              mode = "wb")
-dados_divida_reais <- read_excel("../data/divida.xls",
-                           sheet = "R$ milhões",
-                           skip = 8,
-                           col_names = FALSE,
-                           n_max = 48)
+# List of parameters to get data from Central Bank
+api_bcb <- list(
+  
+  # Inflation-targeting
+  api_gdp_12m = c("Accumulated GDP in the last 12 months" = 4382)
+  
+  )
+  
+
+# Central Government Fiscal Balance (accounts)
+balance_accounts <- tibble(
+  group_1 = c(
+    rep("Total Revenue", 21),
+    rep("Transfers by Revenue Sharing", 7),
+    rep("Total Expenditure", 29)
+    ),
+                     
+  group_2 = c(
+    rep("Revenues Collected by the Federal Revenue Office", 10),
+    "Fiscal Incentives",
+    "Net Social Security Revenues",
+    rep("Revenues Not Collected by the Federal Revenue Office", 9),
+    "FPM / FPE / IPI-EE",
+    rep("Constitutional Funds", 2),
+    "Education-Salary (social contribution for education)",
+    "Exploitation of Natural Reosurces", 
+    "CIDE - Fuels",
+    "Other", 
+    "Social Security Benefits",
+    "Payroll", 
+    rep("Other Compulsory Expenses", 25),
+    rep("Executive Branch Expenses Subject to Financial Programming", 2)
+    ),
+                     
+  group_3 = c(
+    "Import Tax",
+    "Industrialized Products Tax (IPI)",
+    "Income tax (IR)",
+    "Tax on Credit Operations, Exchange and Insurance (IOF)", 
+    "Contribution to Social Security Financing (COFINS)", 
+    "Contribution to the Social Integration Program and Civil Service Asset Formation Program (PIS/Pasep)", 
+    "Social Contribution on Net Corporate Profits (CSLL)", 
+    "Provisional Contribution on Financial Operations (CPMF)",
+    "Contribution on Intervention in the Economic Domain (CIDE) - Fuels",
+    "Other",
+    "Fiscal Incentives",
+    "Net Social Security Revenues", 
+    "Concessions and Permissions", 
+    "Dividends",
+    "Contribution to Civil Service Social Security (CPSS)",
+    "Exploitation of Natural Resources",
+    "Own Revenues and from agreements",
+    "Education-Salary (social contribution for education)",
+    "FGTS Complement (LC nº 110/01)",
+    "Assets Operations",
+    "Other Revenues",
+    "FPM / FPE / IPI-EE",
+    "Total Transfer",
+    "Funds Surplus",
+    "Education-Salary (social contribution for education)",
+    "Exploitation of Natural Reosurces",
+    "CIDE - Fuels",
+    "Other",
+    "Social Security Benefits",
+    "Payroll",
+    "Salary Allowance and Unemployment Benefit",
+    "Amnestied Workers",
+    "Financial support to states and Municipalities",
+    "Financial aid to Energy Development Account (CDE)",
+    "Reparations and Special Legislation Benefits",
+    "Assistance Benefits (LOAS/RMV)",
+    "FGTS Complement (LC nº 110/01)",
+    "Extraordinary credits (excluding PAC)",
+    "Compensation to the Social Security Fund (RGPS) due to the payroll tax reduction",
+    "Covenants", 
+    "Donations", 
+    "Bills and Coins Manufacturing", 
+    "Fundef/Fundeb (Federal Complementation)",
+    "Federal District (DF) Contitucional Fund (Current and Capital)",
+    "Regional Development Funds for the Amazon (FDA) and the Northeast (FDNE)",
+    "Legislative/Judiciary/Public Prosecutor/Public Defendant (Current and Capital)",
+    "Kandir Law (LC nº 87/96 e 102/00) and FEX",
+    "Contingency Reserve",
+    "Reimbursement States/Municipalities Fossil Fuels",
+    "Judicial Remedies (Current and Capital)",
+    "Subsidies and Grants",
+    "ANA (National Water Agency) Transfers", 
+    "ANEEL (Electric Energy National Agency) Transfers and Fines", 
+    "FIES primary impact (Student Funding)",
+    "Electoral Campaign Funding", 
+    "Compulsory Expenses with Cash Control", 
+    "Discretionary"
+    )
+  )
 
 
-dados_ipca <- ts(get_sidra(api = "/t/1737/n1/all/v/2266/p/all/d/v2266%2013")$Valor, start = c(1979, 12), freq = 12) %>%
-  window(., start = c(2006, 12))
+
+# Import data -------------------------------------------------------------
+
+
+# This section performs the import of data from different sources
+
+
+# Central Government Primary Balance
+download.file(
+  url      = url_list$url_treasury,
+  destfile = "./data/treasury.xlsx",
+  mode     = "wb"
+  )
+raw_treasury <- read_xlsx(
+  path      = "./data/treasury.xlsx",
+  sheet     = "1.1-A",
+  col_names = FALSE,
+  skip      = 5,
+  n_max     = 74
+  ) %>%
+  t() %>%
+  as_tibble() %>% 
+  clean_names()
+
+
+# Accumulated GDP in the last 12 months - Current values (R$ million)
+raw_gdp_monthly <- gbcbd_get_series(
+  id         = api_bcb$api_gdp_12m,
+  first.date = "1997-01-01"
+  )
+
+
+# General government net and gross debt
+download.file(
+  url      = url_list$url_debt,
+  destfile = "./data/debt.xls",
+  mode     = "wb"
+  )
+raw_debt <- read_excel(
+  path      = "./data/debt.xls",
+  sheet     = "R$ milhões",
+  skip      = 8,
+  col_names = FALSE,
+  n_max     = 48
+  ) %>%
+  clean_names()
+
+
+# Consumer Price Index (IPCA/IBGE)
+raw_ipca_index <- get_sidra(api = api_sidra$api_ipca_index)$Valor %>% 
+  ts(
+    start     = c(1979, 12), 
+    frequency = 12
+    ) %>%
+  window(start = c(2006, 12))
+
+
+# Federal Public Debt stock (R$ billion)
+download.file(
+  url      = url_list$url_debt_stock,
+  destfile = "./data/dpf.xlsx",
+  mode     = "wb"
+  )
+raw_debt_stock <- read_excel(
+  path      = "./data/dpf.xlsx",
+  skip      = 4,
+  col_names = FALSE
+  )
+
+
+# Debt Risk Rating History
+download.file(
+  url      = url_list$url_rating,
+  destfile = "./data/rating.csv",
+  mode     = "wb"
+  )
+raw_rating <- import("./data/rating.csv")
 
 
 
-download.file("https://www.tesourotransparente.gov.br/ckan/dataset/0998f610-bc25-4ce3-b32c-a873447500c2/resource/0402cb77-5e4c-4414-966f-0e87d802a29a/download/2.1.xlsx",
-              destfile = "../data/dpf.xlsx",
-              mode = "wb")
-dados_dpf <- read_excel("../data/dpf.xlsx",
-                         skip = 4,
-                         col_names = FALSE)
+
+# Data wrangling ----------------------------------------------------------
 
 
-download.file("https://sisweb.tesouro.gov.br/apex/f?p=2810:2::CSV:NO:RP::",
-              destfile = "../data/risco.csv",
-              mode = "wb")
-dados_risco <- rio::import("../data/risco.csv")
+# This section performs data wrangling
 
 
-
-# Tratamento de dados -----------------------------------------------------
-
-tesouro <- dados_resultado_tn %>%
-  janitor::row_to_names(1, remove_row = TRUE) %>%
-  mutate(periodo = format(seq(as.Date("1997/01/27"), length = nrow(dados_resultado_tn)-1, by = "months"), format = "%Y/%m/%d"))
-
-
-tesouro_acum12m <- tesouro %>%
-  mutate_at(-75, ~as.numeric(gsub(",", ".", .))) %>%
-  mutate_at(-75, funs(rollapply(., width = 12, FUN = sum, fill = NA, align = "right"))) %>%
-  left_join(dados_pib_fiscal, by = "periodo") %>%
+# Central Government Primary Balance
+treasury <- raw_treasury %>%
+  row_to_names(
+    row_number = 1,
+    remove_row = TRUE
+    ) %>%
+  mutate(
+    across(where(is.character), as.numeric),
+    date = seq(
+      from   = as.Date("1997/01/01"),
+      length = nrow(raw_treasury)-1,
+      by     = "months"
+      ) %>% format("%Y/%m/%d")
+    ) %>%
   drop_na()
 
 
-tesouro_acum12m_pib <- tesouro_acum12m %>%
-  mutate_at(-(75:76), funs(. / valor*100))
+# Central Government Primary Balance (accumulated in 12 months + GDP)
+treasury_accum_12m <- treasury %>%
+  mutate(
+    across(!date, ~accum_k(., k = 12)) # function from /R/utils.R
+    ) %>%
+  left_join(
+    raw_gdp_monthly %>%
+      mutate(date = format(ref.date, "%Y/%m/%d")) %>%
+      select(date, gdp_accum_12m = value),
+    by = "date"
+    ) %>%
+  drop_na()
 
 
-# Box Resultado Primário
-res_primario <- tesouro_acum12m_pib %>%
-  select(periodo, primario = 68) %>%
-  mutate(id = "Resultado Primário")
+# Central Government Primary Balance accumulated in 12 months (% GDP)
+treasury_accum_12m_gdp <- treasury_accum_12m %>%
+  mutate(
+    across(!c(75:76), ~(. / gdp_accum_12m*100))
+    )
 
 
-# Box Receitas e Despesas
-receita_desp <- tesouro_acum12m_pib %>%
-  select(periodo, `Receita Líquida` = 34, `Despesa Total` = 35) %>%
-  pivot_longer(-periodo, names_to = "fluxo", values_to = "value")
+# Primary Deficit accumulated in 12 months (% GDP)
+primary_deficit <- treasury_accum_12m_gdp %>%
+  select(date, value = 68) %>%
+  mutate(id = "Primary Deficit")
 
 
-# Box Composição das Receitas e Despesas
-categorias <- tibble(categoria_1 = c(rep("Receita Total", 21), rep("Transf. por Repartição de Receita", 7), rep("Despesa Total", 29)),
-                     categoria_2 = c(rep("Receita Administrada pela RFB, exceto RGPS", 10), "Incentivos Fiscais",
-                                      "Arrecadação Líquida para o RGPS", rep("Receitas Não Administradas pela RFB", 9),
-                                      "FPM / FPE / IPI-EE", rep("Fundos Constitucionais", 2), "Contribuição do Salário Educação",
-                                      "Exploração de Recursos Naturais", "CIDE - Combustíveis", "Demais", "Benefícios Previdenciários",
-                                      "Pessoal e Encargos Sociais", rep("Outras Despesas Obrigatórias", 25),
-                                      rep("Despesas do Poder Executivo Sujeitas à Programação Financeira", 2)),
-                     categoria_3 = c("Imposto de Importação", "IPI", "Imposto sobre a Renda", "IOF", "COFINS", "PIS/PASEP", "CSLL", "CPMF",
-                                      "CIDE Combustíveis", "Outras Administradas pela RFB", "Incentivos Fiscais",
-                                      "Arrecadação Líquida para o RGPS", "Concessões e Permissões", "Dividendos e Participações",
-                                      "Contr. Plano de Seguridade Social do Servidor", "Exploração de Recursos Naturais",
-                                      "Receitas Próprias e de Convênios", "Contribuição do Salário Educação",
-                                      "Complemento para o FGTS (LC nº 110/01)", "Operações com Ativos", "Demais Receitas",
-                                      "FPM / FPE / IPI-EE", "Repasse Total", "Superávit dos Fundos", "Contribuição do Salário Educação",
-                                      "Exploração de Recursos Naturais", "CIDE - Combustíveis", "Demais", "Benefícios Previdenciários",
-                                      "Pessoal e Encargos Sociais", "Abono e Seguro Desemprego", "Anistiados", "Apoio Fin. EE/MM",
-                                      "Auxílio CDE", "Benefícios de Legislação Especial e Indenizações",
-                                      "Benefícios de Prestação Continuada da LOAS/RMV", "Complemento para o FGTS (LC nº 110/01)",
-                                      "Créditos Extraordinários (exceto PAC)", "Compensação ao RGPS pelas Desonerações da Folha",
-                                      "Convênios", "Doações", "Fabricação de Cédulas e Moedas", "Fundef/Fundeb - Complementação da União",
-                                      "Fundo Constitucional DF (Custeio e Capital)", "FDA/FDNE",
-                                      "Legislativo/Judiciário/MPU/DPU (Custeio e Capital)", "Lei Kandir (LC nº 87/96 e 102/00) e FEX",
-                                      "Reserva de Contingência", "Ressarc. Est/Mun. Comb. Fósseis",
-                                      "Sentenças Judiciais e Precatórios (Custeio e Capital)", "Subsídios, Subvenções e Proagro",
-                                      "Transferências ANA", "Transferências Multas ANEEL", "Impacto Primário do FIES",
-                                      "Financiamento de Campanha Eleitoral", "Obrigatórias com Controle de Fluxo", "Discricionárias"))
+# Revenues and spending
+revenue_spending <- treasury_accum_12m_gdp %>%
+  select(
+    date, 
+    `Net Revenue`       = 34, 
+    `Total Expenditure` = 35
+    ) %>%
+  pivot_longer(
+    cols      = -date, 
+    names_to  = "variable", 
+    values_to = "value"
+    )
 
-comp_rec_desp <- tesouro_acum12m %>%
+
+# Detailed revenues and spending for the last period
+revenue_spending_detail <- treasury_accum_12m %>%
   slice_tail(n = 1) %>%
   select(-c(1,2,15,25,27,34,35,38,64,67:74,76)) %>%
-  pivot_longer(-periodo, names_to = "resultado", values_to = "valor") %>%
-  select(-resultado) %>%
-  bind_cols(categorias) %>%
-  mutate(periodo = format(as.Date(periodo, format = "%Y/%m/%d"), format = "%b %Y"))
+  pivot_longer(
+    cols      = -date, 
+    names_to  = "variable", 
+    values_to = "value"
+    ) %>%
+  select(-variable) %>%
+  bind_cols(balance_accounts) %>%
+  mutate(date = as.yearmon(date, format = "%Y/%m/%d"))
 
 
-# Box Saldo Conta Única
-divida_reais <- dados_divida_reais %>%
-  mutate_at(-1, as.numeric)
-
-divida_reais <- ts(t(divida_reais[,-1]), start = c(2006, 12), freq = 12)
-divida_reais <- dados_ipca[length(dados_ipca)-1] * (divida_reais / dados_ipca)
-
-conta_unica <- divida_reais[,31] %>%
-  as_tibble() %>%
-  rename(disponibilidade = x) %>%
-  mutate(periodo = seq(as.Date("2006/12/27"), length = nrow(divida_reais), by = "months"),
-         periodo = format(periodo, format = "%Y/%m/%d"),
-         disponibilidade = as.numeric(disponibilidade)*-1,
-         id = "Saldo da Conta Única")
+# General government net and gross debt
+public_debt <- raw_debt %>%
+  mutate(across(!1, as.numeric))
 
 
-# Box Estoque da Dívida
-estoque_div <- t(dados_dpf[c(1,3),-1]) %>%
-  as_tibble() %>%
-  mutate(valor = as.numeric(V2),
-         periodo = format(seq(as.Date("2006/01/27"), length = ncol(dados_dpf)-1, by = "months"), format = "%Y/%m/%d"),
-         id = "Estoque da Dívida") %>%
-  select(periodo, valor, id) %>%
-  filter(periodo >= "2006/12/01") %>%
-  mutate(valor_real = (dados_ipca[length(dados_ipca)-1] * (valor / dados_ipca[1:length(dados_ipca)-1])))
-
-
-# Box Risco da Dívida
-risco  <- dados_risco %>%
-  mutate(`Moeda Estrangeira` = gsub("\\-", "--", `Moeda Estrangeira`),
-         `Moeda Local` = gsub("\\-", "--", `Moeda Local`))
-
-
-# Box Carteira de Títulos Públicos
-titulos_dpmfi <- t(dados_dpf) %>%
-  as_tibble() %>%
-  select(7:10, 12:15) %>%
+# General government net and gross debt (deflated)
+public_debt_deflated <- as_tibble(
+  t(public_debt), 
+  rownames = "row_names"
+  ) %>%
   row_to_names(1) %>%
-  mutate(periodo = as.character(seq(as.Date("2006-01-01"), length = ncol(dados_dpf)-1, by = "months"))) %>%
-  pivot_longer(-periodo, names_to = "id", values_to = "value") %>%
-  mutate(value = as.numeric(format(value, decimal.mark = "."))*1000,
-         mes = lubridate::month(periodo, label = TRUE),
-         ano = lubridate::year(periodo),
-         mes_ano = paste(mes, ano, sep = " "))
+  clean_names() %>%
+  select(!1) %>%
+  mutate(
+    date = seq(
+      from   = as.Date("2006/12/01"), 
+      length = nrow(.), 
+      by     = "months"
+      ),
+    across(!date, as.numeric),
+    across(
+      !date,
+      ~deflate(
+        nominal_values = .x, 
+        nominal_dates  = date, 
+        real_date      = format(last(date), "%m/%Y"), 
+        index          = "ipca"
+        )
+      )
+    )
+
+
+# Single Account balance
+single_account <- public_debt_deflated[,c(31,49)] %>%
+  mutate(
+    value    =  disponibilidades_do_governo_federal_no_bacen*-1,
+    date     = format(date, "%Y/%m/%d"),
+    variable = "Single Account balance"
+    ) %>%
+  select(!1)
+
+
+# Federal Public Debt stock (R$ billion deflated)
+debt_stock <- as_tibble(
+  t(raw_debt_stock[c(1,3),-1])
+  ) %>%
+  mutate(
+    date     = myd(
+      paste0(V1, "/01"),
+      locale = "Portuguese_Brazil.1252"
+      ),
+    value    = as.numeric(V2),
+    variable = "Debt Stock",
+    across(
+      value,
+      ~deflate(
+        nominal_values = .x, 
+        nominal_dates  = date, 
+        real_date      = format(last(date), "%m/%Y"), 
+        index          = "ipca"
+        )
+      ),
+    date     = format(date, "%Y/%m/%d")) %>%
+  select(date, value, variable) %>%
+  filter(date >= "2006/12/01")
+
+
+# Debt Risk Rating History
+rating  <- raw_rating %>%
+  rename_with(~c("Last update", "Agency", "Foreign currency", "Local currency", "Action")) %>% 
+  mutate(
+    `Foreign currency` = gsub("\\-", "--", `Foreign currency`),
+    `Local currency`   = gsub("\\-", "--", `Local currency`)
+    )
+
+
+# Government Securities Portfolio
+gov_portfolio <- t(raw_debt_stock) %>%
+  as_tibble() %>%
+  select(1, 7:10, 12:15) %>%
+  row_to_names(row_number = 1) %>%
+  rename("date" = 1) %>%
+  mutate(
+    date = myd(
+      paste0(date, "/01"),
+      locale = "Portuguese_Brazil.1252"
+      )
+    ) %>% 
+  pivot_longer(
+    cols      = -date, 
+    names_to  = "id", 
+    values_to = "value"
+    ) %>%
+  mutate(
+    value   = as.numeric(value)*1000,
+    date_my = paste(
+      month(date, label = TRUE), 
+      year(date), 
+      sep = " "
+      )
+    )
 
 
 
-# Exportar dados ----------------------------------------------------------
 
-diretorio <- file.path("../data")
-save.image(file = file.path(diretorio, "fiscal.Rdata"))
+# Save data ---------------------------------------------------------------
+
+
+# Aggregate data
+imported_data_fiscal <- mget(ls(pattern = "raw_|api_|url_"))
+
+
+# Remove unnecessary objects
+rm(list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),  # remove function objects
+   envir = .GlobalEnv)
+
+
+# Save RDATA file
+save.image(file = file.path(file.path("./data"), "fiscal.Rdata"))
+
