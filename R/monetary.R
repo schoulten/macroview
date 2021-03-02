@@ -11,6 +11,7 @@
 # Install/load packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
+  "tibbletime",
   "tidyverse",
   "GetBCBData",
   "rbcb",
@@ -19,18 +20,77 @@ pacman::p_load(
   "zoo",
   "sidrar",
   "GetTDData",
-  "quantmod",
-  "tibbletime"
+  "quantmod"
   )
 
 
 
-# Importação de dados -----------------------------------------------------
-
-dados_juros <- get_series(c("SELIC Meta" = 432, "SELIC Efetiva" = 1178, "CDI" = 4389), start_date = "2001/11/07", as = "tibble")
+# Parameters --------------------------------------------------------------
 
 
-dados_inf_expec <- get_twelve_months_inflation_expectations("IPCA", start_date = "07/11/2001")
+# Parameters used in the code to import, download or cleaning data
+
+
+# Load useful functions
+source("./R/utils.R")
+
+
+# List of parameters to get data from Central Bank (API)
+api_bcb <- list(
+  
+  # Interest Rate (short-term) - % p.y.
+  api_interest_rate = c(
+    "SELIC Target rate" = 432,  # Defined by COPOM/BCB - daily
+    "CDI Rate"          = 4389, # CDI in annual terms (basis 252) - daily
+    "SELIC Rate"        = 4189  # Selic accumulated in the month in annual terms (basis 252) - monthly
+    ),
+  
+  # Inflation's market expectations for the next 12 months (IPCA indicator)
+  api_inflation_expec = "IPCA",
+  
+  # SELIC annual market expectations
+  api_selic_expec = "Meta para taxa over-selic"
+  
+  )
+
+
+
+# Import data -------------------------------------------------------------
+
+
+# This section performs the import of data from different sources
+
+
+# Interest Rate, short-term, % p.y.
+raw_interest_rate <- gbcbd_get_series(
+  id         = api_bcb$api_interest_rate,
+  first.date = "2001-11-07"
+  )
+
+# Inflation's market expectations for the next 12 months
+raw_inflation_expec <- get_twelve_months_inflation_expectations(
+  indic      = api_bcb$api_inflation_expec,
+  start_date = "07/11/2001"
+  )
+
+# SELIC annual market expectations
+raw_selic_expec <- get_annual_market_expectations( # IMPROVING THIS FUNCTION IN ./R/UTILS.R
+  indic    = api_bcb$api_selic_expec,
+  start_date = "1999-01-01",
+  end_date = Sys.Date()
+  )
+
+
+
+
+
+
+
+
+dados_moedas <- tibble(currency = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR")) %>%
+  mutate(dados = map(currency, ~ get_currency(.x, as = "tibble", start_date = "2006-09-01", end_date = Sys.Date())))
+
+dados_embi <- series_ipeadata("40940", periodicity = "D")$serie_40940
 
 
 dados_swap <- series_ipeadata("1900214364", periodicity = "M")$serie_1900214364
@@ -40,24 +100,11 @@ ipeadata()
 dados_inf_expec_m <- series_ipeadata("1693254712", periodicity = "M")$serie_1693254712
 
 
-dados_selic_aa <- get_series(c("selic_aa" = 4189), start_date = "2001/07/01") %>%
-  rename(data = date)
-
-
-dados_moedas <- tibble(currency = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR")) %>%
-  mutate(dados = map(currency, ~ get_currency(.x, as = "tibble", start_date = "2006-09-01", end_date = Sys.Date())))
-
-
-dados_selic_expec <- get_annual_market_expectations("Meta para taxa over-selic", end_date = Sys.Date())
-
-
 dados_ettj <- GetTDData::get.yield.curve()
 
 
 quantmod::getSymbols("^BVSP", src = "yahoo")
 
-
-dados_embi <- series_ipeadata("40940", periodicity = "D")$serie_40940
 
 
 dados_ipca <- get_sidra(api = "/t/1737/n1/all/v/63,69,2263,2264,2265/p/all/d/v63%202,v69%202,v2263%202,v2264%202,v2265%202") %>%
@@ -77,7 +124,7 @@ selic <- dados_juros$`SELIC Meta` %>%
 
 
 # Box Expectativas de Inflação
-inf_expec <- dados_inf_expec %>%
+inf_expec <- raw_inflation_expec %>%
   filter(smoothed == "S" & base == "0") %>%
   select(date, indic, mean) %>%
   group_by(month = month(date), year = year(date)) %>%
@@ -110,7 +157,7 @@ ex_ante <- inner_join(dados_swap, dados_inf_expec_m, by = "data") %>%
 ex_post <- dados_ipca %>%
   filter(taxa == "IPCA - Variação acumulada em 12 meses") %>%
   select(data, ipca_12m = valor) %>%
-  inner_join(dados_selic_aa, by = "data") %>%
+  inner_join(raw_interest_rate$, by = "data") %>%
   mutate(valor = (((1+(selic_aa/100))/(1+(ipca_12m/100)))-1)*100,
          data = paste0(format(data, format = "%Y/%m"), "/27"),
          id = "Ex-post")
@@ -154,7 +201,7 @@ moedas_footnote <- paste0("Nota: valores a partir de dados diários mensalizados
 
 
 # Box Expectativas de Juros (Focus)
-selic_expec <- dados_selic_expec %>%
+selic_expec <- raw_selic_expec %>%
   filter(indic_detail == "Fim do ano" & reference_year == format(Sys.Date(), "%Y")) %>%
   select(date, indic, indic_detail, reference_year, mean) %>%
   mutate(date = format(date, format = "%Y/%m/%d")) %>%
