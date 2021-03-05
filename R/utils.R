@@ -159,62 +159,89 @@ bcb <- function (
     stop("\nArgument 'detail' is not valid. Check yout inputs.", call. = FALSE)
   }
   
-  # Convert first_date argument to class "Date"
+  
   tryCatch(
-    (first_date <- as.Date(first_date)),
+    (first_date <- as.Date(as.character(first_date), format = "%Y-%m-%d")),
     error = function(f) {NA}
+  )
+  
+  
+  # Check class of first_date argument
+  if (!is.null(first_date) & (class(first_date) != "Date")) {
+    stop("\nArgument 'first_date' is not a valid date.")
+  } else if
+  (is.null(first_date) || identical(first_date, "")) {
+    first_date <- Sys.Date() - 10 * 365
+  } else if
+  (is.na(first_date)) {
+    first_date <- Sys.Date() - 10 * 365
+  } else
+    tryCatch(
+      (first_date <- as.Date(as.character(first_date), format = "%Y-%m-%d")),
+      error = function(f) {NA}
     )
 
-  # Convert last_date argument to class "Date"
-  tryCatch(
-    (last_date <- as.Date(last_date)),
-    error = function(l) {NA}
-    )
-  
-  # Check class of first_date / last_date argument
-  if ((class(first_date) != "Date") | (class(last_date) != "Date")) {
-    stop("\nArgument 'first_date' and/or 'last_date' is not a valid date.", call. = FALSE)
-  }
-  
   # Check if first_date > Sys.Date()
   if (first_date > Sys.Date()) {
     stop("\nIt seems that 'first_date' > current date. Check your inputs.", call. = FALSE)
   }
   
-  # Check if last_date < first_date
-  if (last_date < first_date) {
-    stop("\nIt seems that 'last_date' < 'first_date'. Check your inputs.", call. = FALSE)
-  }
+  return(first_date)
   
+  # Convert last_date argument to class "Date"
+  tryCatch(
+    (last_date <- as.Date(last_date)),
+    error = function(l) {NA}
+  )
+  
+  # Check class of last_date argument
+  if (!is.null(last_date) & (class(last_date) != "Date")) {
+    stop("\nArgument 'last_date' is not a valid date.", call. = FALSE)
+  } else if
+  (is.null(last_date)) {
+    last_date <- NULL
+  } else if 
+  (!is.null(first_date)) {
+    if (last_date < first_date) {
+      stop("\nIt seems that 'last_date' < 'first_date'. Check your inputs.", call. = FALSE)
+    }
+  } else last_date
   
   # Reference date
   if (!is.null(reference_date)) {
-    
     if ((class(reference_date) != "character")) {
       stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
     } else if 
-    (nchar(reference_date) == 4 & grepl("[[:digit:]]+$", reference_date)) {
+    (nchar(reference_date) == 4L & grepl("[[:digit:]]+$", reference_date)) {
       reference_date <- as.character(reference_date)
     } else if
-    (nchar(reference_date) == 9 & (grepl("(\\d{4})([[:punct:]]{1})(\\d{4}$)", reference_date)) == TRUE) {
-      first_year = substr(reference_date, start = 1, stop = 4)
-      last_year = substr(reference_date, start = 6, stop = 9)
+    (nchar(reference_date) == 9L & (grepl("(\\d{4})([[:punct:]]{1})(\\d{4}$)", reference_date)) == TRUE) {
+      first_year = substr(reference_date, start = 1L, stop = 4L)
+      last_year = substr(reference_date, start = 6L, stop = 9L)
     } else
       stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
-    
   }
-    
-
   
 }
 
 
-filter_indicator <- paste0(sprintf("Indicador eq '%s'", indicator))
-filter_detail <- paste0(sprintf(" and IndicadorDetalhe eq '%s'", detail))
-filter_fd <- if (!is.null(last_date)) {
-  paste0(sprintf("Data le '%s'", end_date))
-} else NULL
-filter_ld
+
+my_args <- paste(
+  
+  sprintf("Indicador eq '%s'", indicator),
+  sprintf(" and IndicadorDetalhe eq '%s'", detail),
+  {filter_fd <- if (!is.null(last_date)) {paste0(sprintf("Data le '%s'", end_date))} else NULL}
+  
+)
+
+my_url <- "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$top=100&$filter=Indicador%20eq%20'Meta%20para%20taxa%20over-selic'%20and%20IndicadorDetalhe%20eq%20'Fim%20do%20ano'%20and%20DataReferencia%20eq%20'2021'%20and%20Data%20ge%20'2021-01-01'%20and%20Data%20le%20'2021-01-29'&$orderby=Data%20desc&$format=json"
+res <- try(jsonlite::fromJSON(my_url), silent = TRUE)
+if (class(res) == "try-error") {
+  stop("BCB API Request error ", conditionMessage(attr(res, "condition")))
+}
+res
+
+
 
 
 odata_url <- sprintf(
@@ -226,6 +253,15 @@ odata_url <- sprintf(
   format(last.date, "%d/%m/%Y"))
 
 
+rbcb::get_annual_market_expectations()
+GetBCBData::gbcbd_get_JSON_fct()
+
+
+indicator      = NULL
+detail         = NULL
+first_date     = Sys.Date() - 10 * 365
+last_date      = Sys.Date()
+reference_date = NULL
 
 
 
@@ -278,6 +314,7 @@ bcb(detail = "Resultado Nominal")
 bcb(detail = "DFSFSDFS")
 
 bcb(indicator = "Fiscal", first_date = "20210302")
+bcb(indicator = "Fiscal", first_date = "54564")
 bcb(indicator = "Fiscal", first_date = "2021-03-02")
 bcb(indicator = "Fiscal", first_date = "2021/03/02")
 
@@ -290,7 +327,11 @@ bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-03-02")
 bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-02-02")
 bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-03-02")
 bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-06-02")
+bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "20210602")
 bcb(indicator = "Fiscal", first_date = "2021-05-02")
+bcb(indicator = "Fiscal", first_date = NULL, last_date = "2021-06-02")
+
+
 
 
 bcb(indicator = "Fiscal", reference_date = 2021)
@@ -302,3 +343,4 @@ bcb(indicator = "Fiscal", reference_date = 2021:2025)
 bcb(indicator = "Fiscal", reference_date = "2021:20255")
 bcb(indicator = "Fiscal", reference_date = "2021:20d5")
 bcb(indicator = "Fiscal", reference_date = "2021:2025")
+bcb(indicator = "Fiscal", reference_date = NULL)
