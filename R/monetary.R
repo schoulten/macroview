@@ -83,7 +83,9 @@ raw_selic_expec <- get_annual_market_expectations( # IMPROVING THIS FUNCTION IN 
 
 
 BETS::bcbExpectA()
-
+GetBCBData::gbcbd_get_series()
+GetBCBData::gbcbd_get_single_series()
+rbcb::get_series()
 
 
 

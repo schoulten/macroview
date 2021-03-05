@@ -137,7 +137,7 @@ bcb <- function (
   
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator)) {
-    stop("\n Argument 'indicator' is not valid or missing. Check your inputs.")
+    stop("\nArgument 'indicator' is not valid or missing. Check your inputs.", call. = FALSE)
   } 
   
   # Available indicator details
@@ -156,7 +156,7 @@ bcb <- function (
   
   # Check if input "detail" is valid and get detail input (or NULL) if is valid
   if (!is.null(detail) & !all(paste0(indicator, " / ", detail) %in% valid_detail)) {
-    stop("\n Argument 'detail' is not valid. Check yout inputs.")
+    stop("\nArgument 'detail' is not valid. Check yout inputs.", call. = FALSE)
   }
   
   # Convert first_date argument to class "Date"
@@ -173,61 +173,64 @@ bcb <- function (
   
   # Check class of first_date / last_date argument
   if ((class(first_date) != "Date") | (class(last_date) != "Date")) {
-    stop("\n Argument 'first_date' and/or 'last_date' is not a valid date.")
+    stop("\nArgument 'first_date' and/or 'last_date' is not a valid date.", call. = FALSE)
   }
   
   # Check if first_date > Sys.Date()
   if (first_date > Sys.Date()) {
-    stop("\n It seems that 'first_date' > current date. Check your inputs.")
+    stop("\nIt seems that 'first_date' > current date. Check your inputs.", call. = FALSE)
   }
   
   # Check if last_date < first_date
   if (last_date < first_date) {
-    stop("\n It seems that 'last_date' < 'first_date'. Check your inputs.")
+    stop("\nIt seems that 'last_date' < 'first_date'. Check your inputs.", call. = FALSE)
   }
   
   
   # Reference date
-  if (!is.null(reference_date) & (class(reference_date) != "character")) {
-    stop("\n Argument 'reference_date' is not valid. Check yout inputs.")
-  } else
+  if (!is.null(reference_date)) {
     
-    if (nchar(reference_date) == 4 & grepl("[[:digit:]]+$", reference_date)) {
+    if ((class(reference_date) != "character")) {
+      stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
+    } else if 
+    (nchar(reference_date) == 4 & grepl("[[:digit:]]+$", reference_date)) {
       reference_date <- as.character(reference_date)
-      } else
-        
-    if (nchar(reference_date) == 9 & (grepl("(\\d{4})([[:punct:]]{1})(\\d{4}$)", reference_date)) == TRUE) {
+    } else if
+    (nchar(reference_date) == 9 & (grepl("(\\d{4})([[:punct:]]{1})(\\d{4}$)", reference_date)) == TRUE) {
       first_year = substr(reference_date, start = 1, stop = 4)
       last_year = substr(reference_date, start = 6, stop = 9)
     } else
-      
-      stop("\n Argument 'reference_date' is not valid. Check yout inputs.")
-  
-  
-  filter_indicator <- paste0(sprintf("Indicador eq '%s'", indicator))
-  filter_detail <- paste0(sprintf(" and IndicadorDetalhe eq '%s'", detail))
-  filter_fd <- if (!is.null(last_date)) {
-    paste0(sprintf("Data le '%s'", end_date))
-  } else NULL
-  filter_ld
-  
-  
-  
-  odata_url <- sprintf(
-    paste0("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
-           "?$filter=%s",
-           "/dados?formato=json&", "dataInicial=%s&", "dataFinal=%s"),
-    id, 
-    format(first.date, "%d/%m/%Y"), 
-    format(last.date, "%d/%m/%Y"))
+      stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
+    
+  }
+    
+
   
 }
 
 
+filter_indicator <- paste0(sprintf("Indicador eq '%s'", indicator))
+filter_detail <- paste0(sprintf(" and IndicadorDetalhe eq '%s'", detail))
+filter_fd <- if (!is.null(last_date)) {
+  paste0(sprintf("Data le '%s'", end_date))
+} else NULL
+filter_ld
+
+
+odata_url <- sprintf(
+  paste0("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
+         "?$filter=%s",
+         "/dados?formato=json&", "dataInicial=%s&", "dataFinal=%s"),
+  id, 
+  format(first.date, "%d/%m/%Y"), 
+  format(last.date, "%d/%m/%Y"))
+
+
+
+
+
 
 urrrl="https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20'Meta%20para%20taxa%20over-selic'%20and%20IndicadorDetalhe%20eq%20'Fim%20do%20ano'%20and%20DataReferencia%20eq%20'2021'%20and%20Data%20ge%20'2021-01-01'%20and%20Data%20le%20'2021-01-29'&$orderby=Data%20desc&$format=text/html"
-
-
 
 
   url <- annual_market_expectations_url(indicator, start_date, 
@@ -248,13 +251,6 @@ urrrl="https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/Exp
   } else NULL
   
   filter__ <- paste(c(indic_filter, sd_filter, ed_filter),  collapse = " and ")
-  
-
-  
-  
-  
-  
-  
   
   
   text_ <- .get_series(url)
@@ -305,6 +301,4 @@ bcb(indicator = "Fiscal", reference_date = "20255")
 bcb(indicator = "Fiscal", reference_date = 2021:2025)
 bcb(indicator = "Fiscal", reference_date = "2021:20255")
 bcb(indicator = "Fiscal", reference_date = "2021:20d5")
-
-
-
+bcb(indicator = "Fiscal", reference_date = "2021:2025")
