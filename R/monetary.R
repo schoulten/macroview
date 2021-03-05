@@ -65,7 +65,8 @@ api_bcb <- list(
 raw_interest_rate <- gbcbd_get_series(
   id         = api_bcb$api_interest_rate,
   first.date = "2001-11-07"
-  )
+  ) %>% 
+  mutate(teste = fgafg)
 
 # Inflation's market expectations for the next 12 months
 raw_inflation_expec <- get_twelve_months_inflation_expectations(
@@ -76,12 +77,12 @@ raw_inflation_expec <- get_twelve_months_inflation_expectations(
 # SELIC annual market expectations
 raw_selic_expec <- get_annual_market_expectations( # IMPROVING THIS FUNCTION IN ./R/UTILS.R
   indic    = api_bcb$api_selic_expec,
-  start_date = "1999-01-01",
+  start_date = "2020-01-01",
   end_date = Sys.Date()
   )
 
 
-
+BETS::bcbExpectA()
 
 
 
