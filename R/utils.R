@@ -135,10 +135,12 @@ bcb <- function (
     "Taxa de câmbio"
     )
   
+  
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator)) {
     stop("\nArgument 'indicator' is not valid or missing. Check your inputs.", call. = FALSE)
   } 
+  
   
   # Available indicator details
   valid_detail <- c(
@@ -154,60 +156,48 @@ bcb <- function (
     "Meta para taxa over-selic / Média do ano"
   )
   
+  
   # Check if input "detail" is valid and get detail input (or NULL) if is valid
   if (!is.null(detail) & !all(paste0(indicator, " / ", detail) %in% valid_detail)) {
     stop("\nArgument 'detail' is not valid. Check yout inputs.", call. = FALSE)
   }
   
   
-  tryCatch(
-    (first_date <- as.Date(as.character(first_date), format = "%Y-%m-%d")),
-    error = function(f) {NA}
-  )
+  # Check if first_date argument is valid
+  first_date <- try(as.Date(first_date), silent = TRUE)
+  if (length(first_date) <= 0 || is.na(first_date)) {first_date = NULL}
+  if (class(first_date) %in% "try-error") {
+    stop("\nArgument 'first_date' is not a valid date.", call. = FALSE)
+  }
+  if (missing(first_date)) {
+    first_date = Sys.Date() - 10 * 365
+  } else first_date
   
   
-  # Check class of first_date argument
-  if (!is.null(first_date) & (class(first_date) != "Date")) {
-    stop("\nArgument 'first_date' is not a valid date.")
-  } else if
-  (is.null(first_date) || identical(first_date, "")) {
-    first_date <- Sys.Date() - 10 * 365
-  } else if
-  (is.na(first_date)) {
-    first_date <- Sys.Date() - 10 * 365
-  } else
-    tryCatch(
-      (first_date <- as.Date(as.character(first_date), format = "%Y-%m-%d")),
-      error = function(f) {NA}
-    )
-
+  # Check if last_date argument is valid
+  last_date <- try(as.Date(last_date), silent = TRUE)
+  if (length(last_date) <= 0 || is.na(last_date)) {last_date = NULL}
+  if (class(last_date) %in% "try-error") {
+    stop("\nArgument 'last_date' is not a valid date.", call. = FALSE)
+  }
+  if (missing(last_date)) {
+    last_date = Sys.Date() - 10 * 365
+  } else last_date
+  
+  
   # Check if first_date > Sys.Date()
-  if (first_date > Sys.Date()) {
+  if ((length(first_date) > 0) && first_date > Sys.Date()) {
     stop("\nIt seems that 'first_date' > current date. Check your inputs.", call. = FALSE)
   }
   
-  return(first_date)
   
-  # Convert last_date argument to class "Date"
-  tryCatch(
-    (last_date <- as.Date(last_date)),
-    error = function(l) {NA}
-  )
+  # Check if last_date < first_date
+  if ((length(first_date) > 0) && last_date < first_date) {
+    stop("\nIt seems that 'last_date' < first_date Check your inputs.", call. = FALSE)
+  }
   
-  # Check class of last_date argument
-  if (!is.null(last_date) & (class(last_date) != "Date")) {
-    stop("\nArgument 'last_date' is not a valid date.", call. = FALSE)
-  } else if
-  (is.null(last_date)) {
-    last_date <- NULL
-  } else if 
-  (!is.null(first_date)) {
-    if (last_date < first_date) {
-      stop("\nIt seems that 'last_date' < 'first_date'. Check your inputs.", call. = FALSE)
-    }
-  } else last_date
   
-  # Reference date
+  # Check if reference date is valid
   if (!is.null(reference_date)) {
     if ((class(reference_date) != "character")) {
       stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
@@ -225,6 +215,63 @@ bcb <- function (
 }
 
 
+### evaluate
+
+bcb(detail = "teste")
+bcb(indicator = "Fiscal")
+bcb(indicator = "Fiscalasas")
+bcb(indicator = "Fiscal", detail = NULL)
+bcb(indicator = "Fiscal", detail = "Resultado Nominal")
+bcb(indicator = "Fiscal", detail = "DFSFSDFS")
+bcb(detail = "Resultado Nominal")
+bcb(detail = "DFSFSDFS")
+
+bcb(indicator = "Fiscal", first_date = "20210302")
+bcb(indicator = "Fiscal", first_date = "54564")
+bcb(indicator = "Fiscal", first_date = "2021-03-02")
+bcb(indicator = "Fiscal", first_date = "2021-03-33")
+bcb(indicator = "Fiscal", first_date = "2021-33-02")
+bcb(indicator = "Fiscal", first_date = "2021/03/02")
+bcb(indicator = "Fiscal", first_date = "teste")
+
+bcb(indicator = "Fiscal", last_date = "20210302", first_date = "20210302")
+bcb(indicator = "Fiscal", last_date = "20210302")
+bcb(indicator = "Fiscal", last_date = "2021-03-02")
+bcb(indicator = "Fiscal", last_date = "2021-33-02")
+bcb(indicator = "Fiscal", last_date = "2021/03/02")
+bcb(indicator = "Fiscal", last_date = "2019/03/02")
+bcb(indicator = "Fiscal", last_date = "2019/03/33")
+bcb(indicator = "Fiscal", last_date = "2019/03/0a")
+bcb(indicator = "Fiscal", last_date = "2tes")
+
+bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-03-02")
+bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-02-02")
+bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-03-02")
+bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-06-02")
+bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "20210602")
+bcb(indicator = "Fiscal", first_date = "2021-05-02")
+bcb(indicator = "Fiscal", first_date = NULL, last_date = "2021-06-02")
+bcb(indicator = "Fiscal", first_date = NA, last_date = "2021-06-02")
+
+
+
+
+bcb(indicator = "Fiscal", reference_date = 2021)
+bcb(indicator = "Fiscal", reference_date = "2021")
+bcb(indicator = "Fiscal", reference_date = "ssddSDS")
+bcb(indicator = "Fiscal", reference_date = "20255")
+
+bcb(indicator = "Fiscal", reference_date = 2021:2025)
+bcb(indicator = "Fiscal", reference_date = "2021:20255")
+bcb(indicator = "Fiscal", reference_date = "2021:20d5")
+bcb(indicator = "Fiscal", reference_date = "2021:2025")
+bcb(indicator = "Fiscal", reference_date = NULL)
+
+
+
+
+
+# messy code
 
 my_args <- paste(
   
@@ -302,45 +349,4 @@ urrrl="https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/Exp
 
 
 
-### evaluate
 
-bcb(detail = "teste")
-bcb(indicator = "Fiscal")
-bcb(indicator = "Fiscalasas")
-bcb(indicator = "Fiscal", detail = NULL)
-bcb(indicator = "Fiscal", detail = "Resultado Nominal")
-bcb(indicator = "Fiscal", detail = "DFSFSDFS")
-bcb(detail = "Resultado Nominal")
-bcb(detail = "DFSFSDFS")
-
-bcb(indicator = "Fiscal", first_date = "20210302")
-bcb(indicator = "Fiscal", first_date = "54564")
-bcb(indicator = "Fiscal", first_date = "2021-03-02")
-bcb(indicator = "Fiscal", first_date = "2021/03/02")
-
-bcb(indicator = "Fiscal", last_date = "20210302", first_date = "20210302")
-bcb(indicator = "Fiscal", last_date = "20210302")
-bcb(indicator = "Fiscal", last_date = "2021-03-02")
-bcb(indicator = "Fiscal", last_date = "2021/03/02")
-
-bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-03-02")
-bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-02-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-03-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-06-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "20210602")
-bcb(indicator = "Fiscal", first_date = "2021-05-02")
-bcb(indicator = "Fiscal", first_date = NULL, last_date = "2021-06-02")
-
-
-
-
-bcb(indicator = "Fiscal", reference_date = 2021)
-bcb(indicator = "Fiscal", reference_date = "2021")
-bcb(indicator = "Fiscal", reference_date = "ssddSDS")
-bcb(indicator = "Fiscal", reference_date = "20255")
-
-bcb(indicator = "Fiscal", reference_date = 2021:2025)
-bcb(indicator = "Fiscal", reference_date = "2021:20255")
-bcb(indicator = "Fiscal", reference_date = "2021:20d5")
-bcb(indicator = "Fiscal", reference_date = "2021:2025")
-bcb(indicator = "Fiscal", reference_date = NULL)
