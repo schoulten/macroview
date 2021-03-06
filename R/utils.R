@@ -137,9 +137,9 @@ bcb <- function (
   
   
   # Check if input "indicator" is valid
-  if (missing(indicator) | !all(indicator %in% valid_indicator)) {
+  if (missing(indicator) | !all(indicator %in% valid_indicator) | is.null(indicator)) {
     stop("\nArgument 'indicator' is not valid or missing. Check your inputs.", call. = FALSE)
-  } 
+  } else indicator
   
   
   # Available indicator details
@@ -158,9 +158,18 @@ bcb <- function (
   
   
   # Check if input "detail" is valid and get detail input (or NULL) if is valid
-  if (!is.null(detail) & !all(paste0(indicator, " / ", detail) %in% valid_detail)) {
-    stop("\nArgument 'detail' is not valid. Check yout inputs.", call. = FALSE)
-  }
+  if (!is.null(detail) && !is.na(detail)) {
+    if ((class(detail) != "character")) {
+      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
+    } else if 
+    (!all(paste0(indicator, " / ", detail) %in% valid_detail)) {
+      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
+    }
+  } else if
+  ((length(detail) > 0) && is.na(detail)) {
+    detail <- NULL
+  } else detail
+   
   
   
   # Check if first_date argument is valid
@@ -198,9 +207,9 @@ bcb <- function (
   
   
   # Check if reference date is valid
-  if (!is.null(reference_date)) {
+  if (!is.null(reference_date) && !is.na(reference_date)) {
     if ((class(reference_date) != "character")) {
-      stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
+      stop("\nArgument 'reference_date' is not valid. Check your inputs.", call. = FALSE)
     } else if 
     (nchar(reference_date) == 4L & grepl("[[:digit:]]+$", reference_date)) {
       reference_date <- as.character(reference_date)
@@ -210,8 +219,25 @@ bcb <- function (
       last_year = substr(reference_date, start = 6L, stop = 9L)
     } else
       stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
-  }
+  } else if
+  (is.na(reference_date) && (length(reference_date) > 0)) {
+    reference_date <- NULL
+  } else reference_date
   
+  
+  # Build URL
+  
+  foo_args <- paste0(
+    
+    sprintf("Indicador eq '%s'", indicator),
+    sprintf(" and IndicadorDetalhe eq '%s'", detail),
+    sprintf(" and Data ge '%s'", first_date),
+    sprintf(" and Data le '%s'", last_date),
+    sprintf(" and DataReferencia eq '%s'", reference_date)
+    
+  )
+  
+  foo_args
 }
 
 
@@ -223,6 +249,8 @@ bcb(indicator = "Fiscalasas")
 bcb(indicator = "Fiscal", detail = NULL)
 bcb(indicator = "Fiscal", detail = "Resultado Nominal")
 bcb(indicator = "Fiscal", detail = "DFSFSDFS")
+bcb(indicator = NULL, detail = "DFSFSDFS")
+bcb(indicator = NA, detail = "DFSFSDFS")
 bcb(detail = "Resultado Nominal")
 bcb(detail = "DFSFSDFS")
 
@@ -254,8 +282,6 @@ bcb(indicator = "Fiscal", first_date = NULL, last_date = "2021-06-02")
 bcb(indicator = "Fiscal", first_date = NA, last_date = "2021-06-02")
 
 
-
-
 bcb(indicator = "Fiscal", reference_date = 2021)
 bcb(indicator = "Fiscal", reference_date = "2021")
 bcb(indicator = "Fiscal", reference_date = "ssddSDS")
@@ -266,21 +292,36 @@ bcb(indicator = "Fiscal", reference_date = "2021:20255")
 bcb(indicator = "Fiscal", reference_date = "2021:20d5")
 bcb(indicator = "Fiscal", reference_date = "2021:2025")
 bcb(indicator = "Fiscal", reference_date = NULL)
+bcb(indicator = "Fiscal", reference_date = NA)
 
 
 
+bcb(indicator      = "Fiscal",
+    detail         = "Resultado Nominal",
+    first_date     = "2021-01-01", 
+    last_date      = "2021-03-03",
+    reference_date = NULL)
+
+bcb(indicator      = "Fiscal",
+    detail         = "teste",
+    first_date     = "2021-01-01", 
+    last_date      = "2021-03-03",
+    reference_date = NULL)
+
+bcb(indicator      = "Fiscal",
+    detail         = NULL,
+    first_date     = "2021-01-01", 
+    last_date      = "2021-03-03",
+    reference_date = NULL)
+
+bcb(indicator      = "Fiscal",
+    detail         = NA,
+    first_date     = "2021-01-01", 
+    last_date      = "2021-03-03",
+    reference_date = NULL)
 
 
 # messy code
-
-my_args <- paste(
-  
-  sprintf("Indicador eq '%s'", indicator),
-  sprintf(" and IndicadorDetalhe eq '%s'", detail),
-  {filter_fd <- if (!is.null(last_date)) {paste0(sprintf("Data le '%s'", end_date))} else NULL}
-  
-)
-
 my_url <- "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$top=100&$filter=Indicador%20eq%20'Meta%20para%20taxa%20over-selic'%20and%20IndicadorDetalhe%20eq%20'Fim%20do%20ano'%20and%20DataReferencia%20eq%20'2021'%20and%20Data%20ge%20'2021-01-01'%20and%20Data%20le%20'2021-01-29'&$orderby=Data%20desc&$format=json"
 res <- try(jsonlite::fromJSON(my_url), silent = TRUE)
 if (class(res) == "try-error") {
