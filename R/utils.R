@@ -225,23 +225,88 @@ bcb <- function (
   } else reference_date
   
   
-  # Build URL
-  
+  # Build args string
   foo_args <- paste0(
-    
     sprintf("Indicador eq '%s'", indicator),
     sprintf(" and IndicadorDetalhe eq '%s'", detail),
     sprintf(" and Data ge '%s'", first_date),
     sprintf(" and Data le '%s'", last_date),
     sprintf(" and DataReferencia eq '%s'", reference_date)
-    
   )
   
-  foo_args
+  # Build URL
+  odata_url <- sprintf(
+    paste0(
+      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
+      "?$filter=%s", "&$orderby=Data desc&$format=json"),
+    foo_args
+  )
+  
+  # Fetching data
+  df <- try(
+    suppressWarnings(jsonlite::fromJSON(readLines(odata_url))$value),
+    silent = TRUE
+    )
+  if (class(df) == "try-error") {
+    stop("\nError in fetching data\n ",
+         conditionMessage(attr(df, "condition")),
+         call. = FALSE
+         )
+  } else
+    message(paste0("\nFound ", nrow(df), " observations"), appendLF = FALSE)
+  df <- dplyr::rename_with(df, ~c("indic", "indic_detail", "date", "reference_year", 
+                                  "mean", "median", "sd", "coefvar", "min", "max", "respondents", 
+                                  "base"))
+    return(df)
 }
 
 
 ### evaluate
+
+df=bcb(indicator   = "Fiscal",
+       detail         = NULL,
+       first_date     = "2021-01-01", 
+       last_date      = "2021-03-03")
+
+df_rbcb = rbcb::get_annual_market_expectations(
+  indic = "Fiscal",
+  start_date = "2021-01-01",
+  end_date = "2021-03-03"
+)
+
+
+
+performance=microbenchmark(
+  {bcb(indicator   = "Meta para taxa over-selic",
+       detail         = NULL,
+       first_date     = "2021-01-01", 
+       last_date      = "2021-03-03")},
+  {rbcb::get_annual_market_expectations(
+    indic = "Meta para taxa over-selic",
+    start_date = "2021-01-01",
+    end_date = "2021-03-03")},
+  times = 10
+)
+
+
+indicator   = "Fiscal"
+detail         = "Resultado Nominal"
+first_date     = "2021-01-01"
+last_date      = "2021-03-03"
+reference_date = "2025"
+
+foo_url <- httr::modify_url(
+  "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
+  query = list(
+    `$filter` = foo_args, 
+    format  = "json", 
+    orderby = "Data desc", 
+    select  = "Indicador,IndicadorDetalhe,Data,DataReferencia,Media,Mediana,DesvioPadrao,CoeficienteVariacao,Minimo,Maximo,numeroRespondentes,baseCalculo"
+  )
+)
+
+
+
 
 bcb(detail = "teste")
 bcb(indicator = "Fiscal")
@@ -296,11 +361,7 @@ bcb(indicator = "Fiscal", reference_date = NA)
 
 
 
-bcb(indicator      = "Fiscal",
-    detail         = "Resultado Nominal",
-    first_date     = "2021-01-01", 
-    last_date      = "2021-03-03",
-    reference_date = NULL)
+
 
 bcb(indicator      = "Fiscal",
     detail         = "teste",
@@ -319,75 +380,3 @@ bcb(indicator      = "Fiscal",
     first_date     = "2021-01-01", 
     last_date      = "2021-03-03",
     reference_date = NULL)
-
-
-# messy code
-my_url <- "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$top=100&$filter=Indicador%20eq%20'Meta%20para%20taxa%20over-selic'%20and%20IndicadorDetalhe%20eq%20'Fim%20do%20ano'%20and%20DataReferencia%20eq%20'2021'%20and%20Data%20ge%20'2021-01-01'%20and%20Data%20le%20'2021-01-29'&$orderby=Data%20desc&$format=json"
-res <- try(jsonlite::fromJSON(my_url), silent = TRUE)
-if (class(res) == "try-error") {
-  stop("BCB API Request error ", conditionMessage(attr(res, "condition")))
-}
-res
-
-
-
-
-odata_url <- sprintf(
-  paste0("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
-         "?$filter=%s",
-         "/dados?formato=json&", "dataInicial=%s&", "dataFinal=%s"),
-  id, 
-  format(first.date, "%d/%m/%Y"), 
-  format(last.date, "%d/%m/%Y"))
-
-
-rbcb::get_annual_market_expectations()
-GetBCBData::gbcbd_get_JSON_fct()
-
-
-indicator      = NULL
-detail         = NULL
-first_date     = Sys.Date() - 10 * 365
-last_date      = Sys.Date()
-reference_date = NULL
-
-
-
-
-urrrl="https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20'Meta%20para%20taxa%20over-selic'%20and%20IndicadorDetalhe%20eq%20'Fim%20do%20ano'%20and%20DataReferencia%20eq%20'2021'%20and%20Data%20ge%20'2021-01-01'%20and%20Data%20le%20'2021-01-29'&$orderby=Data%20desc&$format=text/html"
-
-
-  url <- annual_market_expectations_url(indicator, start_date, 
-                                        end_date, ...)
-  
-  
-  indic_filter <- paste(sprintf("Indicador eq '%s'", indic),  collapse = " or ")
-  
-  indic_filter <- paste0("(", indic_filter, ")")
-  
-  
-  sd_filter <- if (!is.null(start_date)) {
-    sprintf("Data ge '%s'", start_date)
-  } else NULL
-  
-  ed_filter <- if (!is.null(end_date)) {
-    sprintf("Data le '%s'", end_date)
-  } else NULL
-  
-  filter__ <- paste(c(indic_filter, sd_filter, ed_filter),  collapse = " and ")
-  
-  
-  text_ <- .get_series(url)
-  data_ <- jsonlite::fromJSON(text_)
-  df_ <- tibble::as_tibble(data_$value)
-  names(df_) <- c("indicator", "indicator_detail", "date", "reference_year", 
-                  "mean", "median", "sd", "coefvar", "min", "max", "respondents", 
-                  "base")
-  df_$date <- as.Date(df_$date)
-  df_
-
-
-
-
-
-
