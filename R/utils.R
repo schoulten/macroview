@@ -234,7 +234,7 @@ bcb <- function (
     message("", appendLF = FALSE)
   } else {
     message(
-      paste0("\nFetching '", indicator, "' ", "from BCB-Olinda"),
+      paste0("\nFetching '", indicator, "' ", "from BCB-Olinda... \n"),
       appendLF = FALSE
       )
   }
@@ -264,15 +264,23 @@ bcb <- function (
     silent = TRUE
     )
   if (class(df) == "try-error") {
-    stop("\nError in fetching data\n ",
+    stop("\nError in fetching data: ",
          conditionMessage(attr(df, "condition")),
          call. = FALSE
          )
   } else if
+  (length(df) == 0) {
+    stop(
+    sprintf(
+    "\nIt seems that there is no data available. \nPossibly, the last available data is earlier than that defined in the argument 'first_date' = % s.",
+    first_date
+    ),
+    call. = FALSE)
+  } else if
   (be_quiet) {
     message("", appendLF = FALSE)
   } else
-    message(paste0("\nFound ", nrow(df), " observations"), appendLF = FALSE)
+    message(paste0("\nFound ", nrow(df), " observations!\n"), appendLF = FALSE)
   df <- dplyr::rename_with(
     df, 
     ~c("indicator", "detail", "date", "reference_date", "mean",
@@ -286,8 +294,15 @@ bcb <- function (
 
 df=bcb(indicator   = "Fiscal",
        detail         = NULL,
-       first_date     = "2021-02-25", 
-       last_date      = "2021-03-03", be_quiet = FALSE)
+       first_date     = "2021-02-24", 
+       be_quiet = FALSE,
+       reference_date = "5555") ### check this!!
+
+df=bcb(indicator   = "Fiscal",
+       detail         = NULL,
+       first_date     = "2021-02-24", 
+       be_quiet = FALSE,
+       reference_date = "2025")
 
 df_rbcb = rbcb::get_annual_market_expectations(
   indic = "Fiscal",

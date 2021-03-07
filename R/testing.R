@@ -6,16 +6,21 @@ GetBCBData::gbcbd_get_single_series()
 GetBCBData::gbcbd_message()
 GetBCBData::gbcbd_test_internet()
 
+library(BETS)
+BETS::bcbExpectA(indicator = "IPCA",  start = "2021-01-01", end = "2021-03-03")
 
 # testing purrrring wrapper -----------------------------------------------
 
-indicators <- list("IGP-DI", "IGP-M", "INPC", "IPA-DI", "IPA-M","IPCA", "IPCA-15", "IPC-FIPE")
-
+indicators <- list("Balança Comercial", 
+                   "Balanço de Pagamentos",
+                   "Fiscal")
+references <- list(2021,2022,2023) %>% map(as.character)
 
 tictoc::tic()
-test <- map(indicators, ~bcb(indicator = .x,
-                             first_date = "2021-02-01",
-                             reference_date = "2021"))
+test <- map2(.x = indicators,
+             .y = references,
+             .f =  ~bcb(indicator = .x, first_date = "2021-02-01", reference_date = .y)
+             )
 tictoc::toc()
 
 tictoc::tic()
