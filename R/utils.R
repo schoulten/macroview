@@ -109,7 +109,8 @@ bcb <- function (
   detail         = NULL, 
   first_date     = Sys.Date() - 10 * 365, 
   last_date      = Sys.Date(),
-  reference_date = NULL
+  reference_date = NULL,
+  be_quiet       = FALSE
   ){
   
   # Available indicators
@@ -225,6 +226,19 @@ bcb <- function (
   } else reference_date
   
   
+  # Message to display
+  if (class(be_quiet) != "logical") {
+    stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
+  } else if
+  (be_quiet) {
+    message("", appendLF = FALSE)
+  } else {
+    message(
+      paste0("\nFetching '", indicator, "' ", "from BCB-Olinda"),
+      appendLF = FALSE
+      )
+  }
+  
   # Build args string
   foo_args <- paste0(
     sprintf("Indicador eq '%s'", indicator),
@@ -238,7 +252,9 @@ bcb <- function (
   odata_url <- sprintf(
     paste0(
       "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
-      "?$filter=%s", "&$orderby=Data desc&$format=json"),
+      "?$filter=%s", 
+      "&$orderby=Data desc&$format=json"
+      ),
     foo_args
   )
   
@@ -252,11 +268,16 @@ bcb <- function (
          conditionMessage(attr(df, "condition")),
          call. = FALSE
          )
+  } else if
+  (be_quiet) {
+    message("", appendLF = FALSE)
   } else
     message(paste0("\nFound ", nrow(df), " observations"), appendLF = FALSE)
-  df <- dplyr::rename_with(df, ~c("indic", "indic_detail", "date", "reference_year", 
-                                  "mean", "median", "sd", "coefvar", "min", "max", "respondents", 
-                                  "base"))
+  df <- dplyr::rename_with(
+    df, 
+    ~c("indicator", "detail", "date", "reference_date", "mean",
+       "median", "sd", "coef_var", "min", "max", "n_respondents", "basis")
+    )
     return(df)
 }
 
@@ -265,8 +286,8 @@ bcb <- function (
 
 df=bcb(indicator   = "Fiscal",
        detail         = NULL,
-       first_date     = "2021-01-01", 
-       last_date      = "2021-03-03")
+       first_date     = "2021-02-25", 
+       last_date      = "2021-03-03", be_quiet = FALSE)
 
 df_rbcb = rbcb::get_annual_market_expectations(
   indic = "Fiscal",
@@ -301,7 +322,7 @@ foo_url <- httr::modify_url(
     `$filter` = foo_args, 
     format  = "json", 
     orderby = "Data desc", 
-    select  = "Indicador,IndicadorDetalhe,Data,DataReferencia,Media,Mediana,DesvioPadrao,CoeficienteVariacao,Minimo,Maximo,numeroRespondentes,baseCalculo"
+    select  = ""
   )
 )
 
@@ -358,25 +379,3 @@ bcb(indicator = "Fiscal", reference_date = "2021:20d5")
 bcb(indicator = "Fiscal", reference_date = "2021:2025")
 bcb(indicator = "Fiscal", reference_date = NULL)
 bcb(indicator = "Fiscal", reference_date = NA)
-
-
-
-
-
-bcb(indicator      = "Fiscal",
-    detail         = "teste",
-    first_date     = "2021-01-01", 
-    last_date      = "2021-03-03",
-    reference_date = NULL)
-
-bcb(indicator      = "Fiscal",
-    detail         = NULL,
-    first_date     = "2021-01-01", 
-    last_date      = "2021-03-03",
-    reference_date = NULL)
-
-bcb(indicator      = "Fiscal",
-    detail         = NA,
-    first_date     = "2021-01-01", 
-    last_date      = "2021-03-03",
-    reference_date = NULL)
