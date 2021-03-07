@@ -298,11 +298,11 @@ df=bcb(indicator   = "Fiscal",
        be_quiet = FALSE,
        reference_date = "5555") ### check this!!
 
-df=bcb(indicator   = "Fiscal",
+df=bcb(indicator   = "Balança Comercial",
        detail         = NULL,
        first_date     = "2021-02-24", 
        be_quiet = FALSE,
-       reference_date = "2025")
+       reference_date = "2021")
 
 df_rbcb = rbcb::get_annual_market_expectations(
   indic = "Fiscal",
