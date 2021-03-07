@@ -110,7 +110,8 @@ bcb <- function (
   first_date     = Sys.Date() - 10 * 365, 
   last_date      = Sys.Date(),
   reference_date = NULL,
-  be_quiet       = FALSE
+  be_quiet       = FALSE,
+  use_memoise    = TRUE
   ){
   
   # Available indicators
@@ -249,31 +250,52 @@ bcb <- function (
   )
   
   # Build URL
-  odata_url <- sprintf(
-    paste0(
-      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
-      "?$filter=%s", 
-      "&$orderby=Data desc&$format=json"
-      ),
-    foo_args
+  odata_url <- httr::modify_url(
+    "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais", 
+    query = list(
+      `$filter`  = foo_args, 
+      `$format`  = "json", 
+      `$orderby` = "Data desc"
+    )
   )
   
   # Fetching data
+  cache_bcb <- function() {
+    dir_name <- "cache_bcb"
+    return(dir_name)
+  }
+  
+  primeira = function(use_memoise, cache = cache_bcb()) {
+    if (use_memoise) {
+      foo_memoise <- memoise::memoise(
+        f     = jsonlite::fromJSON, 
+        cache = cache
+    )
+    } else
+      foo_memoise <- jsonlite::fromJSON
+  }
+  cache_path = memoise::cache_filesystem(cache_bcb())
+  
+  segunda = primeira(use_memoise, cache_path)
+
+  
+  
   df <- try(
-    suppressWarnings(jsonlite::fromJSON(readLines(odata_url))$value),
+    suppressWarnings(segunda((odata_url))$value),
     silent = TRUE
     )
   if (class(df) == "try-error") {
-    stop("\nError in fetching data: ",
-         conditionMessage(attr(df, "condition")),
+    stop("\nError in fetching data: ", conditionMessage(attr(df, "condition")),
          call. = FALSE
          )
   } else if
   (length(df) == 0) {
     stop(
     sprintf(
-    "\nIt seems that there is no data available. \nPossibly, the last available data is earlier than that defined in the argument 'first_date' = % s.",
-    first_date
+    "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
+    \n'first_date' = %s\n'reference_date = %s",
+    first_date,
+    reference_date
     ),
     call. = FALSE)
   } else if
@@ -282,21 +304,24 @@ bcb <- function (
   } else
     message(paste0("\nFound ", nrow(df), " observations!\n"), appendLF = FALSE)
   df <- dplyr::rename_with(
-    df, 
+    dplyr::as_tibble(df), 
     ~c("indicator", "detail", "date", "reference_date", "mean",
        "median", "sd", "coef_var", "min", "max", "n_respondents", "basis")
     )
     return(df)
 }
 
+future::availableCores()
 
 ### evaluate
 
-df=bcb(indicator   = "Fiscal",
-       detail         = NULL,
-       first_date     = "2021-02-24", 
-       be_quiet = FALSE,
-       reference_date = "5555") ### check this!!
+df = bcb(indicator      = "IPCA",
+         detail         = NULL,
+         first_date     = NULL,
+         last_date      = "2021-02-01",
+         be_quiet       = FALSE,
+         reference_date = NULL,
+         use_memoise    = TRUE)
 
 df=bcb(indicator   = "Balança Comercial",
        detail         = NULL,
@@ -312,17 +337,7 @@ df_rbcb = rbcb::get_annual_market_expectations(
 
 
 
-performance=microbenchmark(
-  {bcb(indicator   = "Meta para taxa over-selic",
-       detail         = NULL,
-       first_date     = "2021-01-01", 
-       last_date      = "2021-03-03")},
-  {rbcb::get_annual_market_expectations(
-    indic = "Meta para taxa over-selic",
-    start_date = "2021-01-01",
-    end_date = "2021-03-03")},
-  times = 10
-)
+
 
 
 indicator   = "Fiscal"
@@ -330,17 +345,6 @@ detail         = "Resultado Nominal"
 first_date     = "2021-01-01"
 last_date      = "2021-03-03"
 reference_date = "2025"
-
-foo_url <- httr::modify_url(
-  "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
-  query = list(
-    `$filter` = foo_args, 
-    format  = "json", 
-    orderby = "Data desc", 
-    select  = ""
-  )
-)
-
 
 
 
