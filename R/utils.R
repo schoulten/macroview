@@ -116,16 +116,16 @@ bcb <- function (
   
   # Available indicators
   valid_indicator <- c(
-    "Balança Comercial", 
+    "Balança Comercial",
     "Balanço de Pagamentos",
-    "Fiscal", 
-    "IGP-DI", 
+    "Fiscal",
+    "IGP-DI",
     "IGP-M",
-    "INPC", 
-    "IPA-DI", 
-    "IPA-M", 
-    "IPCA", 
-    "IPCA-15", 
+    "INPC",
+    "IPA-DI",
+    "IPA-M",
+    "IPCA",
+    "IPCA-15",
     "IPC-FIPE",
     "Preços administrados por contrato e monitorados", 
     "Produção industrial",
@@ -225,7 +225,7 @@ bcb <- function (
   
   # Build args string
   foo_args <- paste0(
-    sprintf("Indicador eq '%s'", indicator),
+    paste0("(", paste(sprintf("Indicador eq '%s'", indicator), collapse = " or ", sep = ""), ")"),
     sprintf(" and IndicadorDetalhe eq '%s'", detail),
     sprintf(" and Data ge '%s'", first_date),
     sprintf(" and Data le '%s'", last_date),
@@ -283,7 +283,7 @@ bcb <- function (
   
   # Fetching data
   df <- try(
-    suppressWarnings(purrr::pmap(.l = list(odata_url), .f = from_bcb)[[1]][["value"]]),
+    suppressWarnings(purrr::pmap(.l = odata_url, .f = from_bcb)[[1]][["value"]]),
     silent = TRUE
     )
   if (class(df) == "try-error") {
@@ -291,15 +291,13 @@ bcb <- function (
          call. = FALSE
          )
   } else if
-  (length(df) == 0) {
+  (purrr::is_empty(df)) {
     stop(
-    sprintf(
-    "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
-    \n'first_date' = %s\n'reference_date = %s",
-    first_date,
-    reference_date
-    ),
-    call. = FALSE)
+      paste0(
+      "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
+      \n1. 'first_date'", "\n2. 'reference_date'"
+      ),
+      call. = FALSE)
   } else if
   (be_quiet) {
     message("", appendLF = FALSE)
@@ -310,6 +308,7 @@ bcb <- function (
     ~c("indicator", "detail", "date", "reference_date", "mean",
        "median", "sd", "coef_var", "min", "max", "n_respondents", "basis")
     )
+  df <- dplyr::mutate(df, date = as.Date(date, format = "%Y-%m-%d"))
     return(df)
 }
 
@@ -317,31 +316,31 @@ bcb <- function (
 
 ### evaluate
 
-df = bcb(indicator      = "Fiscal",
+df = bcb(indicator      = c("PIB Total", "Fiscal"),
          detail         = NULL,
-         first_date     = "2021-01-01",
-         last_date      = "2021-03-03",
+         first_date     = NULL,
+         last_date      = "2018-01-31",
          be_quiet       = FALSE,
          reference_date = NA,
-         use_memoise    = TRUE)
-
-df=bcb(indicator   = "Balança Comercial",
-       detail         = NULL,
-       first_date     = "2021-02-24", 
-       be_quiet = FALSE,
-       reference_date = "2021")
-
+         use_memoise    = FALSE)
+df_rbcb = rbcb::get_annual_market_expectations(
+  indic = c("PIB Total", "Fiscal"),
+  start_date     = "2018-01-01",
+  end_date      = "2018-01-31"
+)
 
 
 
 
-indicator      = "Fiscal"
-detail         = "Resultado Nominal"
-first_date     = "2021-01-01"
-last_date      = "2021-03-03"
+
+
+indicator      = c("PIB Total", "Fiscal")
+detail         = NULL
+first_date     = "2018-01-01"
+last_date      = "2018-01-31"
 be_quiet       = FALSE
 reference_date = NULL
-use_memoise    = TRUE
+use_memoise    = FALSE
 
 
 
@@ -358,7 +357,7 @@ bcb(detail = "DFSFSDFS")
 
 bcb(indicator = "Fiscal", first_date = "20210302")
 bcb(indicator = "Fiscal", first_date = "54564")
-bcb(indicator = "Fiscal", first_date = "2021-03-02")
+bcb(indicator = c("Fiscal", "IPCA"), first_date = "2021-03-02")
 bcb(indicator = "Fiscal", first_date = "2021-03-33")
 bcb(indicator = "Fiscal", first_date = "2021-33-02")
 bcb(indicator = "Fiscal", first_date = "2021/03/02")
@@ -385,7 +384,7 @@ bcb(indicator = "Fiscal", first_date = NA, last_date = "2021-06-02")
 
 
 bcb(indicator = "Fiscal", reference_date = 2021)
-bcb(indicator = "Fiscal", reference_date = "2030")
+bcb(indicator = "Fiscal", reference_date = "2050")
 bcb(indicator = "Fiscal", reference_date = "ssddSDS")
 bcb(indicator = "Fiscal", reference_date = "20255")
 
