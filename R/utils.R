@@ -225,20 +225,7 @@ bcb <- function (
   (is.na(reference_date) && (length(reference_date) > 0)) {
     reference_date <- NULL
   } else reference_date
-  
-  
-  # Message to display
-  if (class(be_quiet) != "logical") {
-    stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
-  } else if
-  (be_quiet) {
-    message("", appendLF = FALSE)
-  } else {
-    message(
-      paste0("\nFetching '", indicator, "' ", "from BCB-Olinda... \n"),
-      appendLF = FALSE
-      )
-  }
+
   
   # Build args string
   foo_args <- paste0(
@@ -249,39 +236,58 @@ bcb <- function (
     sprintf(" and DataReferencia eq '%s'", reference_date)
   )
   
+  
   # Build URL
-  odata_url <- httr::modify_url(
-    "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais", 
-    query = list(
-      `$filter`  = foo_args, 
-      `$format`  = "json", 
-      `$orderby` = "Data desc"
+  odata_url <- list(
+    httr::modify_url(
+      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
+      query = list(
+        `$filter`  = foo_args, 
+        `$format`  = "json", 
+        `$orderby` = "Data desc"
+        )
+      )
     )
-  )
+  
+  
+  # Fetching data function
+  if ((class(use_memoise) != "logical") || (is.na(use_memoise))) {
+    stop("\nArgument 'use_memoise' must be logical. Check your inputs.", call. = FALSE)
+  } else
+    memoising <- function(use_memoise, cache_dir) {
+      if (use_memoise) {
+        foo_memoise <- memoise::memoise(
+          f     = jsonlite::fromJSON, 
+          cache = cache_dir
+        )
+      } else
+        foo_memoise <- jsonlite::fromJSON
+  }
+  
+
+  from_bcb <- memoising(
+    use_memoise = use_memoise,
+    cache_dir   = memoise::cache_filesystem("./cache_bcb")
+    )
+  
+  
+  # Message to display
+  if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
+    stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
+  } else if
+  (be_quiet) {
+    message("", appendLF = FALSE)
+  } else {
+    message(
+      paste0("\nFetching '", indicator, "' ", "from BCB-Olinda... \n"),
+      appendLF = FALSE
+    )
+  }
+  
   
   # Fetching data
-  cache_bcb <- function() {
-    dir_name <- "cache_bcb"
-    return(dir_name)
-  }
-  
-  primeira = function(use_memoise, cache = cache_bcb()) {
-    if (use_memoise) {
-      foo_memoise <- memoise::memoise(
-        f     = jsonlite::fromJSON, 
-        cache = cache
-    )
-    } else
-      foo_memoise <- jsonlite::fromJSON
-  }
-  cache_path = memoise::cache_filesystem(cache_bcb())
-  
-  segunda = primeira(use_memoise, cache_path)
-
-  
-  
   df <- try(
-    suppressWarnings(segunda((odata_url))$value),
+    suppressWarnings(purrr::pmap(.l = list(odata_url), .f = from_bcb)[[1]][["value"]]),
     silent = TRUE
     )
   if (class(df) == "try-error") {
@@ -311,17 +317,17 @@ bcb <- function (
     return(df)
 }
 
-future::availableCores()
+
 
 ### evaluate
 
-df = bcb(indicator      = "IPCA",
+df = bcb(indicator      = "Fiscal",
          detail         = NULL,
-         first_date     = NULL,
-         last_date      = "2021-02-01",
+         first_date     = "2021-01-01",
+         last_date      = "2021-02-02",
          be_quiet       = FALSE,
-         reference_date = NULL,
-         use_memoise    = TRUE)
+         reference_date = NA,
+         use_memoise    = FALSE)
 
 df=bcb(indicator   = "Balança Comercial",
        detail         = NULL,
@@ -340,11 +346,13 @@ df_rbcb = rbcb::get_annual_market_expectations(
 
 
 
-indicator   = "Fiscal"
+indicator      = "Fiscal"
 detail         = "Resultado Nominal"
 first_date     = "2021-01-01"
 last_date      = "2021-03-03"
-reference_date = "2025"
+be_quiet       = FALSE
+reference_date = NULL
+use_memoise    = TRUE
 
 
 

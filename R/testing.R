@@ -65,22 +65,12 @@ teste <- dplyr::bind_rows(test)
 tictoc::toc()
 
 library(microbenchmark)
+library(purrr)
 performance=microbenchmark(
-  {pmap(list(indicators), ~bcb(indicator = .x, use_memoise = TRUE))},
-  {pmap(list(indicators_rbcb), ~rbcb::get_annual_market_expectations(indic = .x))},
-  times = 1
+  {pmap(list(indicators), ~bcb(indicator = .x, use_memoise = FALSE, first_date = "2021-01-01", last_date = "2021-02-01"))},
+  {pmap(list(indicators_rbcb), ~rbcb::get_annual_market_expectations(indic = .x, start_date = "2021-01-01", end_date = "2021-02-01"))},
+  times = 5
 ) %>% print()
 
 
 
-
-my_url=list("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?
-            $filter=Indicador%20eq%20'IPCA'%20and%20Data%20ge%20'2015-01-01'%20and%20Data%20le%20'2021-02-01'&
-            $orderby=Data%20desc&$format=json")
-
-
-performance=microbenchmark(
-  {pmap(my_url, ~try(suppressWarnings(jsonlite::fromJSON(readLines(.x))$value), silent = TRUE))},
-  {pmap(my_url, ~try(suppressWarnings(jsonlite::fromJSON(my_url)$value), silent = TRUE))},
-  times = 1
-) %>% print()
