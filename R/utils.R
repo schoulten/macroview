@@ -204,7 +204,7 @@ bcb <- function (
   
   # Check if last_date < first_date
   if ((length(first_date) > 0) && last_date < first_date) {
-    stop("\nIt seems that 'last_date' < first_date Check your inputs.", call. = FALSE)
+    stop("\nIt seems that 'last_date' < first_date. Check your inputs.", call. = FALSE)
   }
   
   
@@ -215,10 +215,6 @@ bcb <- function (
     } else if 
     (nchar(reference_date) == 4L & grepl("[[:digit:]]+$", reference_date)) {
       reference_date <- as.character(reference_date)
-    } else if
-    (nchar(reference_date) == 9L & (grepl("(\\d{4})([[:punct:]]{1})(\\d{4}$)", reference_date)) == TRUE) {
-      first_year = substr(reference_date, start = 1L, stop = 4L)
-      last_year = substr(reference_date, start = 6L, stop = 9L)
     } else
       stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
   } else if
@@ -324,23 +320,16 @@ bcb <- function (
 df = bcb(indicator      = "Fiscal",
          detail         = NULL,
          first_date     = "2021-01-01",
-         last_date      = "2021-02-02",
+         last_date      = "2021-03-03",
          be_quiet       = FALSE,
          reference_date = NA,
-         use_memoise    = FALSE)
+         use_memoise    = TRUE)
 
 df=bcb(indicator   = "Balança Comercial",
        detail         = NULL,
        first_date     = "2021-02-24", 
        be_quiet = FALSE,
        reference_date = "2021")
-
-df_rbcb = rbcb::get_annual_market_expectations(
-  indic = "Fiscal",
-  start_date = "2021-01-01",
-  end_date = "2021-03-03"
-)
-
 
 
 
@@ -396,7 +385,7 @@ bcb(indicator = "Fiscal", first_date = NA, last_date = "2021-06-02")
 
 
 bcb(indicator = "Fiscal", reference_date = 2021)
-bcb(indicator = "Fiscal", reference_date = "2021")
+bcb(indicator = "Fiscal", reference_date = "2030")
 bcb(indicator = "Fiscal", reference_date = "ssddSDS")
 bcb(indicator = "Fiscal", reference_date = "20255")
 
@@ -406,3 +395,4 @@ bcb(indicator = "Fiscal", reference_date = "2021:20d5")
 bcb(indicator = "Fiscal", reference_date = "2021:2025")
 bcb(indicator = "Fiscal", reference_date = NULL)
 bcb(indicator = "Fiscal", reference_date = NA)
+

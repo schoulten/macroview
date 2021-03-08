@@ -64,6 +64,18 @@ tictoc::tic()
 teste <- dplyr::bind_rows(test)
 tictoc::toc()
 
+nomes <- c("2020","2021","2022")
+
+
+teste = map2_dfr(.x = list("Fiscal"),
+                 .y = list("2020","2021","2022","2023"),
+                 .f = ~bcb(indicator      = .x,
+                           first_date     = "2021-01-01",
+                           reference_date = .y)
+                 )
+
+
+
 library(microbenchmark)
 library(purrr)
 performance=microbenchmark(
@@ -73,4 +85,24 @@ performance=microbenchmark(
 ) %>% print()
 
 
+
+
+
+library(microbenchmark)
+library(purrr)
+performance=microbenchmark(
+  {df = bcb(indicator      = "Fiscal",
+            detail         = NULL,
+            first_date     = "2021-01-01",
+            last_date      = "2021-03-03",
+            be_quiet       = FALSE,
+            reference_date = NA,
+            use_memoise    = FALSE)},
+  {df_rbcb = rbcb::get_annual_market_expectations(
+    indic      = "Fiscal",
+    start_date = "2021-01-01",
+    end_date   = "2021-03-03"
+  )},
+  times = 20
+) %>% print()
 
