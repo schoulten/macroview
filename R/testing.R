@@ -63,22 +63,14 @@ library(purrr)
 future::plan(future::multisession, workers = floor(future::availableCores())/2)
 
 performance=microbenchmark(
-  df = {bcb(
-    indicator      = indicators,
-    detail         = NULL,
-    first_date     = "2011-01-01",
-    last_date      = "2021-03-03",
-    be_quiet       = TRUE,
-    reference_date = NA,
-    use_memoise    = FALSE,
-    do_parallel    = TRUE
-    )},
-  df_rbcb = {rbcb::get_annual_market_expectations(
-    indic      = indicators_rbcb,
-    start_date = "2011-01-01",
-    end_date   = "2021-03-03"
-  )},
-  times = 5
+  df = bcb(indicator      = c("PIB Total", "Fiscal"),
+           first_date     = "2018-01-01",
+           use_memoise    = FALSE,
+           do_parallel    = FALSE),
+  df_rbcb = rbcb::get_annual_market_expectations(
+    indic = c("PIB Total", "Fiscal"),
+    start_date     = "2018-01-01"),
+  times = 1
 ) %>% print()
 
 

@@ -1,110 +1,4 @@
-### Useful functions for cleaning and processing data ###
-
-
-
-# Packages ----------------------------------------------------------------
-
-
-# Install/load packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  "zoo", 
-  "lubridate",
-  "janitor",
-  "dplyr"
-  )
-
-
-
-# YoY Growth Rate ---------------------------------------------------------
-
-
-# Function to calculate the growth rate of the last 12 months
-# in relation to the same period of the previous year
-
-yoy_growth_rate = function(col, round) {
-  
-  # Works within a dataframe
-  
-  ((zoo::rollsum(
-    col, 
-    k     = 12, 
-    fill  = NA, 
-    align = "right"
-    ) /
-      zoo::rollsum(
-        dplyr::lag(col, 12), 
-        k     = 12, 
-        fill  = NA, 
-        align = "right")-1)*100) %>%
-    base::round(., digits = round)
-  
-}
-
-
-
-# Accumulate last k values ------------------------------------------------
-
-
-# Function to calculate the moving sum of the last k periods
-
-accum_k = function(col, k) {
-  
-  # Works within a dataframe
-  
-  zoo::rollsum(x     = col,
-               k     = k,
-               fill  = NA,
-               align = "right")
-  
-}
-
-
-
-
-# Format SIDRA's date column (monthly) ------------------------------------
-
-
-# Function to format date time to "ymd" format (from lubridate's package)
-
-ymd_sidra <- function(col){
-  
-  # Works within a dataframe
-  
-  format(lubridate::ymd(paste0(col, "01")), format = "%Y/%m/%d")
-  
-}
-
-
-
-
-# Data wrangling for BCB inflation series ---------------------------------
-
-
-# Function for data wrangling some data frames from BCB (imported with GetBCBData package)
-
-clean_inflation_bcb <- function(df){
-  
-  # Must be called in this context:
-  # df_clean <- df_raw %>%
-  #   clean_inflation_bcb()
-  
-  df %>% 
-    janitor::clean_names() %>%
-    dplyr::mutate(date = format(ref_date, "%Y/%m/%d")) %>%
-    dplyr::select(date, id = series_name, value)
-  
-}
-
-
-
-
-# Get BCB Expectations data (from Olinda/BCB) -----------------------------
-
-
-# Function to extract data from Olinda/BCB "ExpectativasMercadoAnuais"
-
-get_annual <- function (
+function (
   indicator      = NULL, # Single character or a character vector
   detail         = NULL, # Single character or NULL/NA
   first_date     = Sys.Date() - 2*365, # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
@@ -113,7 +7,7 @@ get_annual <- function (
   be_quiet       = FALSE, # Logical
   use_memoise    = TRUE, # Logical
   do_parallel    = FALSE # Logical
-  ){
+){
   # Available indicators
   valid_indicator <- c(
     "Balança Comercial", "Balanço de Pagamentos", "Fiscal", "IGP-DI",
@@ -121,7 +15,7 @@ get_annual <- function (
     "Preços administrados por contrato e monitorados", "Produção industrial",
     "PIB Agropecuária", "PIB Industrial", "PIB Serviços", "PIB Total",
     "Meta para taxa over-selic", "Taxa de câmbio"
-    )
+  )
   
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator) | is.null(indicator)) {
@@ -150,7 +44,7 @@ get_annual <- function (
   ((length(detail) > 0) && is.na(detail)) {
     detail <- NULL
   } else detail
-   
+  
   # Check if first_date argument is valid
   first_date <- try(as.Date(first_date), silent = TRUE)
   if (length(first_date) <= 0 || is.na(first_date)) {first_date = NULL}
@@ -179,7 +73,7 @@ get_annual <- function (
     stop("\nIt seems that 'last_date' < first_date. Check your inputs.", call. = FALSE)
   }
   
-    # Check if reference date is valid
+  # Check if reference date is valid
   if (!is.null(reference_date) && !is.na(reference_date)) {
     if ((class(reference_date) != "character")) {
       stop("\nArgument 'reference_date' is not valid. Check your inputs.", call. = FALSE)
@@ -209,9 +103,9 @@ get_annual <- function (
         `$filter`  = foo_args, 
         `$format`  = "json", 
         `$orderby` = "Data desc"
-        )
       )
     )
+  )
   
   # Fetching data function
   if ((class(use_memoise) != "logical") || (is.na(use_memoise))) {
@@ -222,12 +116,12 @@ get_annual <- function (
         foo_memoise <- memoise::memoise(f = jsonlite::fromJSON, cache = cache_dir)
       } else
         foo_memoise <- jsonlite::fromJSON
-  }
+    }
   
   from_bcb <- memoising(
     use_memoise = use_memoise,
     cache_dir   = memoise::cache_filesystem("./cache_bcb")
-    )
+  )
   
   # Fetching data
   if (!do_parallel) {
@@ -257,7 +151,7 @@ get_annual <- function (
       message(
         paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)"),
         appendLF = FALSE
-        )
+      )
     msg <- utils::capture.output(future::plan())
     flag <- grepl("sequential", msg)[1]
     if (flag) {
@@ -268,7 +162,7 @@ get_annual <- function (
         "The last line should be placed just before calling get_expectations()\n", 
         "Notice it will use half of your available cores so that your OS has some room to breathe."),
         call. = FALSE
-        )
+      )
     }
     
     # Message to display
@@ -292,16 +186,16 @@ get_annual <- function (
   if (class(df) == "try-error") {
     stop("\nError in fetching data: ", conditionMessage(attr(df, "condition")),
          call. = FALSE
-         )
+    )
   } else if
   (purrr::is_empty(df)) {
     stop(
       paste0(
-      "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
+        "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
       \n1. 'first_date'", "\n2. 'reference_date'"
       ),
       call. = FALSE
-      )
+    )
   } else if
   (be_quiet) {message("", appendLF = FALSE)}
   else
@@ -311,92 +205,8 @@ get_annual <- function (
     dplyr::as_tibble(df), 
     ~c("indicator", "detail", "date", "reference_date", "mean",
        "median", "sd", "coef_var", "min", "max", "n_respondents", "basis")
-    )
+  )
   df <- dplyr::mutate(df, date = as.Date(date, format = "%Y-%m-%d"))
   
   return(df)
 }
-
-
-
-### evaluate
-tictoc::tic()
-df = bcb(indicator      = c("PIB Total", "Fiscal"),
-         first_date     = "2018-01-01",
-         use_memoise    = FALSE,
-         do_parallel    = FALSE)
-tictoc::toc()
-
-# {rbcb}
-tictoc::tic()
-df_rbcb = rbcb::get_annual_market_expectations(
-  indic = c("PIB Total", "Fiscal"),
-  start_date     = "2018-01-01")
-tictoc::toc()
-
-
-
-
-
-indicator      = c("PIB Total", "Fiscal")
-detail         = NULL
-first_date     = "2018-01-01"
-last_date      = "2018-01-31"
-be_quiet       = FALSE
-reference_date = NULL
-use_memoise    = FALSE
-
-
-
-bcb(detail = "teste")
-bcb(indicator = "Fiscal")
-bcb(indicator = "Fiscalasas")
-bcb(indicator = "Fiscal", detail = NULL)
-bcb(indicator = "Fiscal", detail = "Resultado Nominal")
-bcb(indicator = "Fiscal", detail = "DFSFSDFS")
-bcb(indicator = NULL, detail = "DFSFSDFS")
-bcb(indicator = NA, detail = "DFSFSDFS")
-bcb(detail = "Resultado Nominal")
-bcb(detail = "DFSFSDFS")
-
-bcb(indicator = "Fiscal", first_date = "20210302")
-bcb(indicator = "Fiscal", first_date = "54564")
-bcb(indicator = c("Fiscal", "IPCA"), first_date = "2019-03-08", do_parallel = TRUE, use_memoise = FALSE)
-bcb(indicator = c("Fiscal", "as"), first_date = "2021-03-02", do_parallel = TRUE, use_memoise = FALSE)
-bcb(indicator = "Fiscal", first_date = "2021-03-33")
-bcb(indicator = "Fiscal", first_date = "2021-33-02")
-bcb(indicator = "Fiscal", first_date = "2021/03/02")
-bcb(indicator = "Fiscal", first_date = "teste")
-
-bcb(indicator = "Fiscal", last_date = "20210302", first_date = "20210302")
-bcb(indicator = "Fiscal", last_date = "20210302")
-bcb(indicator = "Fiscal", last_date = "2021-03-02")
-bcb(indicator = "Fiscal", last_date = "2021-33-02")
-bcb(indicator = "Fiscal", last_date = "2021/03/02")
-bcb(indicator = "Fiscal", last_date = "2019/03/02")
-bcb(indicator = "Fiscal", last_date = "2019/03/33")
-bcb(indicator = "Fiscal", last_date = "2019/03/0a")
-bcb(indicator = "Fiscal", last_date = "2tes")
-
-bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-03-02")
-bcb(indicator = c("Fiscal", "IPC-FIPE", "IPCA"), first_date = "2021-01-02", last_date = "2021-02-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-03-02")
-bcb(indicator = "IPC-FIPE", first_date = "2021-05-02", last_date = "2021-06-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "20210602")
-bcb(indicator = "Fiscal", first_date = "2021-05-02")
-bcb(indicator = "IPC-FIPE", first_date = NULL, last_date = "2021-06-02")
-bcb(indicator = "IPC-FIPE", first_date = NA, last_date = "2021-06-02") %>% dplyr::arrange(date)
-
-
-bcb(indicator = "Fiscal", reference_date = 2021)
-bcb(indicator = "Fiscal", reference_date = "2050", do_parallel = TRUE)
-bcb(indicator = "Fiscal", reference_date = "ssddSDS")
-bcb(indicator = "Fiscal", reference_date = "20255")
-
-bcb(indicator = "Fiscal", reference_date = 2021:2025)
-bcb(indicator = "Fiscal", reference_date = "2021:20255")
-bcb(indicator = "Fiscal", reference_date = "2021:20d5")
-bcb(indicator = "Fiscal", reference_date = "2021:2025")
-bcb(indicator = "IPC-FIPE", reference_date = NULL)
-bcb(indicator = "IPC-FIPE", reference_date = NA, do_parallel = TRUE, use_memoise = FALSE, first_date = "2021-03-08")
-
