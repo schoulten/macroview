@@ -42,8 +42,10 @@ get_monthly <- function (
   }
   
   # Check if last_date < first_date
-  if ((length(first_date) > 0) && last_date < first_date) {
-    stop("\nIt seems that 'last_date' < first_date. Check your inputs.", call. = FALSE)
+  if (!is.null(last_date)) {
+    if ((length(first_date) > 0) && last_date < first_date) {
+      stop("\nIt seems that 'last_date' < first_date. Check your inputs.", call. = FALSE)
+    }
   }
   
   # Check if reference date is valid

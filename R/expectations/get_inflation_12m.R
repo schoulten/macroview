@@ -1,53 +1,19 @@
-get_annual <- function (
+get_inflation_12m <- function (
   indicator      = NULL, # Single character or a character vector
-  detail         = NULL, # Single character or NULL/NA
   first_date     = Sys.Date() - 2*365, # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
   last_date      = Sys.Date(), # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
-  reference_date = NULL, # Single character of lenght == 4 or NULL/NA
+  smoothed       = NULL, # Single character (yes or no)
   be_quiet       = FALSE, # Logical
   use_memoise    = TRUE, # Logical
   do_parallel    = FALSE # Logical
 ){
   # Available indicators
-  valid_indicator <- c(
-    "Balança Comercial", "Balanço de Pagamentos", "Fiscal", "IGP-DI",
-    "IGP-M", "INPC", "IPA-DI", "IPA-M", "IPCA", "IPCA-15", "IPC-FIPE",
-    "Preços administrados por contrato e monitorados", "Produção industrial",
-    "PIB Agropecuária", "PIB Industrial", "PIB Serviços", "PIB Total",
-    "Meta para taxa over-selic", "Taxa de câmbio"
-  )
+  valid_indicator <- c("IGP-DI", "IGP-M", "INPC", "IPA-DI", "IPA-M", "IPCA", "IPCA-15", "IPC-FIPE")
   
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator) | is.null(indicator)) {
     stop("\nArgument 'indicator' is not valid or missing. Check your inputs.", call. = FALSE)
   } else indicator
-  
-  # Available indicator details
-  valid_detail <- c(
-    "Balança Comercial / Exportações", "Balança Comercial / Importações",
-    "Balança Comercial / Saldo", "Balanço de Pagamentos / Conta corrente",
-    "Balanço de Pagamentos / Investimento direto no país",
-    "Fiscal / Resultado Primário", "Fiscal / Resultado Nominal",
-    "Fiscal / Dívida líquida do setor público", "Meta para taxa over-selic / Fim do ano",
-    "Meta para taxa over-selic / Média do ano"
-  )
-  
-  # Check if input "detail" is valid and get detail input (or NULL) if is valid
-  if (!is.null(detail) && !is.na(detail)) {
-    if ((class(detail) != "character")) {
-      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    } else if 
-    (!all(paste0(indicator, " / ", detail) %in% valid_detail)) {
-      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    } else if
-    (length(detail) > 1) {
-      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    } else
-      detail
-  } else if
-  ((length(detail) > 0) && is.na(detail)) {
-    detail <- NULL
-  } else detail
   
   # Check if first_date argument is valid
   first_date <- try(as.Date(first_date), silent = TRUE)
@@ -79,18 +45,19 @@ get_annual <- function (
     }
   }
   
-  # Check if reference date is valid
-  if (!is.null(reference_date) && !is.na(reference_date)) {
-    if ((class(reference_date) != "character")) {
-      stop("\nArgument 'reference_date' is not valid. Check your inputs.", call. = FALSE)
-    } else if 
-    (nchar(reference_date) == 4L & grepl("[[:digit:]]+$", reference_date)) {
-      reference_date <- as.character(reference_date)
+  # Check if smoothed argument is valid
+  if (!is.null(smoothed) && !is.na(smoothed)) {
+    if ((class(smoothed) != "character")) {
+      stop("\nArgument 'smoothed' is not valid. Check your inputs.", call. = FALSE)
+    } else if
+    (!all(smoothed %in% c("yes", "no"))){
+      stop("\nArgument 'smoothed' is not valid. Check your inputs.", call. = FALSE)
     } else
-      stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
-  } else if
-  (is.na(reference_date) && (length(reference_date) > 0)) {reference_date <- NULL} else
-    reference_date
+      if (smoothed == "yes") {smoothed <- "S"} else
+        if (smoothed == "no") {smoothed <- "N"}
+    } else if
+    (is.na(smoothed) && (length(smoothed) > 0)) {smoothed <- NULL} else
+    smoothed <- as.character(smoothed)
   
   # Check class of do_parallel argument
   if ((class(do_parallel) != "logical") || (is.na(do_parallel))) {
@@ -105,16 +72,15 @@ get_annual <- function (
   # Build args string
   foo_args <- paste0(
     paste0("(", paste(sprintf("Indicador eq '%s'", indicator), collapse = " or ", sep = ""), ")"),
-    sprintf(" and IndicadorDetalhe eq '%s'", detail),
     sprintf(" and Data ge '%s'", first_date),
     sprintf(" and Data le '%s'", last_date),
-    sprintf(" and DataReferencia eq '%s'", reference_date)
+    sprintf(" and Suavizada eq '%s'", smoothed)
   )
   
   # Build URL
   odata_url <- list(
     httr::modify_url(
-      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
+      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoInflacao12Meses",
       query = list(
         `$filter`  = foo_args, 
         `$format`  = "json", 
@@ -191,7 +157,7 @@ get_annual <- function (
     stop(
       paste0(
         "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
-      \n1. 'first_date'", "\n2. 'reference_date'"
+      \n1. 'first_date'"
       ),
       call. = FALSE
     )
@@ -200,11 +166,11 @@ get_annual <- function (
   else
     message(paste0("\nFound ", nrow(df), " observations!\n"), appendLF = FALSE)
   
-  # Convert as_tibble()  
+  # Convert as_tibble()
   df <- dplyr::rename_with(
     dplyr::as_tibble(df), 
-    ~c("indicator", "detail", "date", "reference_date", "mean",
-       "median", "sd", "coef_var", "min", "max", "n_respondents", "basis")
+    ~c("indicator", "date", "smoothed", "mean", "median",
+       "sd","coef_var", "min", "max", "n_respondents", "basis")
   )
   df <- dplyr::mutate(df, date = as.Date(date, format = "%Y-%m-%d"))
   
