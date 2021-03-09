@@ -39,7 +39,11 @@ function (
     } else if 
     (!all(paste0(indicator, " / ", detail) %in% valid_detail)) {
       stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    }
+    } else if
+    (length(detail) > 1) {
+      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
+    } else
+      detail
   } else if
   ((length(detail) > 0) && is.na(detail)) {
     detail <- NULL
@@ -149,17 +153,16 @@ function (
     if (be_quiet) {message("", appendLF = FALSE)
     } else
       message(
-        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)"),
-        appendLF = FALSE
+        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)\n"),
+        appendLF = TRUE
       )
     msg <- utils::capture.output(future::plan())
     flag <- grepl("sequential", msg)[1]
     if (flag) {
       stop(paste0(
         "When using do_parallel = TRUE, you need to call future::plan() to configure your parallel settings.\n", 
-        "A suggestion, write the following lines:\n\n", 
+        "A suggestion, write the following lines just before:\n\n", 
         "future::plan(future::multisession, workers = floor(future::availableCores()/2))", "\n\n",
-        "The last line should be placed just before calling get_expectations()\n", 
         "Notice it will use half of your available cores so that your OS has some room to breathe."),
         call. = FALSE
       )

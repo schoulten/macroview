@@ -145,7 +145,11 @@ get_annual <- function (
     } else if 
     (!all(paste0(indicator, " / ", detail) %in% valid_detail)) {
       stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    }
+    } else if
+    (length(detail) > 1) {
+      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
+    } else
+      detail
   } else if
   ((length(detail) > 0) && is.na(detail)) {
     detail <- NULL
@@ -255,17 +259,16 @@ get_annual <- function (
     if (be_quiet) {message("", appendLF = FALSE)
     } else
       message(
-        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)"),
-        appendLF = FALSE
+        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)\n"),
+        appendLF = TRUE
         )
     msg <- utils::capture.output(future::plan())
     flag <- grepl("sequential", msg)[1]
     if (flag) {
       stop(paste0(
         "When using do_parallel = TRUE, you need to call future::plan() to configure your parallel settings.\n", 
-        "A suggestion, write the following lines:\n\n", 
+        "A suggestion, write the following lines just before:\n\n", 
         "future::plan(future::multisession, workers = floor(future::availableCores()/2))", "\n\n",
-        "The last line should be placed just before calling get_expectations()\n", 
         "Notice it will use half of your available cores so that your OS has some room to breathe."),
         call. = FALSE
         )
@@ -321,7 +324,7 @@ get_annual <- function (
 
 ### evaluate
 tictoc::tic()
-df = bcb(indicator      = c("PIB Total", "Fiscal"),
+df = get_annual(indicator      = c("PIB Total", "Fiscal"),
          first_date     = "2018-01-01",
          use_memoise    = FALSE,
          do_parallel    = FALSE)
@@ -348,55 +351,56 @@ use_memoise    = FALSE
 
 
 
-bcb(detail = "teste")
-bcb(indicator = "Fiscal")
-bcb(indicator = "Fiscalasas")
-bcb(indicator = "Fiscal", detail = NULL)
-bcb(indicator = "Fiscal", detail = "Resultado Nominal")
-bcb(indicator = "Fiscal", detail = "DFSFSDFS")
-bcb(indicator = NULL, detail = "DFSFSDFS")
-bcb(indicator = NA, detail = "DFSFSDFS")
-bcb(detail = "Resultado Nominal")
-bcb(detail = "DFSFSDFS")
+get_annual(detail = "teste")
+get_annual(indicator = "Fiscal")
+get_annual(indicator = "Fiscalasas")
+get_annual(indicator = "Fiscal", detail = NULL)
+get_annual(indicator = "Fiscal", detail = "Resultado Nominal")
+get_annual(indicator = "Fiscal", detail = "DFSFSDFS")
+get_annual(indicator = NULL, detail = "DFSFSDFS")
+get_annual(indicator = NA, detail = "DFSFSDFS")
+get_annual(indicator = "Fiscal", detail = "Resultado Nominal", first_date = "2021-01-30")
+get_annual(detail = "DFSFSDFS")
+get_annual(indicator = "Fiscal", detail = NA)
 
-bcb(indicator = "Fiscal", first_date = "20210302")
-bcb(indicator = "Fiscal", first_date = "54564")
-bcb(indicator = c("Fiscal", "IPCA"), first_date = "2019-03-08", do_parallel = TRUE, use_memoise = FALSE)
-bcb(indicator = c("Fiscal", "as"), first_date = "2021-03-02", do_parallel = TRUE, use_memoise = FALSE)
-bcb(indicator = "Fiscal", first_date = "2021-03-33")
-bcb(indicator = "Fiscal", first_date = "2021-33-02")
-bcb(indicator = "Fiscal", first_date = "2021/03/02")
-bcb(indicator = "Fiscal", first_date = "teste")
+get_annual(indicator = "Fiscal", first_date = "20210302")
+get_annual(indicator = "Fiscal", first_date = "54564")
+get_annual(indicator = c("Fiscal", "IPCA"), first_date = "2019-03-08", do_parallel = TRUE, use_memoise = FALSE)
+get_annual(indicator = c("Fiscal", "as"), first_date = "2021-03-02", do_parallel = TRUE, use_memoise = FALSE)
+get_annual(indicator = "Fiscal", first_date = "2021-03-33")
+get_annual(indicator = "Fiscal", first_date = "2021-33-02")
+get_annual(indicator = "Fiscal", first_date = "2021/03/02")
+get_annual(indicator = "Fiscal", first_date = "teste")
 
-bcb(indicator = "Fiscal", last_date = "20210302", first_date = "20210302")
-bcb(indicator = "Fiscal", last_date = "20210302")
-bcb(indicator = "Fiscal", last_date = "2021-03-02")
-bcb(indicator = "Fiscal", last_date = "2021-33-02")
-bcb(indicator = "Fiscal", last_date = "2021/03/02")
-bcb(indicator = "Fiscal", last_date = "2019/03/02")
-bcb(indicator = "Fiscal", last_date = "2019/03/33")
-bcb(indicator = "Fiscal", last_date = "2019/03/0a")
-bcb(indicator = "Fiscal", last_date = "2tes")
+get_annual(indicator = "Fiscal", last_date = "20210302", first_date = "20210302")
+get_annual(indicator = "Fiscal", last_date = "20210302")
+get_annual(indicator = "Fiscal", last_date = "2021-03-02")
+get_annual(indicator = "Fiscal", last_date = "2021-33-02")
+get_annual(indicator = "Fiscal", last_date = "2021/03/02")
+get_annual(indicator = "Fiscal", last_date = "2019/03/02")
+get_annual(indicator = "Fiscal", last_date = "2019/03/33")
+get_annual(indicator = "Fiscal", last_date = "2019/03/0a")
+get_annual(indicator = "Fiscal", last_date = "2tes")
 
-bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-03-02")
-bcb(indicator = c("Fiscal", "IPC-FIPE", "IPCA"), first_date = "2021-01-02", last_date = "2021-02-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-03-02")
-bcb(indicator = "IPC-FIPE", first_date = "2021-05-02", last_date = "2021-06-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "20210602")
-bcb(indicator = "Fiscal", first_date = "2021-05-02")
-bcb(indicator = "IPC-FIPE", first_date = NULL, last_date = "2021-06-02")
-bcb(indicator = "IPC-FIPE", first_date = NA, last_date = "2021-06-02") %>% dplyr::arrange(date)
+get_annual(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-03-02")
+get_annual(indicator = c("Fiscal", "IPC-FIPE", "IPCA"), first_date = "2021-01-02", last_date = "2021-02-02")
+get_annual(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-03-02")
+get_annual(indicator = "IPC-FIPE", first_date = "2021-05-02", last_date = "2021-06-02")
+get_annual(indicator = "Fiscal", first_date = "2021-05-02", last_date = "20210602")
+get_annual(indicator = "Fiscal", first_date = "2021-05-02")
+get_annual(indicator = "IPC-FIPE", first_date = NULL, last_date = "2021-06-02")
+get_annual(indicator = "IPC-FIPE", first_date = NA, last_date = "2021-06-02") %>% dplyr::arrange(date)
 
 
-bcb(indicator = "Fiscal", reference_date = 2021)
-bcb(indicator = "Fiscal", reference_date = "2050", do_parallel = TRUE)
-bcb(indicator = "Fiscal", reference_date = "ssddSDS")
-bcb(indicator = "Fiscal", reference_date = "20255")
+get_annual(indicator = "Fiscal", reference_date = 2021)
+get_annual(indicator = "Fiscal", reference_date = "2050", do_parallel = TRUE)
+get_annual(indicator = "Fiscal", reference_date = "ssddSDS")
+get_annual(indicator = "Fiscal", reference_date = "20255")
 
-bcb(indicator = "Fiscal", reference_date = 2021:2025)
-bcb(indicator = "Fiscal", reference_date = "2021:20255")
-bcb(indicator = "Fiscal", reference_date = "2021:20d5")
-bcb(indicator = "Fiscal", reference_date = "2021:2025")
-bcb(indicator = "IPC-FIPE", reference_date = NULL)
-bcb(indicator = "IPC-FIPE", reference_date = NA, do_parallel = TRUE, use_memoise = FALSE, first_date = "2021-03-08")
+get_annual(indicator = "Fiscal", reference_date = 2021:2025)
+get_annual(indicator = "Fiscal", reference_date = "2021:20255")
+get_annual(indicator = "Fiscal", reference_date = "2021:20d5")
+get_annual(indicator = "Fiscal", reference_date = "2021:2025")
+get_annual(indicator = "IPC-FIPE", reference_date = NULL)
+get_annual(indicator = "IPC-FIPE", reference_date = NA, do_parallel = TRUE, use_memoise = FALSE, first_date = "2021-02-01")
 
