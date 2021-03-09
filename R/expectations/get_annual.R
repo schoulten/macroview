@@ -1,109 +1,3 @@
-### Useful functions for cleaning and processing data ###
-
-
-
-# Packages ----------------------------------------------------------------
-
-
-# Install/load packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  "zoo", 
-  "lubridate",
-  "janitor",
-  "dplyr"
-  )
-
-
-
-# YoY Growth Rate ---------------------------------------------------------
-
-
-# Function to calculate the growth rate of the last 12 months
-# in relation to the same period of the previous year
-
-yoy_growth_rate = function(col, round) {
-  
-  # Works within a dataframe
-  
-  ((zoo::rollsum(
-    col, 
-    k     = 12, 
-    fill  = NA, 
-    align = "right"
-    ) /
-      zoo::rollsum(
-        dplyr::lag(col, 12), 
-        k     = 12, 
-        fill  = NA, 
-        align = "right")-1)*100) %>%
-    base::round(., digits = round)
-  
-}
-
-
-
-# Accumulate last k values ------------------------------------------------
-
-
-# Function to calculate the moving sum of the last k periods
-
-accum_k = function(col, k) {
-  
-  # Works within a dataframe
-  
-  zoo::rollsum(x     = col,
-               k     = k,
-               fill  = NA,
-               align = "right")
-  
-}
-
-
-
-
-# Format SIDRA's date column (monthly) ------------------------------------
-
-
-# Function to format date time to "ymd" format (from lubridate's package)
-
-ymd_sidra <- function(col){
-  
-  # Works within a dataframe
-  
-  format(lubridate::ymd(paste0(col, "01")), format = "%Y/%m/%d")
-  
-}
-
-
-
-
-# Data wrangling for BCB inflation series ---------------------------------
-
-
-# Function for data wrangling some data frames from BCB (imported with GetBCBData package)
-
-clean_inflation_bcb <- function(df){
-  
-  # Must be called in this context:
-  # df_clean <- df_raw %>%
-  #   clean_inflation_bcb()
-  
-  df %>% 
-    janitor::clean_names() %>%
-    dplyr::mutate(date = format(ref_date, "%Y/%m/%d")) %>%
-    dplyr::select(date, id = series_name, value)
-  
-}
-
-
-
-
-# Get BCB Expectations data (from Olinda/BCB) -----------------------------
-
-
-# Function to extract data from Olinda/BCB "ExpectativasMercadoAnuais"
-
 get_annual <- function (
   indicator      = NULL, # Single character or a character vector
   detail         = NULL, # Single character or NULL/NA
@@ -113,7 +7,7 @@ get_annual <- function (
   be_quiet       = FALSE, # Logical
   use_memoise    = TRUE, # Logical
   do_parallel    = FALSE # Logical
-  ){
+){
   # Available indicators
   valid_indicator <- c(
     "Balança Comercial", "Balanço de Pagamentos", "Fiscal", "IGP-DI",
@@ -121,7 +15,7 @@ get_annual <- function (
     "Preços administrados por contrato e monitorados", "Produção industrial",
     "PIB Agropecuária", "PIB Industrial", "PIB Serviços", "PIB Total",
     "Meta para taxa over-selic", "Taxa de câmbio"
-    )
+  )
   
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator) | is.null(indicator)) {
@@ -154,7 +48,7 @@ get_annual <- function (
   ((length(detail) > 0) && is.na(detail)) {
     detail <- NULL
   } else detail
-   
+  
   # Check if first_date argument is valid
   first_date <- try(as.Date(first_date), silent = TRUE)
   if (length(first_date) <= 0 || is.na(first_date)) {first_date = NULL}
@@ -183,7 +77,7 @@ get_annual <- function (
     stop("\nIt seems that 'last_date' < first_date. Check your inputs.", call. = FALSE)
   }
   
-    # Check if reference date is valid
+  # Check if reference date is valid
   if (!is.null(reference_date) && !is.na(reference_date)) {
     if ((class(reference_date) != "character")) {
       stop("\nArgument 'reference_date' is not valid. Check your inputs.", call. = FALSE)
@@ -195,6 +89,16 @@ get_annual <- function (
   } else if
   (is.na(reference_date) && (length(reference_date) > 0)) {reference_date <- NULL} else
     reference_date
+  
+  # Check class of do_parallel argument
+  if ((class(do_parallel) != "logical") || (is.na(do_parallel))) {
+    stop("\nArgument 'do_parallel' must be logical. Check your inputs.", call. = FALSE)
+  } else if
+  
+  # Check class of be_quiet argument
+  ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
+    stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
+  }
   
   # Build args string
   foo_args <- paste0(
@@ -213,9 +117,9 @@ get_annual <- function (
         `$filter`  = foo_args, 
         `$format`  = "json", 
         `$orderby` = "Data desc"
-        )
       )
     )
+  )
   
   # Fetching data function
   if ((class(use_memoise) != "logical") || (is.na(use_memoise))) {
@@ -226,22 +130,18 @@ get_annual <- function (
         foo_memoise <- memoise::memoise(f = jsonlite::fromJSON, cache = cache_dir)
       } else
         foo_memoise <- jsonlite::fromJSON
-  }
+    }
   
   from_bcb <- memoising(
     use_memoise = use_memoise,
     cache_dir   = memoise::cache_filesystem("./cache_bcb")
-    )
+  )
   
   # Fetching data
   if (!do_parallel) {
     
-    # Message to display
-    if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
-      stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
-    } else if
-    (be_quiet) {message("", appendLF = FALSE)
-    } else {
+    # Display message
+    if (be_quiet) {message("", appendLF = FALSE)} else {
       message(
         paste0("\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
         appendLF = FALSE
@@ -256,12 +156,6 @@ get_annual <- function (
     formals_parallel <- formals(future::plan())
     used_workers <- formals_parallel$workers
     available_cores <- future::availableCores()
-    if (be_quiet) {message("", appendLF = FALSE)
-    } else
-      message(
-        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)\n"),
-        appendLF = TRUE
-        )
     msg <- utils::capture.output(future::plan())
     flag <- grepl("sequential", msg)[1]
     if (flag) {
@@ -271,20 +165,14 @@ get_annual <- function (
         "future::plan(future::multisession, workers = floor(future::availableCores()/2))", "\n\n",
         "Notice it will use half of your available cores so that your OS has some room to breathe."),
         call. = FALSE
-        )
-    }
-    
-    # Message to display
-    if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
-      stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
-    } else if
-    (be_quiet) {message("", appendLF = FALSE)}
-    else {
-      message(
-        paste0("\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
-        appendLF = FALSE
       )
-    }
+    } else if
+    (be_quiet) {message("", appendLF = FALSE)} else
+      message(
+        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)\n",
+               "\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
+        appendLF = TRUE
+      )
     
     df <- try(
       suppressWarnings(furrr::future_pmap(.l = odata_url, .f = from_bcb)[[1]][["value"]]),
@@ -295,56 +183,28 @@ get_annual <- function (
   if (class(df) == "try-error") {
     stop("\nError in fetching data: ", conditionMessage(attr(df, "condition")),
          call. = FALSE
-         )
+    )
   } else if
   (purrr::is_empty(df)) {
     stop(
       paste0(
-      "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
+        "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
       \n1. 'first_date'", "\n2. 'reference_date'"
       ),
       call. = FALSE
-      )
+    )
   } else if
   (be_quiet) {message("", appendLF = FALSE)}
   else
     message(paste0("\nFound ", nrow(df), " observations!\n"), appendLF = FALSE)
   
+  # Convert as_tibble()  
   df <- dplyr::rename_with(
     dplyr::as_tibble(df), 
     ~c("indicator", "detail", "date", "reference_date", "mean",
        "median", "sd", "coef_var", "min", "max", "n_respondents", "basis")
-    )
+  )
   df <- dplyr::mutate(df, date = as.Date(date, format = "%Y-%m-%d"))
   
   return(df)
 }
-
-
-
-### evaluate
-tictoc::tic()
-df = get_annual(indicator      = c("PIB Total", "Fiscal"),
-         first_date     = "2018-01-01",
-         use_memoise    = FALSE,
-         do_parallel    = FALSE)
-tictoc::toc()
-
-# {rbcb}
-tictoc::tic()
-df_rbcb = rbcb::get_annual_market_expectations(
-  indic = c("PIB Total", "Fiscal"),
-  start_date     = "2018-01-01")
-tictoc::toc()
-
-
-
-
-
-indicator      = c("PIB Total", "Fiscal")
-detail         = NULL
-first_date     = "2018-01-01"
-last_date      = "2018-01-31"
-be_quiet       = FALSE
-reference_date = NULL
-use_memoise    = FALSE

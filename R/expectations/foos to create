@@ -1,0 +1,15 @@
+Expectativas de Mercado Mensais	Expectativas de Mercado Mensais. Para períodos para os quais não haja estatísticas serão omitidos na consulta.
+Expectativas de Mercado Trimestrais	Expectativas de Mercado Trimestrais. Para períodos para os quais não haja estatísticas serão omitidos na consulta.
+Expectativas de Mercado Anuais	Expectativas de Mercado com referência anual. Para períodos para os quais não haja estatísticas serão omitidos na consulta.
+Expectativas de mercado para inflação nos próximos 12 meses	Expectativas de mercado para inflação nos próximos 12 meses. Para períodos para os quais não haja estatísticas serão omitidos na consulta.
+Expectativas de Mercado Mensais Top5	Expectativas de mercado mensais para os indicadores do Top 5. Para períodos para os quais não haja estatísticas serão omitidos na consulta.
+Expectativas de Mercado Anuais Top5	Expectativas de mercado anuais para os indicadores do Top 5. Para períodos para os quais não haja estatísticas serão omitidos na consulta.
+Expectativas de Mercado das Instituições	Expectativas de mercado informadas pelas instituições credenciadas. São publicadas as expectativas informadas pelas instituições que autorizaram a divulgação. As expectativas divulgadas possuem defasagem de 1 ano.
+
+
+get_monthly
+get_quarterly
+get_annual
+get_inflation_12m
+get_monthly_top5
+get_annual_top5

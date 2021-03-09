@@ -1,6 +1,5 @@
-function (
+get_monthly <- function (
   indicator      = NULL, # Single character or a character vector
-  detail         = NULL, # Single character or NULL/NA
   first_date     = Sys.Date() - 2*365, # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
   last_date      = Sys.Date(), # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
   reference_date = NULL, # Single character of lenght == 4 or NULL/NA
@@ -10,44 +9,14 @@ function (
 ){
   # Available indicators
   valid_indicator <- c(
-    "Balança Comercial", "Balanço de Pagamentos", "Fiscal", "IGP-DI",
-    "IGP-M", "INPC", "IPA-DI", "IPA-M", "IPCA", "IPCA-15", "IPC-FIPE",
-    "Preços administrados por contrato e monitorados", "Produção industrial",
-    "PIB Agropecuária", "PIB Industrial", "PIB Serviços", "PIB Total",
-    "Meta para taxa over-selic", "Taxa de câmbio"
+    "IGP-DI", "IGP-M", "INPC", "IPA-DI", "IPA-M", "IPCA", "IPCA-15", "IPC-FIPE",
+    "Produção industrial", "Meta para taxa over-selic", "Taxa de câmbio"
   )
   
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator) | is.null(indicator)) {
     stop("\nArgument 'indicator' is not valid or missing. Check your inputs.", call. = FALSE)
   } else indicator
-  
-  # Available indicator details
-  valid_detail <- c(
-    "Balança Comercial / Exportações", "Balança Comercial / Importações",
-    "Balança Comercial / Saldo", "Balanço de Pagamentos / Conta corrente",
-    "Balanço de Pagamentos / Investimento direto no país",
-    "Fiscal / Resultado Primário", "Fiscal / Resultado Nominal",
-    "Fiscal / Dívida líquida do setor público", "Meta para taxa over-selic / Fim do ano",
-    "Meta para taxa over-selic / Média do ano"
-  )
-  
-  # Check if input "detail" is valid and get detail input (or NULL) if is valid
-  if (!is.null(detail) && !is.na(detail)) {
-    if ((class(detail) != "character")) {
-      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    } else if 
-    (!all(paste0(indicator, " / ", detail) %in% valid_detail)) {
-      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    } else if
-    (length(detail) > 1) {
-      stop("\nArgument 'detail' is not valid. Check your inputs.", call. = FALSE)
-    } else
-      detail
-  } else if
-  ((length(detail) > 0) && is.na(detail)) {
-    detail <- NULL
-  } else detail
   
   # Check if first_date argument is valid
   first_date <- try(as.Date(first_date), silent = TRUE)
@@ -82,7 +51,7 @@ function (
     if ((class(reference_date) != "character")) {
       stop("\nArgument 'reference_date' is not valid. Check your inputs.", call. = FALSE)
     } else if 
-    (nchar(reference_date) == 4L & grepl("[[:digit:]]+$", reference_date)) {
+    (nchar(reference_date) == 7L & (grepl("(\\d{2})(\\/{1})(\\d{4}$)", reference_date))) {
       reference_date <- as.character(reference_date)
     } else
       stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
@@ -90,10 +59,19 @@ function (
   (is.na(reference_date) && (length(reference_date) > 0)) {reference_date <- NULL} else
     reference_date
   
+  # Check class of do_parallel argument
+  if ((class(do_parallel) != "logical") || (is.na(do_parallel))) {
+    stop("\nArgument 'do_parallel' must be logical. Check your inputs.", call. = FALSE)
+  } else if
+  
+  # Check class of be_quiet argument
+  ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
+    stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
+  }
+  
   # Build args string
   foo_args <- paste0(
     paste0("(", paste(sprintf("Indicador eq '%s'", indicator), collapse = " or ", sep = ""), ")"),
-    sprintf(" and IndicadorDetalhe eq '%s'", detail),
     sprintf(" and Data ge '%s'", first_date),
     sprintf(" and Data le '%s'", last_date),
     sprintf(" and DataReferencia eq '%s'", reference_date)
@@ -102,7 +80,7 @@ function (
   # Build URL
   odata_url <- list(
     httr::modify_url(
-      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais",
+      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativaMercadoMensais",
       query = list(
         `$filter`  = foo_args, 
         `$format`  = "json", 
@@ -126,16 +104,12 @@ function (
     use_memoise = use_memoise,
     cache_dir   = memoise::cache_filesystem("./cache_bcb")
   )
-  
+ 
   # Fetching data
   if (!do_parallel) {
     
-    # Message to display
-    if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
-      stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
-    } else if
-    (be_quiet) {message("", appendLF = FALSE)
-    } else {
+    # Display message
+    if (be_quiet) {message("", appendLF = FALSE)} else {
       message(
         paste0("\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
         appendLF = FALSE
@@ -150,12 +124,6 @@ function (
     formals_parallel <- formals(future::plan())
     used_workers <- formals_parallel$workers
     available_cores <- future::availableCores()
-    if (be_quiet) {message("", appendLF = FALSE)
-    } else
-      message(
-        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)\n"),
-        appendLF = TRUE
-      )
     msg <- utils::capture.output(future::plan())
     flag <- grepl("sequential", msg)[1]
     if (flag) {
@@ -166,19 +134,13 @@ function (
         "Notice it will use half of your available cores so that your OS has some room to breathe."),
         call. = FALSE
       )
-    }
-    
-    # Message to display
-    if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
-      stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
     } else if
-    (be_quiet) {message("", appendLF = FALSE)}
-    else {
+    (be_quiet) {message("", appendLF = FALSE)} else
       message(
-        paste0("\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
-        appendLF = FALSE
+        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)\n",
+               "\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
+        appendLF = TRUE
       )
-    }
     
     df <- try(
       suppressWarnings(furrr::future_pmap(.l = odata_url, .f = from_bcb)[[1]][["value"]]),
@@ -204,10 +166,11 @@ function (
   else
     message(paste0("\nFound ", nrow(df), " observations!\n"), appendLF = FALSE)
   
+  # Convert as_tibble()
   df <- dplyr::rename_with(
     dplyr::as_tibble(df), 
-    ~c("indicator", "detail", "date", "reference_date", "mean",
-       "median", "sd", "coef_var", "min", "max", "n_respondents", "basis")
+    ~c("indicator", "date", "reference_date", "mean", "median",
+       "sd","coef_var", "min", "max", "n_respondents", "basis")
   )
   df <- dplyr::mutate(df, date = as.Date(date, format = "%Y-%m-%d"))
   
