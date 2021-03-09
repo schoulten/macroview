@@ -1,17 +1,14 @@
-get_monthly <- function (
+get_quarterly <- function (
   indicator      = NULL, # Single character or a character vector
   first_date     = Sys.Date() - 2*365, # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
   last_date      = Sys.Date(), # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
-  reference_date = NULL, # Single character (format mm/YYYY) or NULL/NA
+  reference_date = NULL, # Single character, format "q/YYYY" (q = quarter) or NULL/NA
   be_quiet       = FALSE, # Logical
   use_memoise    = TRUE, # Logical
   do_parallel    = FALSE # Logical
 ){
   # Available indicators
-  valid_indicator <- c(
-    "IGP-DI", "IGP-M", "INPC", "IPA-DI", "IPA-M", "IPCA", "IPCA-15", "IPC-FIPE",
-    "Produção industrial", "Meta para taxa over-selic", "Taxa de câmbio"
-  )
+  valid_indicator <- c("PIB Agropecuária", "PIB Industrial", "PIB Serviços", "PIB Total")
   
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator) | is.null(indicator)) {
@@ -51,7 +48,7 @@ get_monthly <- function (
     if ((class(reference_date) != "character")) {
       stop("\nArgument 'reference_date' is not valid. Check your inputs.", call. = FALSE)
     } else if 
-    (nchar(reference_date) == 7L & (grepl("(\\d{2})(\\/{1})(\\d{4}$)", reference_date))) {
+    (nchar(reference_date) == 6L & (grepl("(\\d{1})(\\/{1})(\\d{4}$)", reference_date))) {
       reference_date <- as.character(reference_date)
     } else
       stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
@@ -80,7 +77,7 @@ get_monthly <- function (
   # Build URL
   odata_url <- list(
     httr::modify_url(
-      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativaMercadoMensais",
+      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoTrimestrais",
       query = list(
         `$filter`  = foo_args, 
         `$format`  = "json", 
@@ -104,7 +101,7 @@ get_monthly <- function (
     use_memoise = use_memoise,
     cache_dir   = memoise::cache_filesystem("./cache_bcb")
   )
- 
+  
   # Fetching data
   if (!do_parallel) {
     
@@ -170,7 +167,7 @@ get_monthly <- function (
   df <- dplyr::rename_with(
     dplyr::as_tibble(df), 
     ~c("indicator", "date", "reference_date", "mean", "median",
-       "sd","coef_var", "min", "max", "n_respondents", "basis")
+       "sd","coef_var", "min", "max", "n_respondents")
   )
   df <- dplyr::mutate(df, date = as.Date(date, format = "%Y-%m-%d"))
   

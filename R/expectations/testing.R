@@ -14,6 +14,7 @@ rbcb::get_annual_market_expectations()
 rbcb::get_monthly_market_expectations()
 rbcb::get_top5s_annual_market_expectations()
 rbcb::get_monthly_market_expectations()
+rbcb::get_quarterly_market_expectations()
 
 library(microbenchmark)
 library(magrittr)
@@ -221,4 +222,94 @@ get_monthly(indicator = "INPC", reference_date = NA)
 
 get_monthly(indicator = "INPC", reference_date = NA, be_quiet = FALSE, use_memoise = TRUE, do_parallel = FALSE)
 get_monthly(indicator = "INPC", reference_date = NULL, be_quiet = FALSE, use_memoise = TRUE, do_parallel = TRUE)
+
+
+
+
+# get_quarterly testing ---------------------------------------------------
+
+### evaluate
+indicator <- c("PIB Agropecuária", "PIB Industrial", "PIB Serviços", "PIB Total")
+indicator_rbcb <- c("PIB Agropecuária", "PIB Industrial", "PIB Serviços", "PIB Total")
+
+performance=microbenchmark(
+  df = get_quarterly(indicator = indicator,
+                   first_date     = "2020-01-01",
+                   use_memoise    = FALSE,
+                   do_parallel    = TRUE),
+  df_rbcb = rbcb::get_quarterly_market_expectations(
+    indic = indicator_rbcb,
+    start_date     = "2020-01-01"),
+  times = 10
+) %>% print()
+
+
+
+get_quarterly()
+get_quarterly(indicator = "PIB Total")
+get_quarterly(indicator = "PIB Totalsds")
+get_quarterly(indicator = "PIB Total")
+get_quarterly(indicator = NULL)
+get_quarterly(indicator = NA)
+
+get_quarterly(indicator = "PIB Total", first_date = "20210302")
+get_quarterly(indicator = "PIB Total", first_date = "54564")
+get_quarterly(indicator = c("PIB Total", "PIB Serviços"), first_date = "2019-03-08", do_parallel = FALSE, use_memoise = FALSE)
+get_quarterly(indicator = c("PIB Total", "as"), first_date = "2021-03-02", do_parallel = TRUE, use_memoise = FALSE)
+get_quarterly(indicator = "PIB Total", first_date = "2021-03-33")
+get_quarterly(indicator = "PIB Total", first_date = "2021-33-02")
+get_quarterly(indicator = "PIB Total", first_date = "2021/02/01")
+get_quarterly(indicator = "PIB Total", first_date = NULL)
+get_quarterly(indicator = "PIB Total", first_date = NA)
+get_quarterly(indicator = "PIB Total", first_date = "teste")
+
+get_quarterly(indicator = "PIB Total", last_date = "20210302", first_date = "20210302")
+get_quarterly(indicator = "PIB Total", last_date = "20210302")
+get_quarterly(indicator = "PIB Total", last_date = "2021-03-02")
+get_quarterly(indicator = "PIB Total", last_date = "2021-33-02")
+get_quarterly(indicator = "PIB Total", last_date = "2021/03/02")
+get_quarterly(indicator = "PIB Total", last_date = "2019/03/02")
+get_quarterly(indicator = "PIB Total", last_date = "2019/03/33")
+get_quarterly(indicator = "PIB Total", last_date = "2019/03/0a")
+get_quarterly(indicator = "PIB Total", last_date = "2tes")
+
+get_quarterly(indicator = "PIB Total", first_date = "2021-03-02", last_date = "2021-03-02")
+get_quarterly(indicator = c("PIB Total", "IPC-FIPE", "IPCA"), first_date = "2021-01-02", last_date = "2021-02-02")
+get_quarterly(indicator = "PIB Total", first_date = "2021-05-02", last_date = "2021-03-02")
+get_quarterly(indicator = "PIB Serviços", first_date = "2021-05-02", last_date = "2021-06-02")
+get_quarterly(indicator = "PIB Total", first_date = "2021-05-02", last_date = "20210602")
+get_quarterly(indicator = "PIB Total", first_date = "2021-05-02")
+get_quarterly(indicator = "PIB Serviços", first_date = NULL, last_date = "2021-06-02")
+get_quarterly(indicator = "PIB Serviços", first_date = NA, last_date = "2021-06-02") %>% dplyr::arrange(date)
+
+
+get_quarterly(indicator = "PIB Total", reference_date = 2021)
+get_quarterly(indicator = "PIB Total", reference_date = "2050", do_parallel = TRUE)
+get_quarterly(indicator = "PIB Total", reference_date = "ssddSDS")
+get_quarterly(indicator = "PIB Total", reference_date = "20255")
+
+get_quarterly(indicator = "PIB Total", reference_date = 2021:2025)
+get_quarterly(indicator = "PIB Total", reference_date = "2021:20255")
+get_quarterly(indicator = "PIB Total", reference_date = "2021:20d5")
+get_quarterly(indicator = "PIB Total", reference_date = "2021:2025")
+get_quarterly(indicator = "PIB Serviços", reference_date = NULL)
+get_quarterly(indicator = "PIB Serviços", reference_date = NA, do_parallel = TRUE, use_memoise = FALSE, first_date = "2021-02-01")
+
+get_quarterly(indicator = "PIB Total", reference_date = "1/2021")
+get_quarterly(indicator = "PIB Total", reference_date = "1/2028")
+get_quarterly(indicator = "PIB Total", reference_date = " 1/2021")
+get_quarterly(indicator = "PIB Total", reference_date = "A/2021")
+get_quarterly(indicator = "PIB Total", reference_date = "1:2021")
+get_quarterly(indicator = "PIB Total", reference_date = "1-2021")
+get_quarterly(indicator = "PIB Total", reference_date = "01/2021")
+get_quarterly(indicator = "PIB Total", reference_date = "1/20201")
+get_quarterly(indicator = "PIB Total", reference_date = "6/2021")
+get_quarterly(indicator = "PIB Total", reference_date = "1/202A")
+get_quarterly(indicator = "PIB Total", reference_date = "2/20 21")
+get_quarterly(indicator = "PIB Total", reference_date = NULL)
+get_quarterly(indicator = "PIB Total", reference_date = NA)
+
+get_quarterly(indicator = "PIB Total", reference_date = NA, be_quiet = FALSE, use_memoise = TRUE, do_parallel = FALSE)
+get_quarterly(indicator = "PIB Total", reference_date = NULL, be_quiet = FALSE, use_memoise = F, do_parallel = TRUE)
+
 
