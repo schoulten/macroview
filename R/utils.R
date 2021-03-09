@@ -111,7 +111,8 @@ bcb <- function (
   last_date      = Sys.Date(),
   reference_date = NULL,
   be_quiet       = FALSE,
-  use_memoise    = TRUE
+  use_memoise    = TRUE,
+  do_parallel    = FALSE
   ){
   
   # Available indicators
@@ -267,25 +268,72 @@ bcb <- function (
     )
   
   
-  # Message to display
-  if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
-    stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
-  } else if
-  (be_quiet) {
-    message("", appendLF = FALSE)
+  # Fetching data
+  if (!do_parallel) {
+    
+    # Message to display
+    if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
+      stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
+    } else if
+    (be_quiet) {
+      message("", appendLF = FALSE)
+    } else {
+      message(
+        paste0("\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
+        appendLF = FALSE
+      )
+    }
+    
+    df <- try(
+      suppressWarnings(purrr::pmap(.l = odata_url, .f = from_bcb)[[1]][["value"]]),
+      silent = TRUE
+    )
   } else {
-    message(
-      paste0("\nFetching '", indicator, "' ", "from BCB-Olinda... \n"),
-      appendLF = FALSE
+    formals_parallel <- formals(future::plan())
+    used_workers <- formals_parallel$workers
+    available_cores <- future::availableCores()
+    if (be_quiet) {
+      message("", appendLF = FALSE)
+    } else
+      message(
+        paste0("\nRunning parallel with ", used_workers, " cores (", available_cores, " available)")
+        )
+    msg <- utils::capture.output(future::plan())
+    flag <- stringr::str_detect(msg[1], "sequential")
+    if (flag) {
+      stop(paste0(
+        "When using do_parallel = TRUE, you need to call future::plan() to configure your parallel settings.\n", 
+        "A suggestion, write the following lines:\n\n", 
+        "future::plan(future::multisession, workers = floor(future::availableCores()/2))", "\n\n",
+        "The last line should be placed just before calling get_expectations()\n", 
+        "Notice it will use half of your available cores so that your OS has some room to breathe."),
+        call. = FALSE
+        )
+    }
+    
+    # Message to display
+    if ((class(be_quiet) != "logical") || (is.na(be_quiet))) {
+      stop("\nArgument 'be_quiet' must be logical. Check your inputs.", call. = FALSE)
+    } else if
+    (be_quiet) {
+      message("", appendLF = FALSE)
+    } else {
+      message(
+        paste0("\nFetching [", paste(indicator, collapse = ", "), "] data ", "from BCB-Olinda... \n"),
+        appendLF = FALSE
+      )
+    }
+    
+    df <- try(
+      suppressWarnings(
+        furrr::future_pmap(
+          .l = odata_url, 
+          .f = from_bcb)[[1]][["value"]]
+        ),
+      silent = TRUE
     )
   }
   
-  
-  # Fetching data
-  df <- try(
-    suppressWarnings(purrr::pmap(.l = odata_url, .f = from_bcb)[[1]][["value"]]),
-    silent = TRUE
-    )
   if (class(df) == "try-error") {
     stop("\nError in fetching data: ", conditionMessage(attr(df, "condition")),
          call. = FALSE
@@ -315,14 +363,14 @@ bcb <- function (
 
 
 ### evaluate
+future::plan(future::multisession, workers = floor(future::availableCores()/2))
+df = bcb(indicator      = indicators,
+         first_date     = "2021-01-01",
+         use_memoise    = FALSE,
+         do_parallel    = TRUE)
 
-df = bcb(indicator      = c("PIB Total", "Fiscal"),
-         detail         = NULL,
-         first_date     = NULL,
-         last_date      = "2018-01-31",
-         be_quiet       = FALSE,
-         reference_date = NA,
-         use_memoise    = FALSE)
+
+# {rbcb}
 df_rbcb = rbcb::get_annual_market_expectations(
   indic = c("PIB Total", "Fiscal"),
   start_date     = "2018-01-01",
@@ -357,7 +405,8 @@ bcb(detail = "DFSFSDFS")
 
 bcb(indicator = "Fiscal", first_date = "20210302")
 bcb(indicator = "Fiscal", first_date = "54564")
-bcb(indicator = c("Fiscal", "IPCA"), first_date = "2021-03-02")
+bcb(indicator = c("Fiscal", "IPCA"), first_date = "2019-03-08", do_parallel = TRUE, use_memoise = FALSE)
+bcb(indicator = c("Fiscal", "as"), first_date = "2021-03-02", do_parallel = TRUE, use_memoise = FALSE)
 bcb(indicator = "Fiscal", first_date = "2021-03-33")
 bcb(indicator = "Fiscal", first_date = "2021-33-02")
 bcb(indicator = "Fiscal", first_date = "2021/03/02")
@@ -374,17 +423,17 @@ bcb(indicator = "Fiscal", last_date = "2019/03/0a")
 bcb(indicator = "Fiscal", last_date = "2tes")
 
 bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-03-02")
-bcb(indicator = "Fiscal", first_date = "2021-03-02", last_date = "2021-02-02")
+bcb(indicator = c("Fiscal", "IPC-FIPE", "IPCA"), first_date = "2021-01-02", last_date = "2021-02-02")
 bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-03-02")
-bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "2021-06-02")
+bcb(indicator = "IPC-FIPE", first_date = "2021-05-02", last_date = "2021-06-02")
 bcb(indicator = "Fiscal", first_date = "2021-05-02", last_date = "20210602")
 bcb(indicator = "Fiscal", first_date = "2021-05-02")
-bcb(indicator = "Fiscal", first_date = NULL, last_date = "2021-06-02")
-bcb(indicator = "Fiscal", first_date = NA, last_date = "2021-06-02")
+bcb(indicator = "IPC-FIPE", first_date = NULL, last_date = "2021-06-02")
+bcb(indicator = "IPC-FIPE", first_date = NA, last_date = "2021-06-02") %>% dplyr::arrange(date)
 
 
 bcb(indicator = "Fiscal", reference_date = 2021)
-bcb(indicator = "Fiscal", reference_date = "2050")
+bcb(indicator = "Fiscal", reference_date = "2050", do_parallel = TRUE)
 bcb(indicator = "Fiscal", reference_date = "ssddSDS")
 bcb(indicator = "Fiscal", reference_date = "20255")
 
@@ -392,6 +441,6 @@ bcb(indicator = "Fiscal", reference_date = 2021:2025)
 bcb(indicator = "Fiscal", reference_date = "2021:20255")
 bcb(indicator = "Fiscal", reference_date = "2021:20d5")
 bcb(indicator = "Fiscal", reference_date = "2021:2025")
-bcb(indicator = "Fiscal", reference_date = NULL)
-bcb(indicator = "Fiscal", reference_date = NA)
+bcb(indicator = "IPC-FIPE", reference_date = NULL)
+bcb(indicator = "IPC-FIPE", reference_date = NA, do_parallel = TRUE, use_memoise = FALSE, first_date = "2021-03-08")
 

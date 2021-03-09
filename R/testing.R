@@ -1,7 +1,7 @@
 library(GetBCBData)
 GetBCBData::gbcbd_get_default_cache_folder()
 GetBCBData::gbcbd_get_JSON_fct()
-GetBCBData::gbcbd_get_series()
+GetBCBData::gbcbd_get_series("189", first.date = "2018-01-01", do.parallel = TRUE, use.memoise = FALSE)
 GetBCBData::gbcbd_get_single_series()
 GetBCBData::gbcbd_message()
 GetBCBData::gbcbd_test_internet()
@@ -16,8 +16,8 @@ rbcb::get_top5s_annual_market_expectations()
 
 
 # testing purrrring wrapper -----------------------------------------------
-
-indicators <- list("Balança Comercial", 
+library(magrittr)
+indicators <- c("Balança Comercial", 
                    "Balanço de Pagamentos",
                    "Fiscal", 
                    "IGP-DI", 
@@ -35,8 +35,8 @@ indicators <- list("Balança Comercial",
                    "PIB Serviços", 
                    "PIB Total",
                    "Meta para taxa over-selic",
-                   "Taxa de câmbio") %>% t() %>% data.frame() 
-indicators_rbcb <- list("Balança Comercial", 
+                   "Taxa de câmbio")
+indicators_rbcb <- c("Balança Comercial", 
                         "Balanço de Pagamentos",
                         "Fiscal", 
                         "IGP-DI", 
@@ -54,45 +54,41 @@ indicators_rbcb <- list("Balança Comercial",
                         "PIB Serviços", 
                         "PIB Total",
                         "Meta para taxa over-selic",
-                        "Taxa de câmbio") %>% t() %>% data.frame() 
-references <- list(2021,2022,2023) %>% map(as.character)
-
-tictoc::tic()
-test <- map(indicators, pmap(.l = odata_url, .f = from_bcb)[[1]][["value"]])
-tictoc::toc()
-
-tictoc::tic()
-teste <- dplyr::bind_rows(test)
-tictoc::toc()
-
-nomes <- c("2020","2021","2022")
-
-
-teste = map2_dfr(.x = list("Fiscal"),
-                 .y = list("2020","2022"),
-                 .f = ~bcb(indicator      = .x,
-                           first_date     = "2020-01-01",
-                           reference_date = .y)
-                 )
+                        "Taxa de câmbio")
 
 
 library(microbenchmark)
 library(purrr)
+
+future::plan(future::multisession, workers = floor(future::availableCores())/2)
+
 performance=microbenchmark(
   df = {bcb(
-    indicator      = c("PIB Total", "Fiscal", "IPCA"),
+    indicator      = indicators,
     detail         = NULL,
-    first_date     = "2021-01-01",
+    first_date     = "2011-01-01",
     last_date      = "2021-03-03",
-    be_quiet       = FALSE,
+    be_quiet       = TRUE,
     reference_date = NA,
-    use_memoise    = FALSE
+    use_memoise    = FALSE,
+    do_parallel    = TRUE
     )},
   df_rbcb = {rbcb::get_annual_market_expectations(
-    indic      = c("PIB Total", "Fiscal", "IPCA"),
-    start_date = "2021-01-01",
+    indic      = indicators_rbcb,
+    start_date = "2011-01-01",
     end_date   = "2021-03-03"
   )},
   times = 5
 ) %>% print()
 
+
+bcb(
+  indicator      = indicators,
+  detail         = NULL,
+  first_date     = "2020-01-01",
+  last_date      = "2021-03-03",
+  be_quiet       = FALSE,
+  reference_date = NA,
+  use_memoise    = F,
+  do_parallel    = TRUE
+)
