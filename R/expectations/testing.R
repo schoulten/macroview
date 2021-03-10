@@ -510,3 +510,91 @@ get_monthly_top5(indicator = "IPCA", reference_date = NA, be_quiet = FALSE, use_
 get_monthly_top5(indicator = "IPCA", reference_date = NULL, be_quiet = FALSE, use_memoise = F, do_parallel = TRUE,
                  first_date = NULL)
 
+
+
+
+
+# get_annual_top5 testing -------------------------------------------------
+
+
+indicators <- c("IGP-DI", "IGP-M", "IPCA", "Meta para taxa over-selic", "Taxa de câmbio")
+indicators_rbcb <- c("IGP-DI", "IGP-M", "IPCA", "Meta para taxa over-selic", "Taxa de câmbio")
+
+
+library(microbenchmark)
+library(purrr)
+
+future::plan(future::multisession, workers = floor(future::availableCores())/2)
+
+performance=microbenchmark(
+  df = get_annual_top5(
+    indicator      = indicators,
+    first_date     = "2021-01-01",
+    last_date      = NULL,
+    use_memoise    = F,
+    do_parallel    = T
+    ),
+  df_rbcb = rbcb::get_top5s_annual_market_expectations(
+    indic = indicators_rbcb,
+    start_date     = "2021-01-01"
+    ),
+  times = 5
+) %>% print()
+
+
+get_annual_top5(detail = "teste")
+get_annual_top5(indicator = "Taxa de câmbio")
+get_annual_top5(indicator = "Taxa de câmbioasas")
+get_annual_top5(indicator = "Taxa de câmbio", detail = NULL)
+get_annual_top5(indicator = "Taxa de câmbio", detail = "Fim do ano")
+get_annual_top5(indicator = "Taxa de câmbio", detail = "DFSFSDFS")
+get_annual_top5(indicator = NULL, detail = "DFSFSDFS")
+get_annual_top5(indicator = NA, detail = "DFSFSDFS")
+get_annual_top5(indicator = "Taxa de câmbio", detail = "Fim do ano", first_date = "2021-01-30")
+get_annual_top5(detail = "DFSFSDFS")
+get_annual_top5(indicator = "Taxa de câmbio", detail = NA)
+
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "20210302")
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "54564")
+get_annual_top5(indicator = c("Taxa de câmbio", "IPCA"), first_date = "2019-03-08", do_parallel = TRUE, use_memoise = FALSE)
+get_annual_top5(indicator = c("Taxa de câmbio", "as"), first_date = "2021-03-02", do_parallel = TRUE, use_memoise = FALSE)
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "2021-03-33")
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "2021-33-02")
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "2021/03/02")
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "teste")
+
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "20210302", first_date = "20210302")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "20210302")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "2021-03-02")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "2021-33-02")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "2021/03/02")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "2019/03/02")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "2019/03/33")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "2019/03/0a")
+get_annual_top5(indicator = "Taxa de câmbio", last_date = "2tes")
+
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "2021-03-02", last_date = "2021-03-02")
+get_annual_top5(indicator = c("Taxa de câmbio", "IPCA"), first_date = "2021-01-02", last_date = "2021-02-02")
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "2021-05-02", last_date = "2021-03-02")
+get_annual_top5(indicator = "IPCA", first_date = "2021-05-02", last_date = "2021-06-02")
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "2021-05-02", last_date = "20210602")
+get_annual_top5(indicator = "Taxa de câmbio", first_date = "2021-05-02")
+get_annual_top5(indicator = "IPCA", first_date = NULL, last_date = "2021-06-02")
+get_annual_top5(indicator = "IPCA", first_date = NA, last_date = "2021-06-02") %>% dplyr::arrange(date)
+
+
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = 2021)
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = "2050", do_parallel = TRUE)
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = "ssddSDS")
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = "20255")
+
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = 2021:2025)
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = "2021:20255")
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = "2021:20d5")
+get_annual_top5(indicator = "Taxa de câmbio", reference_date = "2021:2025")
+get_annual_top5(indicator = "IPCA", reference_date = NULL)
+get_annual_top5(indicator = "IPCA", reference_date = NA, do_parallel = TRUE, use_memoise = FALSE, first_date = "2021-02-01")
+TESTE=get_annual_top5(indicator = "IPCA", reference_date = NA, calc_type = NA, first_date = "2021-02-01")
+
+
+

@@ -7,5 +7,4 @@ Expectativas de Mercado Anuais Top5	Expectativas de mercado anuais para os indic
 Expectativas de Mercado das Instituições	Expectativas de mercado informadas pelas instituições credenciadas. São publicadas as expectativas informadas pelas instituições que autorizaram a divulgação. As expectativas divulgadas possuem defasagem de 1 ano.
 
 
-get_monthly_top5
 get_annual_top5
