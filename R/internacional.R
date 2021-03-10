@@ -10,10 +10,7 @@
 
 # Install/load packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  "OECD",
-  "tidyverse"
-  )
+pacman::p_load("OECD", "tidyverse")
 
 
 
