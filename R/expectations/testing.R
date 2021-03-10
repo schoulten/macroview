@@ -331,7 +331,7 @@ performance=microbenchmark(
     first_date     = "2020-01-01",
     last_date      = NULL,
     use_memoise    = FALSE),
-  times = 10
+  times = 5
 ) %>% print()
 
 
@@ -347,6 +347,8 @@ get_inflation_12m(indicator = "IPCA", smoothed = "YES")
 get_inflation_12m(indicator = "IPCA", smoothed = "NO")
 get_inflation_12m(indicator = "IPCA", smoothed = "123")
 get_inflation_12m(indicator = "IPCA", smoothed = "n5")
+get_inflation_12m(indicator = "IPCA", smoothed = NULL)
+get_inflation_12m(indicator = "IPCA", smoothed = NA)
 get_inflation_12m(indicator = NULL)
 get_inflation_12m(indicator = NA)
 
@@ -413,4 +415,98 @@ get_inflation_12m(indicator = "IPCA", reference_date = NA)
 get_inflation_12m(indicator = "IPCA", reference_date = NA, be_quiet = FALSE, use_memoise = TRUE, do_parallel = FALSE)
 get_inflation_12m(indicator = "IPCA", reference_date = NULL, be_quiet = FALSE, use_memoise = F, do_parallel = TRUE)
 
+
+
+
+
+# get_monthly_top5 --------------------------------------------------------
+
+### evaluate
+indicator <- c("IGP-DI", "IGP-M", "IPCA", "Meta para taxa over-selic", "Taxa de câmbio")
+indicator_rbcb <- c("IGP-DI", "IGP-M", "IPCA", "Meta para taxa over-selic", "Taxa de câmbio")
+
+performance=microbenchmark(
+  df = get_monthly_top5(
+    indicator = indicator,
+    first_date     = "2020-01-01",
+    use_memoise    = FALSE,
+    do_parallel    = TRUE
+    ),
+  df_rbcb = rbcb::get_top5s_monthly_market_expectations(
+    indic = indicator_rbcb,
+    start_date     = "2020-01-01"
+    ),
+  times = 10
+) %>% print()
+
+
+
+get_monthly_top5()
+get_monthly_top5(indicator = "IPCA")
+get_monthly_top5(indicator = "IPCAsds")
+get_monthly_top5(indicator = "IPCA")
+get_monthly_top5(indicator = NULL)
+get_monthly_top5(indicator = NA)
+
+get_monthly_top5(indicator = "IPCA", first_date = "20210302")
+get_monthly_top5(indicator = "IPCA", first_date = "54564")
+get_monthly_top5(indicator = c("IPCA", "IGP-M"), first_date = "2019-03-08", do_parallel = FALSE, use_memoise = FALSE)
+get_monthly_top5(indicator = c("IPCA", "as"), first_date = "2021-03-02", do_parallel = FALSE, use_memoise = FALSE)
+get_monthly_top5(indicator = "IPCA", first_date = "2021-03-33")
+get_monthly_top5(indicator = "IPCA", first_date = "2021-33-02")
+get_monthly_top5(indicator = "IPCA", first_date = "2021/02/01")
+get_monthly_top5(indicator = "IPCA", first_date = NULL)
+get_monthly_top5(indicator = "IPCA", first_date = NA)
+get_monthly_top5(indicator = "IPCA", first_date = "teste")
+
+get_monthly_top5(indicator = "IPCA", last_date = "20210302", first_date = "20210302")
+get_monthly_top5(indicator = "IPCA", last_date = "20210302")
+get_monthly_top5(indicator = "IPCA", last_date = "2021-03-02")
+get_monthly_top5(indicator = "IPCA", last_date = "2021-33-02")
+get_monthly_top5(indicator = "IPCA", last_date = "2021/03/02")
+get_monthly_top5(indicator = "IPCA", last_date = "2019/03/02")
+get_monthly_top5(indicator = "IPCA", last_date = "2019/03/02", first_date = NULL)
+get_monthly_top5(indicator = "IPCA", last_date = "2019/03/33")
+get_monthly_top5(indicator = "IPCA", last_date = "2019/03/0a")
+get_monthly_top5(indicator = "IPCA", last_date = "2tes")
+
+get_monthly_top5(indicator = "IPCA", first_date = "2021-03-02", last_date = "2021-03-02")
+get_monthly_top5(indicator = c("IPCA", "IGP-M"), first_date = "2021-01-02", last_date = "2021-02-02")
+get_monthly_top5(indicator = "IPCA", first_date = "2021-05-02", last_date = "2021-03-02")
+get_monthly_top5(indicator = "IGP-M", first_date = "2021-05-02", last_date = "2021-06-02")
+get_monthly_top5(indicator = "IPCA", first_date = "2021-05-02", last_date = "20210602")
+get_monthly_top5(indicator = "IPCA", first_date = "2021-05-02")
+get_monthly_top5(indicator = "IGP-M", first_date = NULL, last_date = "2021-06-02")
+get_monthly_top5(indicator = "IGP-M", first_date = NA, last_date = "2021-06-02") %>% dplyr::arrange(date)
+
+
+get_monthly_top5(indicator = "IPCA", reference_date = 2021)
+get_monthly_top5(indicator = "IPCA", reference_date = "2050", do_parallel = TRUE)
+get_monthly_top5(indicator = "IPCA", reference_date = "ssddSDS")
+get_monthly_top5(indicator = "IPCA", reference_date = "20255")
+
+get_monthly_top5(indicator = "IPCA", reference_date = 2021:2025)
+get_monthly_top5(indicator = "IPCA", reference_date = "2021:20255")
+get_monthly_top5(indicator = "IPCA", reference_date = "2021:20d5")
+get_monthly_top5(indicator = "IPCA", reference_date = "2021:2025")
+get_monthly_top5(indicator = "IGP-M", reference_date = NULL)
+get_monthly_top5(indicator = "IGP-M", reference_date = NA, do_parallel = FALSE, use_memoise = FALSE, first_date = "2021-02-01")
+
+get_monthly_top5(indicator = "IPCA", reference_date = "01/2021")
+get_monthly_top5(indicator = "IPCA", reference_date = "01/2028")
+get_monthly_top5(indicator = "IPCA", reference_date = " 01/2021")
+get_monthly_top5(indicator = "IPCA", reference_date = "0A/2021")
+get_monthly_top5(indicator = "IPCA", reference_date = "01:2021")
+get_monthly_top5(indicator = "IPCA", reference_date = "01-2021")
+get_monthly_top5(indicator = "IPCA", reference_date = "001/2021")
+get_monthly_top5(indicator = "IPCA", reference_date = "01/20201")
+get_monthly_top5(indicator = "IPCA", reference_date = "13/2021")
+get_monthly_top5(indicator = "IPCA", reference_date = "01/202A")
+get_monthly_top5(indicator = "IPCA", reference_date = "01/20 21")
+get_monthly_top5(indicator = "IPCA", reference_date = NULL)
+get_monthly_top5(indicator = "IPCA", reference_date = NA)
+
+get_monthly_top5(indicator = "IPCA", reference_date = NA, be_quiet = FALSE, use_memoise = TRUE, do_parallel = FALSE)
+get_monthly_top5(indicator = "IPCA", reference_date = NULL, be_quiet = FALSE, use_memoise = F, do_parallel = TRUE,
+                 first_date = NULL)
 

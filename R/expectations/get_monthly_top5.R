@@ -1,14 +1,15 @@
-get_inflation_12m <- function (
+get_monthly_top5 <- function (
   indicator      = NULL, # Single character or a character vector
   first_date     = Sys.Date() - 2*365, # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
   last_date      = Sys.Date(), # String, format: "YYYY-mm-dd" or "YYYY/mm/dd" or NULL/NA
-  smoothed       = NULL, # Single character (yes or no)
+  reference_date = NULL, # Single character (format mm/YYYY) or NULL/NA
+  calc_type      = c("short", "medium", "long"), # Single character or a character vector
   be_quiet       = FALSE, # Logical
   use_memoise    = TRUE, # Logical
   do_parallel    = FALSE # Logical
 ){
   # Available indicators
-  valid_indicator <- c("IGP-DI", "IGP-M", "INPC", "IPA-DI", "IPA-M", "IPCA", "IPCA-15", "IPC-FIPE")
+  valid_indicator <- c("IGP-DI", "IGP-M", "IPCA", "Meta para taxa over-selic", "Taxa de câmbio")
   
   # Check if input "indicator" is valid
   if (missing(indicator) | !all(indicator %in% valid_indicator) | is.null(indicator)) {
@@ -45,19 +46,38 @@ get_inflation_12m <- function (
     }
   }
   
-  # Check if smoothed argument is valid
-  if (!is.null(smoothed) && !is.na(smoothed)) {
-    if ((class(smoothed) != "character")) {
-      stop("\nArgument 'smoothed' is not valid. Check your inputs.", call. = FALSE)
-    } else if
-    (!all(smoothed %in% c("yes", "no"))){
-      stop("\nArgument 'smoothed' is not valid. Check your inputs.", call. = FALSE)
+  # Check if reference date is valid
+  if (!is.null(reference_date) && !is.na(reference_date)) {
+    if ((class(reference_date) != "character")) {
+      stop("\nArgument 'reference_date' is not valid. Check your inputs.", call. = FALSE)
+    } else if 
+    (nchar(reference_date) == 7L & (grepl("(\\d{2})(\\/{1})(\\d{4}$)", reference_date))) {
+      reference_date <- as.character(reference_date)
     } else
-      if (smoothed == "yes") {smoothed <- "S"} else
-        if (smoothed == "no") {smoothed <- "N"}
+      stop("\nArgument 'reference_date' is not valid. Check yout inputs.", call. = FALSE)
+  } else if
+  (is.na(reference_date) && (length(reference_date) > 0)) {reference_date <- NULL} else
+    reference_date
+  
+  # Check if calc_type input is valid
+  if (!is.null(calc_type) && !is.na(calc_type) && length(calc_type) > 0) {
+    if ((class(calc_type) != "character")) {
+      stop("\nArgument 'calc_type' is not valid. Check your inputs.", call. = FALSE)
     } else if
-    (is.na(smoothed) && (length(smoothed) > 0)) {smoothed <- NULL} else
-    smoothed <- as.character(smoothed)
+    (!all(calc_type %in% c("short", "medium", "long"))){
+      stop("\nArgument 'calc_type' is not valid. Check your inputs.", call. = FALSE)
+    } else {
+      calc_type <- dplyr::recode(
+        as.character(calc_type),
+        "short"  = "C",
+        "medium" = "M",
+        "long"   = "L"
+      )
+    }
+    } else if
+  (is.na(calc_type) && (length(calc_type) > 0) | is.null(calc_type)) {calc_type <- NULL} else {
+    stop("\nArgument 'calc_type' is not valid. Check your inputs.", call. = FALSE)
+  }
   
   # Check class of do_parallel argument
   if ((class(do_parallel) != "logical") || (is.na(do_parallel))) {
@@ -74,13 +94,14 @@ get_inflation_12m <- function (
     paste0("(", paste(sprintf("Indicador eq '%s'", indicator), collapse = " or ", sep = ""), ")"),
     sprintf(" and Data ge '%s'", first_date),
     sprintf(" and Data le '%s'", last_date),
-    sprintf(" and Suavizada eq '%s'", smoothed)
+    sprintf(" and DataReferencia eq '%s'", reference_date),
+    paste0(" and (", paste(sprintf("tipoCalculo eq '%s'", calc_type), collapse = " or ", sep = ""), ")")
   )
   
   # Build URL
   odata_url <- list(
     httr::modify_url(
-      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoInflacao12Meses",
+      "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoTop5Mensais",
       query = list(
         `$filter`  = foo_args, 
         `$format`  = "json", 
@@ -157,7 +178,7 @@ get_inflation_12m <- function (
     stop(
       paste0(
         "\nIt seems that there is no data available. Possibly, the last available data is earlier than that defined in one of these arguments:
-      \n1. 'first_date'"
+      \n1. 'first_date'", "\n2. 'reference_date'"
       ),
       call. = FALSE
     )
@@ -169,13 +190,13 @@ get_inflation_12m <- function (
   # Convert as_tibble()
   df <- dplyr::rename_with(
     dplyr::as_tibble(df), 
-    ~c("indicator", "date", "smoothed", "mean", "median",
-       "sd","coef_var", "min", "max", "n_respondents", "basis")
+    ~c("indicator", "date", "reference_date", "calc_type",
+       "mean", "median", "sd","coef_var", "min", "max")
   )
   df <- dplyr::mutate(
     df,
     date = as.Date(date, format = "%Y-%m-%d"),
-    smoothed = recode(smoothed, "N" = "no", "S" = "yes") # smoothed option
+    calc_type = recode(calc_type, "C" = "S") # short-term calculation type
     )
   
   return(df)
