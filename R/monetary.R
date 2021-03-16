@@ -19,7 +19,6 @@ pacman::p_load(
   "zoo",
   "sidrar",
   "GetTDData",
-  "quantmod",
   "meedr",
   "ipeadatar",
   "tidyquant",
@@ -43,7 +42,7 @@ source("./R/utils.R")
 
 
 # List of parameters to get data from Central Bank (API)
-api_bcb <- list(
+api_bcb <- dplyr::lst(
   
   # Interest Rate (short-term) - % p.y.
   api_interest_rate = c(
@@ -58,9 +57,25 @@ api_bcb <- list(
   # SELIC annual market expectations
   api_selic_expec = "Meta para taxa over-selic",
   
-  # Currency rates (symbols)
-  currencies = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR") %>% 
-      purrr::set_names(.)
+  # Currency rates
+  symbol = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR") %>% 
+      purrr::set_names(.),
+  
+  currencies = tibble(
+    currency = c(
+      "US Dollar", 
+      "Euro",
+      "Argentine Peso",
+      "Mexican Peso",
+      "Chinese Renminbi",
+      "Turkish Lira",
+      "Russian Ruble",
+      "Indian Rupee",
+      "Saudi Riyal",
+      "South African Rand"
+      ),
+    symbol = symbol
+    )
   
   )
 
@@ -131,9 +146,9 @@ raw_selic_expec <- get_annual(
 
 # Currency rates
 raw_currency <- map_dfr(
-  api_bcb$currencies,
-  ~rbcb::get_currency(.x, as = "tibble", start_date = Sys.Date()-3*365, end_date = Sys.Date()),
-  .id = "currencies"
+  api_bcb$symbol,
+  ~rbcb::get_currency(.x, as = "tibble", start_date = Sys.Date() - 3 * 365, end_date = Sys.Date()),
+  .id = "symbol"
   )
 
 # EMBI+ Risco-Brasil
@@ -279,56 +294,66 @@ real_interest_rate <- bind_rows(
   )
 
 
-
-#### CONTINUE HERE...
-
-
-# Tabela Mercado Cambial
-moedas_nomes <- tibble(symbol = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR"),
-                       names = c('Dólar Americano', 'Euro', 'Peso Argentino', 'Peso Mexicano', 'Renminbi Chinês', 'Lira Turca', 'Rublo Russo', 'Rupia Indiana', 'Rial Saudita', 'Rand Sul-africano'))
-
-moedas_nomes_tabela <- c("Moeda", paste0("Cotação (", format(tail(raw_currency[[2]][[1]]$date, 1), format = "%b/%y"), ")"), 'Mensal (%)', 'Trimestral (%)', 'Interanual (%)', '12 meses (%)')
-
-moedas <- raw_currency %>%
-  unnest(dados) %>%
-  group_by(symbol) %>%
-  tibbletime::as_tbl_time(index = date) %>%
-  tibbletime::collapse_by(period = "monthly") %>%
-  as_tibble() %>%
-  group_by(symbol, date) %>%
-  summarise(ask_monthly = mean(ask)) %>%
-  mutate(previous = lag(ask_monthly, 12), 
-         mom = (ask_monthly/lag(ask_monthly)-1)*100,
-         qyoy = (rollsum(ask_monthly, 3, fill = "NA", align = "right") / 
-                  rollsum(previous, 3, fill = "NA", align = "right")-1)*100,
-         myoy = (ask_monthly/lag(ask_monthly, 12)-1)*100,
-         yoy = (rollsum(ask_monthly, 12, fill = "NA", align = "right") / 
-                  rollsum(previous, 12, fill = "NA", align = "right")-1)*100) %>%
-  group_by(symbol) %>%
+# Exchange rate (currency/R$)
+currency <- raw_currency %>%
+  group_by(
+    symbol,
+    date = format(date, "%Y-%m-01")
+    ) %>% 
+  summarise(value = mean(ask)) %>%
+  mutate( # functions from /R/utils.R
+    mom  = (value / dplyr::lag(value) - 1) * 100,
+    qyoy = (roll_sum_k(value, 3) / roll_sum_k(dplyr::lag(value, 12), 3) - 1) * 100,
+    ytd  = (value / dplyr::lag(value, 12) - 1) * 100,
+    yoy  = (roll_sum_k(value, 12) / roll_sum_k(dplyr::lag(value, 12), 12) - 1) * 100,
+    across(where(is.numeric), ~round(., 2))
+    ) %>% 
   slice_tail(n = 1) %>%
-  ungroup() %>%
-  mutate_if(is.numeric, round, 2) %>%
-  left_join(moedas_nomes, by = "symbol") %>%
-  arrange(order(moedas_nomes$symbol)) %>%
-  select(9, 3, 5:8) %>%
-  rename_all(~moedas_nomes_tabela)
+  ungroup() %>% 
+  left_join(
+    api_bcb$currencies,
+    by = c("symbol" = "symbol")
+    ) %>%
+  arrange(order(api_bcb$currencies$symbol)) %>% 
+  select(8, 3, 4:7) %>%
+  rename_with(
+    ~c("Currency",
+       paste0("Exchange rate (", format(max(raw_currency$date), "%b %Y)")),
+       "MoM %",
+       "QoQ %",
+       "YTD %",
+       "YoY %"
+       )
+    )
 
-moedas_footnote <- paste0("Nota: valores a partir de dados diários mensalizados, atualizado até ",
-                         paste0(format(tail(raw_currency[[2]][[1]]$date, 1), format = "%d/%b/%Y")),
-                         ".")
+# Footnote
+footnote_currency <- paste0(
+  "Note: average monthly exchange rate, updated to ",
+  format(max(raw_currency$date), "%B %d, %Y.")
+  )
 
 
-# Box Expectativas de Juros (Focus)
+# Annual market expectations for the current year's interest rate (Focus/BCB)
 selic_expec <- raw_selic_expec %>%
-  filter(indic_detail == "Fim do ano" & reference_year == format(Sys.Date(), "%Y")) %>%
-  select(date, indic, indic_detail, reference_year, mean) %>%
-  mutate(date = format(date, format = "%Y/%m/%d")) %>%
-  group_by(month = month(date), year = year(date)) %>%
-  slice(which.max(day(date))) %>%
-  ungroup() %>%
-  mutate(mes_ano = paste(month(date, label = TRUE), year(date), sep = " "),
-         date = paste0(format(as.Date(date), format = "%Y/%m"), "/27")) %>%
-  select(-month, -year)
+  select(
+    date,
+    variable = indicator,
+    detail,
+    reference_date,
+    value = mean
+    ) %>%
+  timetk::condense_period(
+    .date_var = date,
+    .period   = "1 month",
+    .side     = "end"
+    ) %>% 
+  mutate(
+    date_my  = format(date, "%b %Y"),
+    date     = format(date, "%Y/%m/01"),
+    variable = recode(variable, "Meta para taxa over-selic" = "SELIC Target rate"),
+    detail   = recode(detail, "Fim do ano" = "End of the year")
+    )
+
 
 
 # Box ETTJ

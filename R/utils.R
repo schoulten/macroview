@@ -22,7 +22,7 @@ pacman::p_load(
 # Function to calculate the growth rate of the last 12 months
 # in relation to the same period of the previous year
 
-yoy_growth_rate = function(col, round) {
+yoy_growth_rate = function(col, round) { ### CHANGE THIS
   
   # Works within a dataframe
   
@@ -43,6 +43,7 @@ yoy_growth_rate = function(col, round) {
 
 
 
+
 # Accumulate last k values ------------------------------------------------
 
 
@@ -58,6 +59,20 @@ accum_k = function(col, k) {
                align = "right")
   
 }
+
+roll_sum_k <- function(col, k) {
+  
+  # Works within a dataframe
+    timetk::slidify_vec(
+      .x      = col,
+      .f      = mean,
+      .period = k,
+      .align  = "right"
+      )
+  
+  } 
+
+
 
 
 
