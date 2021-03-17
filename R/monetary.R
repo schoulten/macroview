@@ -1,4 +1,4 @@
-### Monetary policy ###
+### Monetary policy ###     TODO: create retry for API wrappers
 
 
 # This R code provides the extraction and data wrangling of macroeconomic
@@ -83,7 +83,7 @@ api_bcb <- dplyr::lst(
 # List of parameters to get data from IPEADATA (API)
 api_ipeadata <- list(
   
-  # EMBI+ Risco-Brasil - daily - JP Morgan
+  # EMBI+ Risk-Brasil - daily - JP Morgan
   api_embi = "JPM366_EMBI366",
   
   # Reference rate - swaps - DI fixed rate - 360 days - period average - monthly - B3
@@ -152,7 +152,7 @@ raw_currency <- map_dfr(
   )
 
 # EMBI+ Risco-Brasil
-raw_embi <- ipeadatar::ipeadata(api_ipeadata$api_embi)
+raw_embi <- ipeadatar::ipeadata(api_ipeadata$api_embi) # improve this (use try or purrr::insistently)
 
 # Swaps - DI fixed rate - 360 days
 raw_swaps <- ipeadatar::ipeadata(api_ipeadata$api_swaps)
@@ -355,51 +355,62 @@ selic_expec <- raw_selic_expec %>%
     )
 
 
-
-# Box ETTJ
+# Current yield curve (ETTJ/Anbima)
 ettj <- raw_ettj %>%
-  mutate(data_consulta = paste(day(as.Date(current.date)),
-                               month(as.Date(current.date), label = TRUE),
-                               year(as.Date(current.date)), sep = " "),
-         data_ref = format(as.Date(ref.date), format = "%Y/%m/%d"),
-         data_dmy = paste(day(as.Date(data_ref)),
-                          month(as.Date(data_ref), label = TRUE),
-                          year(as.Date(data_ref)), sep = " "),
-         n.biz.days = as.character(n.biz.days),
-         value = round(value, 2),
-         id = "ETTJ IPCA") %>%
   filter(type == "real_return") %>%
-  select(data_consulta, data_ref, valor = value, dias_uteis = n.biz.days, id, data_dmy)
+  mutate(
+    date_query    = format(current.date, "%B %d, %Y"),
+    date_ref      = format(ref.date, "%Y/%m/%d"),
+    date_ref_full = format(ref.date, "%B %d, %Y"),
+    business_days = as.character(n.biz.days),
+    value         = round(value, 2),
+    variable      = "Yield curve (ETTJ IPCA)"
+    ) %>%
+  select(date_ref, business_days, date_ref_full, date_query, variable, value)
   
 
-# Box Ibovespa
-ibov <- tibble(periodo = as.Date(time(raw_ibovespa)),
-               pontos = as.numeric(raw_ibovespa$BVSP.Close),
-               id = "IBOVESPA") %>%
-  mutate(periodo = format(periodo, format = "%Y/%m/%d")) %>%
-  group_by(month = month(periodo),
-           year = year(periodo)) %>%
-  slice(which.max(day(periodo))) %>%
-  ungroup() %>%
-  mutate(mes_ano = paste(month(periodo, label = TRUE), year(periodo), sep = " "),
-         periodo = paste0(format(as.Date(periodo), format = "%Y/%m"), "/27", sep = "")) %>%
-  select(-month, -year)
+# Ibovespa index (B3)
+ibovespa <- raw_ibovespa %>%
+  timetk::condense_period(
+    .date_var = date,
+    .period   = "1 month",
+    .side     = "end"
+    ) %>%
+  mutate(
+    date_my = format(date, "%b %Y"),
+    date = format(date, "%Y/%m/01")
+    ) 
 
 
-# Box Risco-País (EMBI+)
+# EMBI+ Risk-Brasil - daily - JP Morgan
 embi <- raw_embi %>%
-  mutate(data = format(data, format = "%Y/%m/%d"),
-         id = "EMBI+ Risco-Brasil") %>%
-  group_by(month = month(data), year = year(data)) %>%
-  slice(which.max(day(data))) %>%
-  ungroup() %>%
-  mutate(mes_ano = paste(month(data, label = TRUE), year(data), sep = " "),
-         data = paste0(format(as.Date(data), format = "%Y/%m"), "/27", sep = "")) %>%
-  select(-month, -year)
+  timetk::condense_period(
+    .date_var = date,
+    .period   = "1 month",
+    .side     = "end"
+    ) %>%
+  mutate(
+    date_my  = format(date, "%b %Y"),
+    date     = format(date, "%Y/%m/01"),
+    variable = "EMBI+ Risk-Brasil"
+    ) %>%
+  select(date, date_my, variable, value)
 
 
 
-# Exportar dados ----------------------------------------------------------
 
-diretorio <- file.path("../data")
-save.image(file = file.path(diretorio, "monetaria.Rdata"))
+# Save data ---------------------------------------------------------------
+
+
+# Aggregate data
+imported_data_monetary <- mget(ls(pattern = "raw_|api_"))
+
+
+# Remove unnecessary objects
+rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
+   envir = .GlobalEnv)
+
+
+# Save RDATA file
+save.image(file = file.path(file.path("./data"), "monetary.Rdata"))
+
