@@ -18,7 +18,8 @@ pacman::p_load(
   "janitor",
   "survey",
   "convey",
-  "rvest"
+  "rvest",
+  "here"
   )
 
 
@@ -182,10 +183,8 @@ unemployment_gender_color <- raw_pnadct %>%
   replace_na(list(unemployed = 0)) %>%
   group_by(gender, color) %>%
   mutate(
-    unemployment_rate = sum(unemployed) / sum(unemployed + employed) * 100,
-    date              = paste0(
-      api_ibge$api_pnadc_dates$year, " Q", api_ibge$api_pnadc_dates$quarter
-      )
+    unemployment_rate = unemployed / (unemployed + employed) * 100,
+    date              = paste0(api_ibge[[2]][[3]], " Q", api_ibge[[2]][[2]])
     ) %>% 
   filter(color != "Ignorado")
 
@@ -201,9 +200,9 @@ gender_attr <- data.frame(
   )
 
 
-# Create list of Brazilian states
+# Create list of Brazilian states for the map plot
 states <- tibble(
-  state = c(
+  states = c(
     "Rondônia", "Acre", "Amazonas", "Roraima", "Pará", "Amapá", 
     "Tocantins", "Maranhão", "Piauí", "Ceará", "Rio Grande do Norte", 
     "Paraíba", "Pernambuco", "Alagoas", "Sergipe", "Bahia",
@@ -219,87 +218,144 @@ states <- tibble(
   )
 
 
-dicionario_desemprego_map <- list(
-  tx_desemprego = "Taxa de Desemprego",
-  pessoas_ocupadas = "Pessoas Ocupadas",
-  pessoas_desocupadas = "Pessoas Desocupadas",
-  trimestre = "Trimestre",
-  isolar = "Isolar",
-  ocultar = "Ocultar")
+# Dictionary for the map plot
+dict_unemployment <- list(
+  unemployment_rate = "Unemployment rate",
+  employed          = "Employed",
+  unemployed        = "Unemployed",
+  date              = "Trimestre",
+  isolar            = "Isolate",
+  ocultar           = "Hide"
+  )
+# num_txt_desemprego_map <- c("Mil", "Milhão", "Milhões", "Bilhão", "Bilhões")
 
 
-num_txt_desemprego_map <- c("Mil", "Milhão", "Milhões", "Bilhão", "Bilhões")
-
-# Mapa do Desemprego
-desemprego_map <- raw_pnadct %>% 
-  group_by(UF, VD4002) %>%
+# Unemployment rate by states
+unemployment_states <- raw_pnadct %>% 
+  group_by(
+    "states" = UF,
+    VD4002
+    ) %>%
   summarise(n = sum(V1028)) %>%
   drop_na() %>% 
   ungroup() %>% 
-  pivot_wider(names_from = VD4002, values_from = n) %>% 
-  clean_names() %>% 
-  replace_na(list(pessoas_desocupadas = 0, pessoas_ocupadas = 0)) %>% 
-  group_by(uf) %>% 
-  summarise(pessoas_ocupadas = sum(pessoas_ocupadas),
-            pessoas_desocupadas = sum(pessoas_desocupadas),
-            tx_desemprego = sum(pessoas_desocupadas)/sum(pessoas_desocupadas + pessoas_ocupadas) * 100) %>% 
-  arrange(-tx_desemprego) %>% 
-  left_join(uf_sigla, by = "uf") %>%
-  mutate(trimestre = paste(tail(raw_pnadct$Ano, length(uf)), "-T",
-                               tail(raw_pnadct$Trimestre, length(uf)), sep = ""))
+  pivot_wider(
+    names_from  = VD4002,
+    values_from = n
+    ) %>% 
+  rename_with(~c("employed", "unemployed"), 2:3) %>% 
+  replace_na(list(employed = 0, unemployed = 0)) %>% 
+  mutate(
+    unemployment_rate = unemployed / (unemployed + employed) * 100,
+    date              = paste0(api_ibge[[2]][[3]], " Q", api_ibge[[2]][[2]])
+    ) %>% 
+  arrange(-unemployment_rate) %>% 
+  left_join(states, by = "states")
 
 
-# Gráfico Nível da Ocupação
-nivel_ocupacao <- raw_labor_force %>%
-  select(trimestre = "Trimestre (Código)",
-         variavel = "Variável",
-         sexo = "Sexo",
-         valor = "Valor") %>%
-  mutate(trimestre = gsub("(\\d{4})(\\d{2})$","\\1-\\2", trimestre),
-         trimestre = gsub("-0", "-T", trimestre)) %>%
-  filter(variavel == "Nível de ocupação, na semana de referência, das pessoas de 14 anos ou mais de idade") %>%
-  select(-variavel)
+# Labor force occupation level
+occupation_level <- raw_labor_force %>%
+  select(
+    date     = "Trimestre (Código)",
+    variable = "Variável",
+    gender   = "Sexo",
+    value    = "Valor"
+    ) %>%
+  filter(
+    variable == "Nível de ocupação, na semana de referência, das pessoas de 14 anos ou mais de idade"
+    ) %>%
+  mutate(
+    date = stringr::str_replace(date, "(\\d{4})0(\\d{1}$)", "\\1 Q\\2"),
+    variable = "Labor force occupation level",
+    gender = recode(
+      gender,
+      "Homens" = "Man",
+      "Mulheres" = "Woman"
+      )
+    )
 
 
-# Box Taxa de Participação
-taxa_participacao <- raw_labor_force %>%
-  select(trimestre = "Trimestre (Código)",
-         variavel = "Variável",
-         sexo = "Sexo",
-         valor = "Valor") %>%
-  mutate(trimestre = gsub("(\\d{4})(\\d{2})$","\\1-\\2", trimestre),
-         trimestre = gsub("-0", "-T", trimestre)) %>%
-  filter(variavel == "Taxa de participação na força de trabalho, na semana de referência, das pessoas de 14 anos ou mais de idade") %>%
-  select(-variavel)
+# Labor force participation rate
+participation_rate <- raw_labor_force %>%
+  select(
+    date     = "Trimestre (Código)",
+    variable = "Variável",
+    gender   = "Sexo",
+    value    = "Valor"
+    ) %>%
+  filter(
+    variable == "Taxa de participação na força de trabalho, na semana de referência, das pessoas de 14 anos ou mais de idade"
+    ) %>%
+  mutate(
+    date = stringr::str_replace(date, "(\\d{4})0(\\d{1}$)", "\\1 Q\\2"),
+    variable = "Labor force participation rate",
+    gender = recode(
+      gender,
+      "Homens" = "Man",
+      "Mulheres" = "Woman"
+      )
+    )
 
 
-# Box Rendimento
-rendimento <- raw_income %>%
-  select(trimestre = "Trimestre (Código)",
-         idade = "Grupo de idade",
-         valor = "Valor") %>%
-  mutate(trimestre = gsub("(\\d{4})(\\d{2})$","\\1-\\2", trimestre),
-         trimestre = gsub("-0", "-T", trimestre),
-         idade = gsub(" anos", "", idade),
-         id = rep(c("1","2","3","4","5","6"), length(trimestre)/6)) %>%
+# Average real income from work, by age group
+income <- raw_income %>%
+  select(
+    date     = "Trimestre (Código)",
+    variable = "Variável",
+    age      = "Grupo de idade",
+    value    = "Valor"
+    ) %>%
+  mutate(
+    date = stringr::str_replace(date, "(\\d{4})0(\\d{1}$)", "\\1 Q\\2"),
+    variable = "Average real income from work",
+    id = rep(c("1","2","3","4","5","6"), length(date)/6),
+    age = purrr::reduce2(
+      .x    = c(" anos", " ou mais", " a "),
+      .y    = c("", " or more", " to "),
+      .init = age,
+      stringr::str_replace
+      )
+    ) %>%
   drop_na()
 
 
-# Box Índice de Gini Estadual
-raw_pnadct_gini <- raw_pnadct %>%
-  pnadc_design() %>%
-  convey_prep()
+# Gini index by state
+raw_pnadct_svy <- raw_pnadct %>%
+  PNADcIBGE::pnadc_design() %>%
+  convey::convey_prep()
 
-gini <- svyby(~VD4020, by = ~UF, raw_pnadct_gini, svygini, na.rm = TRUE) %>%
-  select(uf = UF, VD4020) %>%
-  mutate(id = "gini") %>%
-  left_join(uf_sigla, by = "uf") %>%
+gini <- survey::svyby(~VD4020, by = ~UF, raw_pnadct_svy, svygini, na.rm = TRUE) %>%
+  select("states" = UF, VD4020) %>% # Effective monthly income from all jobs
+  left_join(states, by = "states") %>%
   as_tibble() %>%
-  mutate(trimestre = paste0(raw_pnadct$Ano[1], "-T", raw_pnadct$Trimestre[1]))
+  mutate(
+    quarter  = paste0(raw_pnadct$Ano[1], " Q", raw_pnadct$Trimestre[1]),
+    variable = "Gini index"
+    ) %>% 
+  select(
+    quarter, 
+    code, 
+    states,
+    variable, 
+    "value" = VD4020
+    )
 
 
 
-# Exportar dados ----------------------------------------------------------
 
-diretorio <- file.path("../data")
-save.image(file = file.path(diretorio, "trabalho.Rdata"))
+# Save data ---------------------------------------------------------------
+
+
+# Aggregate data
+rm(raw_pnadct_svy)
+imported_data_labor <- mget(ls(pattern = "raw_|api_"))
+
+
+# Remove unnecessary objects
+rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
+   envir = .GlobalEnv)
+
+
+# Save RDATA file
+save.image(file = file.path(file.path("./data"), "labor.Rdata"))
+
