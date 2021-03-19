@@ -22,29 +22,29 @@ pacman::p_load("OECD", "tidyverse")
 
 # List of parameters to get data from OECD API
 api_oecd <- list(
-  
+
   # Quarterly National Accounts (code to get dataset)
   dataset_qna = "QNA",
-  
+
   # Main Economic Indicators (code to get  dataset)
   dataset_mei = "MEI",
-  
+
   # Labour statistics (code to get dataset)
   dataset_stlabour = "STLABOUR",
-  
-  
+
+
   # GDP (list of parameters to filter the QNA dataset)
   filter_gdp = "AUS+CAN+CHL+FRA+DEU+ITA+JPN+MEX+ESP+TUR+USA+ARG+BRA+CHN+CRI+IND+RUS.B1_GE.GYSA.A+Q",
-  
+
   # Unemployment (list of parameters to filter the STLABOUR dataset)
   filter_unemployment = "AUS+CAN+CHL+FRA+DEU+ITA+JPN+MEX+ESP+TUR+USA.LRHUTTTT.STSA.M",
-  
+
   # Inflation (list of parameters to filter the MEI dataset)
   filter_inflation = "AUS+CAN+CHL+FRA+DEU+ITA+JPN+MEX+ESP+TUR+USA+ARG+BRA+CHN+CRI+IND+RUS+BRIICS.CPALTT01.GY.M",
-  
+
   # Interest rate (list of parameters to filter the MEI dataset)
   filter_int_rate = "AUS+CAN+CHL+FRA+DEU+ITA+JPN+MEX+ESP+TUR+USA+ARG+BRA+CHN+CRI+IND+RUS+BRIICS.IRSTCB01+IRSTCI01.ST+STSA.M"
-  
+
   )
 
 
@@ -102,9 +102,9 @@ raw_int_rate <- get_dataset(
 gdp_oecd <- raw_gdp_oecd %>%
   filter(FREQUENCY == "Q") %>%
   select(
-    date     = obsTime, 
-    location = LOCATION, 
-    value    = obsValue, 
+    date     = obsTime,
+    location = LOCATION,
+    value    = obsValue,
     status   = contains("OBS_STATUS")
     ) %>%
   left_join(
@@ -126,9 +126,9 @@ gdp_oecd <- raw_gdp_oecd %>%
 # Inflation
 inflation_oecd <- raw_inflation_oecd %>%
   select(
-    date     = obsTime, 
-    location = LOCATION, 
-    value    = obsValue, 
+    date     = obsTime,
+    location = LOCATION,
+    value    = obsValue,
     status   = contains("OBS_STATUS")
   ) %>%
   left_join(
@@ -151,9 +151,9 @@ inflation_oecd <- raw_inflation_oecd %>%
 # Unemployment rate
 unemployment_oecd <- raw_unemployment_oecd %>%
   select(
-    date     = obsTime, 
-    location = LOCATION, 
-    value    = obsValue, 
+    date     = obsTime,
+    location = LOCATION,
+    value    = obsValue,
     status   = contains("OBS_STATUS")
   ) %>%
   left_join(
@@ -178,9 +178,9 @@ unemployment_oecd <- raw_unemployment_oecd %>%
 int_rate_oecd <- raw_int_rate %>%
   filter(SUBJECT == "IRSTCI01") %>%
   select(
-    date     = obsTime, 
-    location = LOCATION, 
-    value    = obsValue, 
+    date     = obsTime,
+    location = LOCATION,
+    value    = obsValue,
     status   = contains("OBS_STATUS")
   ) %>%
   left_join(

@@ -11,13 +11,13 @@
 # Install/load packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
-  "tidyverse", 
+  "tidyverse",
   "sidrar",
   "readxl",
   "lubridate",
   "GetBCBData",
-  "zoo", 
-  "mgsub", 
+  "zoo",
+  "mgsub",
   "janitor"
   )
 
@@ -35,48 +35,48 @@ source("./R/utils.R")
 
 # List of URLs to get data from different sources
 url_list <- list(
-  
+
   # ICVA (spreadsheet data of the Cielo Index)
   url_icva = "https://apicatalog.mziq.com/filemanager/v2/d/4d1ebe73-b068-4443-992a-3d72d573238c/3e864198-0b72-c970-1771-80cd8c338a30?origin=2",
-  
+
   # Vehicle Production (spreadsheet data from ANFAVEA)
   url_anfavea = "http://www.anfavea.com.br/docs/SeriesTemporais_Autoveiculos.xlsm"
-  
+
 )
 
 
 # List of parameters to get data from SIDRA/IBGE website
 api_sidra <- list(
-  
+
   # GDP (percent changes)
   api_gdp = "/t/5932/n1/all/v/all/p/all/c11255/90687,90691,90696,90707,93404,93405,93406,93407,93408/d/v6561%201,v6562%201,v6563%201,v6564%201",
-  
+
   # GDP (R$ million, current prices)
   api_gdp_brl = "/t/1846/n1/all/v/all/p/all/c11255/90687,90691,90696,90707,93404,93405,93406,93407,93408/d/v585%200",
-  
+
   # PMC (retail trade from IBGE)
   api_pmc = "/t/3416/n1/all/v/all/p/all/c11046/90668/d/v564%201,v565%201",
-  
+
   # PMC (expanded retail trade from IBGE)
   api_pmc_expanded = "/t/3417/n1/all/v/all/p/all/c11046/90668/d/v1186%201,v1190%201",
-  
+
   # PMS (Monthly Service Survey from IBGE)
   api_pms = "/t/6442/n1/all/v/all/p/all/c11046/90668/d/v8676%201,v8677%201",
-  
+
   # PIM (Monthly Industrial Survey from IBGE - YoY rate of change)
   api_pim = "/t/3653/n1/all/v/3139/p/all/c544/129314,129315,129316,129338/d/v3139%201"
-  
+
   )
 
 
 # List of parameters to get data from Central Bank
 api_bcb <- list(
-  
+
   # Installed Capacity Utilization Level (NUCI/FGV)
   api_nuci = c(
     "Installed Capacity Utilization Level" = 28561
     ),
-  
+
   # IBC-Br (economic activity index from BCB)
   api_ibc = c(
     "Brasil"       = 24364,
@@ -86,7 +86,7 @@ api_bcb <- list(
     "Sudeste"      = 25395,
     "Sul"          = 25403
     )
-  
+
   )
 
 
@@ -181,15 +181,17 @@ raw_vehicle <- read_excel(
 
 # Installed Capacity Utilization Level (NUCI/FGV)
 raw_nuci <- gbcbd_get_series(
-  id         = api_bcb$api_nuci,
-  first.date = "2001-01-01"
+  id          = api_bcb$api_nuci,
+  first.date  = "2001-01-01",
+  use.memoise = FALSE
   )
 
 
 # IBC-Br (economic activity index from Central Bank of Brazil)
 raw_ibc <- gbcbd_get_series(
-  id         = api_bcb$api_ibc,
-  first.date = "2003-01-27"
+  id          = api_bcb$api_ibc,
+  first.date  = "2003-01-27",
+  use.memoise = FALSE
   )
 
 
@@ -255,9 +257,9 @@ icva <- raw_icva %>%
   rename_with(~c("date", "nominal", "nominal_sa", "real", "real_sa")) %>%
   mutate(
     value = real_sa*100, # convert to % format
-    date  = as_date(date),
+    date  = lubridate::as_date(date),
     ) %>%
-  filter(date == last(date)) %>% 
+  filter(date == last(date)) %>%
   select(date, value)
 
 
@@ -268,11 +270,11 @@ vehicle <- raw_vehicle %>%
     date  = x1,
     value = producao_5
     ) %>%
-  mutate(date = as_date(date)) %>% 
+  mutate(date = lubridate::as_date(date)) %>%
   na_if(0) %>%
   drop_na()
 
-  
+
 # Installed Capacity Utilization Level (NUCI/FGV)
 nuci <- raw_nuci %>%
   clean_names() %>%
@@ -284,14 +286,14 @@ nuci <- raw_nuci %>%
 
 # Levels for factor column
 levels_gdp <- c(
-  "GDP", 
+  "GDP",
   "Agriculture",
-  "Industry", 
+  "Industry",
   "Services",
-  "Private consumption", 
+  "Private consumption",
   "Government spending",
-  "Investment", 
-  "Exports", 
+  "Investment",
+  "Exports",
   "Imports"
   )
 
@@ -301,7 +303,7 @@ footnote_gdp <- gdp %>%
   mutate(
     note = paste0(
       "Note: updated until ",
-      parse_date_time(date, orders = "Yq") %>% as.yearqtr(),
+      stringr::str_replace(date, "(\\d{4}).(\\d{1}$)", "\\1 Q\\2"),
       "."
       )
     ) %>%
@@ -312,14 +314,14 @@ footnote_gdp <- gdp %>%
 gdp_measures <- gdp %>%
   filter(date == max(date)) %>%
   pivot_wider(
-    id_cols     = sector, 
-    names_from  = variable, 
+    id_cols     = sector,
+    names_from  = variable,
     values_from = value
     ) %>%
   relocate(1, 5, 2, 4, 3) %>%
   mutate(
     sector = factor(
-      sector, 
+      sector,
       levels = levels_gdp
       )
     ) %>%
@@ -344,10 +346,10 @@ gdp_growth_sector <- gdp %>%
 # IBC-Br growth by region
 ibc_growth <- raw_ibc %>%
   select(
-    date     = ref.date, 
-    variable = series.name, 
+    date     = ref.date,
+    variable = series.name,
     value
-    ) %>% 
+    ) %>%
   group_by(variable) %>%
   mutate(
     yoy = yoy_growth_rate( # function from /R/utils.R
@@ -355,7 +357,7 @@ ibc_growth <- raw_ibc %>%
       round = 2
       ),
     date = as.character(
-      format(date, format = "%Y/%m/%d")
+      format(date, "%Y/%m/%d")
       )
   ) %>%
   drop_na()
@@ -367,7 +369,7 @@ pmc <- bind_rows(
   raw_pmc
   ) %>%
   mutate(
-    date     = ymd_sidra(date),
+    date     = ymd_sidra(date), # function from /R/utils.R
     variable = recode(
       variable,
       "Índice de volume de vendas no comércio varejista ampliado"          = "Retail sales volume expanded",
@@ -387,7 +389,7 @@ pms <- raw_pms %>%
       "Índice de receita nominal de serviços" = "Revenue",
       "Índice de volume de serviços"          = "Volume"
       ),
-    date     = ymd_sidra(date)
+    date     = ymd_sidra(date) # function from /R/utils.R
     ) %>%
   drop_na()
 
@@ -402,7 +404,7 @@ pim <- raw_pim %>%
       "3 Indústrias de transformação"                                   = "Manufacturing industries",
       "3.29 Fabricação de veículos automotores, reboques e carrocerias" = "Manufacture of motor vehicles"
       ),
-    date = ymd_sidra(date)
+    date = ymd_sidra(date) # function from /R/utils.R
   ) %>%
   drop_na()
 
