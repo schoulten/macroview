@@ -11,9 +11,9 @@
 # Install/load packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
-  "sidrar", 
+  "sidrar",
   "tidyverse",
-  "lubridate", 
+  "lubridate",
   "GetBCBData",
   "janitor"
   )
@@ -36,48 +36,48 @@ source("./R/utils.R")
 
 # List of parameters to get data from SIDRA/IBGE website
 api_sidra <- list(
-  
+
   # Consumer Price Index - IPCA (parameters from SIDRA/IBGE website)
   api_ipca = "/t/1737/n1/all/v/63,69,2263,2264,2265/p/all/d/v63%202,v69%202,v2263%202,v2264%202,v2265%202",
-  
+
     # Consumer Price Index (groups) - IPCA (parameters from SIDRA/IBGE website)
   api_ipca_groups = "/t/7060/n1/all/v/63,69/p/all/c315/7169,7170,7445,7486,7558,7625,7660,7712,7766,7786/d/v63%202,v69%202",
-  
+
     # Consumer Price Index by Metropolitan Region - IPCA (parameters from SIDRA/IBGE website)
   api_ipca_region = "/t/7060/n7/all/v/69/p/all/c315/7169/d/v69%202"
-  
+
   )
 
 
 # List of parameters to get data from Central Bank
 api_bcb <- list(
-  
+
   # Inflation-targeting
   api_ipca_target = c(
     "Inflation target" = 13521
     ),
-  
+
   # Diffusion index - Consumer Price Index (IPCA)
   api_ipca_diffusion = c(
     "Diffusion index (PCI)" = 21379
     ),
-  
+
   # CPI cores - IPCA
   api_ipca_cores = c(
-    "IPCA-EX0" = 11427, 
-    "IPCA-EX1" = 16121, 
-    "IPCA-DP"  = 16122, 
+    "IPCA-EX0" = 11427,
+    "IPCA-EX1" = 16121,
+    "IPCA-DP"  = 16122,
     "IPCA-MA"  = 11426,
     "IPCA-MS"  = 4466
     ),
-  
+
   # General price index (IGP/FGV)
   api_igp = c(
-    "IGP-M"  = 189, 
+    "IGP-M"  = 189,
     "IGP-DI" = 190,
     "IGP-10" = 7447
     )
-  
+
   )
 
 
@@ -89,18 +89,19 @@ api_bcb <- list(
 
 
 # Inflation-targeting
-raw_ipca_target <- gbcbd_get_series(
-  id         = api_bcb$api_ipca_target,
-  first.date = "1999-01-01"
+raw_ipca_target <- GetBCBData::gbcbd_get_series(
+  id          = api_bcb$api_ipca_target,
+  first.date  = "1999-01-01",
+  use.memoise = FALSE
   )
 
 
-# Consumer Price Index - IPCA 
-raw_ipca <- get_sidra(api = api_sidra$api_ipca)
+# Consumer Price Index - IPCA
+raw_ipca <- sidrar::get_sidra(api = api_sidra$api_ipca)
 
 
 # Consumer Price Index by groups - IPCA
-raw_ipca_groups <- get_sidra(api = api_sidra$api_ipca_groups) %>%
+raw_ipca_groups <- sidrar::get_sidra(api = api_sidra$api_ipca_groups) %>%
   select(
     date     = "Mês (Código)",
     variable = "Variável",
@@ -110,7 +111,7 @@ raw_ipca_groups <- get_sidra(api = api_sidra$api_ipca_groups) %>%
 
 
 # Consumer Price Index by Metropolitan Region - IPCA
-raw_ipca_region <- get_sidra(api = api_sidra$api_ipca_region) %>% 
+raw_ipca_region <- sidrar::get_sidra(api = api_sidra$api_ipca_region) %>%
   select(
     date     = "Mês (Código)",
     variable = "Variável",
@@ -120,22 +121,25 @@ raw_ipca_region <- get_sidra(api = api_sidra$api_ipca_region) %>%
 
 
 # Diffusion index - Consumer Price Index (IPCA)
-raw_ipca_diffusion <- gbcbd_get_series(
-  id         = api_bcb$api_ipca_diffusion,
-  first.date = "2001-01-01"
+raw_ipca_diffusion <- GetBCBData::gbcbd_get_series(
+  id          = api_bcb$api_ipca_diffusion,
+  first.date  = "2001-01-01",
+  use.memoise = FALSE
   )
 
 
 # CPI cores - IPCA
-raw_ipca_cores <- gbcbd_get_series(
-  id = api_bcb$api_ipca_cores
+raw_ipca_cores <- GetBCBData::gbcbd_get_series(
+  id          = api_bcb$api_ipca_cores,
+  use.memoise = FALSE
   )
 
 
 # General price index (IGP/FGV)
-raw_igp <- gbcbd_get_series(
-  id         = api_bcb$api_igp,
-  first.date = "1994-09-01"
+raw_igp <- GetBCBData::gbcbd_get_series(
+  id          = api_bcb$api_igp,
+  first.date  = "1994-09-01",
+  use.memoise = FALSE
   )
 
 
@@ -165,7 +169,7 @@ ipca <- raw_ipca %>%
       ),
     date = ymd_sidra(date) # function from /R/utils.R
     ) %>%
-  drop_na()
+  tidyr::drop_na()
 
 
 # Consumer Price Index by groups - IPCA
@@ -206,7 +210,7 @@ footnote_ipca_grupos <- raw_ipca_groups %>%
   mutate(
     date = paste0(
       "Note: data for ",
-      format(as.Date(ymd_sidra(date), "%Y/%m/%d"), format = "%B %Y"), # function from /R/utils.R
+      format(as.Date(ymd_sidra(date), "%Y/%m/%d"), "%B %Y"), # function from /R/utils.R
       "."
       )
     ) %>%
@@ -214,7 +218,7 @@ footnote_ipca_grupos <- raw_ipca_groups %>%
 
 
 # Consumer Price Index by Metropolitan Region - IPCA
-ipca_region <- raw_ipca_region %>% 
+ipca_region <- raw_ipca_region %>%
   mutate(date = ymd_sidra(date)) # function from /R/utils.R
 
 
@@ -227,7 +231,7 @@ ipca_yoy <- ipca %>%
 
 # Inflation-targeting (current year)
 inflation_target <- raw_ipca_target %>%
-  clean_names() %>%
+  janitor::clean_names() %>%
   mutate(date = format(ref_date, "%Y")) %>%
   filter(date == format(Sys.time(), "%Y")) %>%
   select(date, id = series_name, value)
@@ -238,7 +242,7 @@ ipca_trend <- ipca %>%
   filter(
     variable %in% c("Month over Month (%)", "Year over Year (%)")
     )
-  
+
 
 # Diffusion index - Consumer Price Index (IPCA)
 ipca_diffusion <- raw_ipca_diffusion %>%

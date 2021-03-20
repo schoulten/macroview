@@ -11,14 +11,14 @@
 # Install/load packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
-  "readxl", 
+  "readxl",
   "tidyverse",
   "sidrar",
   "GetBCBData",
   "zoo",
-  "janitor", 
+  "janitor",
   "rio",
-  "deflateBR", 
+  "deflateBR",
   "lubridate"
   )
 
@@ -39,48 +39,48 @@ source("./R/utils.R")
 
 
 # Disable scientific notation
-options(scipen = 999)
+options(scipen = 999, digits = 15)
 
 
 # List of URLs to get data from different sources
 url_list <- list(
-  
+
   # Central Government Primary Balance (URL to download spreadsheet data from National Treasury)
   url_treasury = "http://sisweb.tesouro.gov.br/apex/cosis/thot/link/rtn/serie-historica?conteudo=cdn",
-  
-  
+
+
   # General government net and gross debt (URL to download spreadsheet data from Central Bank)
   url_debt = "https://www.bcb.gov.br/content/estatisticas/Documents/Tabelas_especiais/Divggnp.xls",
-  
-  
+
+
   # Federal Public Debt stock (URL to download spreadsheet data from National Treasury)
   url_debt_stock = "https://www.tesourotransparente.gov.br/ckan/dataset/0998f610-bc25-4ce3-b32c-a873447500c2/
 resource/0402cb77-5e4c-4414-966f-0e87d802a29a/download/2.1.xlsx",
-  
-  
+
+
   # Debt Risk Rating History (URL to download spreadsheet data from National Treasury)
   url_rating = "https://sisweb.tesouro.gov.br/apex/f?p=2810:2::CSV:NO:RP::"
-  
+
   )
 
 
 # List of parameters to get data from SIDRA/IBGE website
 api_sidra <- list(
-  
+
   # Consumer Price Index - IPCA
   api_ipca_index = "/t/1737/n1/all/v/2266/p/all/d/v2266%2013"
-  
+
   )
 
 
 # List of parameters to get data from Central Bank
 api_bcb <- list(
-  
+
   # Inflation-targeting
   api_gdp_12m = c("Accumulated GDP in the last 12 months" = 4382)
-  
+
   )
-  
+
 
 # Central Government Fiscal Balance (accounts)
 balance_accounts <- tibble(
@@ -89,7 +89,7 @@ balance_accounts <- tibble(
     rep("Transfers by Revenue Sharing", 7),
     rep("Total Expenditure", 29)
     ),
-                     
+
   group_2 = c(
     rep("Revenues Collected by the Federal Revenue Office", 10),
     "Fiscal Incentives",
@@ -98,29 +98,29 @@ balance_accounts <- tibble(
     "FPM / FPE / IPI-EE",
     rep("Constitutional Funds", 2),
     "Education-Salary (social contribution for education)",
-    "Exploitation of Natural Reosurces", 
+    "Exploitation of Natural Reosurces",
     "CIDE - Fuels",
-    "Other", 
+    "Other",
     "Social Security Benefits",
-    "Payroll", 
+    "Payroll",
     rep("Other Compulsory Expenses", 25),
     rep("Executive Branch Expenses Subject to Financial Programming", 2)
     ),
-                     
+
   group_3 = c(
     "Import Tax",
     "Industrialized Products Tax (IPI)",
     "Income tax (IR)",
-    "Tax on Credit Operations, Exchange and Insurance (IOF)", 
-    "Contribution to Social Security Financing (COFINS)", 
-    "Contribution to the Social Integration Program and Civil Service Asset Formation Program (PIS/Pasep)", 
-    "Social Contribution on Net Corporate Profits (CSLL)", 
+    "Tax on Credit Operations, Exchange and Insurance (IOF)",
+    "Contribution to Social Security Financing (COFINS)",
+    "Contribution to the Social Integration Program and Civil Service Asset Formation Program (PIS/Pasep)",
+    "Social Contribution on Net Corporate Profits (CSLL)",
     "Provisional Contribution on Financial Operations (CPMF)",
     "Contribution on Intervention in the Economic Domain (CIDE) - Fuels",
     "Other",
     "Fiscal Incentives",
-    "Net Social Security Revenues", 
-    "Concessions and Permissions", 
+    "Net Social Security Revenues",
+    "Concessions and Permissions",
     "Dividends",
     "Contribution to Civil Service Social Security (CPSS)",
     "Exploitation of Natural Resources",
@@ -147,9 +147,9 @@ balance_accounts <- tibble(
     "FGTS Complement (LC nº 110/01)",
     "Extraordinary credits (excluding PAC)",
     "Compensation to the Social Security Fund (RGPS) due to the payroll tax reduction",
-    "Covenants", 
-    "Donations", 
-    "Bills and Coins Manufacturing", 
+    "Covenants",
+    "Donations",
+    "Bills and Coins Manufacturing",
     "Fundef/Fundeb (Federal Complementation)",
     "Federal District (DF) Contitucional Fund (Current and Capital)",
     "Regional Development Funds for the Amazon (FDA) and the Northeast (FDNE)",
@@ -159,11 +159,11 @@ balance_accounts <- tibble(
     "Reimbursement States/Municipalities Fossil Fuels",
     "Judicial Remedies (Current and Capital)",
     "Subsidies and Grants",
-    "ANA (National Water Agency) Transfers", 
-    "ANEEL (Electric Energy National Agency) Transfers and Fines", 
+    "ANA (National Water Agency) Transfers",
+    "ANEEL (Electric Energy National Agency) Transfers and Fines",
     "FIES primary impact (Student Funding)",
-    "Electoral Campaign Funding", 
-    "Compulsory Expenses with Cash Control", 
+    "Electoral Campaign Funding",
+    "Compulsory Expenses with Cash Control",
     "Discretionary"
     )
   )
@@ -190,14 +190,15 @@ raw_treasury <- read_xlsx(
   n_max     = 74
   ) %>%
   t() %>%
-  as_tibble() %>% 
+  as_tibble() %>%
   clean_names()
 
 
 # Accumulated GDP in the last 12 months - Current values (R$ million)
 raw_gdp_monthly <- gbcbd_get_series(
-  id         = api_bcb$api_gdp_12m,
-  first.date = "1997-01-01"
+  id          = api_bcb$api_gdp_12m,
+  first.date  = "1997-01-01",
+  use.memoise = FALSE
   )
 
 
@@ -218,9 +219,9 @@ raw_debt <- read_excel(
 
 
 # Consumer Price Index (IPCA/IBGE)
-raw_ipca_index <- get_sidra(api = api_sidra$api_ipca_index)$Valor %>% 
+raw_ipca_index <- get_sidra(api = api_sidra$api_ipca_index)$Valor %>%
   ts(
-    start     = c(1979, 12), 
+    start     = c(1979, 12),
     frequency = 12
     ) %>%
   window(start = c(2006, 12))
@@ -258,7 +259,7 @@ raw_rating <- import("./data/rating.csv")
 
 # Central Government Primary Balance
 treasury <- raw_treasury %>%
-  row_to_names(
+  janitor::row_to_names(
     row_number = 1,
     remove_row = TRUE
     ) %>%
@@ -270,7 +271,7 @@ treasury <- raw_treasury %>%
       by     = "months"
       ) %>% format("%Y/%m/%d")
     ) %>%
-  drop_na()
+  tidyr::drop_na()
 
 
 # Central Government Primary Balance (accumulated in 12 months + GDP)
@@ -284,7 +285,7 @@ treasury_accum_12m <- treasury %>%
       select(date, gdp_accum_12m = value),
     by = "date"
     ) %>%
-  drop_na()
+  tidyr::drop_na()
 
 
 # Central Government Primary Balance accumulated in 12 months (% GDP)
@@ -303,13 +304,13 @@ primary_deficit <- treasury_accum_12m_gdp %>%
 # Revenues and spending
 revenue_spending <- treasury_accum_12m_gdp %>%
   select(
-    date, 
-    `Net Revenue`       = 34, 
+    date,
+    `Net Revenue`       = 34,
     `Total Expenditure` = 35
     ) %>%
   pivot_longer(
-    cols      = -date, 
-    names_to  = "variable", 
+    cols      = -date,
+    names_to  = "variable",
     values_to = "value"
     )
 
@@ -319,13 +320,13 @@ revenue_spending_detail <- treasury_accum_12m %>%
   slice_tail(n = 1) %>%
   select(-c(1,2,15,25,27,34,35,38,64,67:74,76)) %>%
   pivot_longer(
-    cols      = -date, 
-    names_to  = "variable", 
+    cols      = -date,
+    names_to  = "variable",
     values_to = "value"
     ) %>%
   select(-variable) %>%
   bind_cols(balance_accounts) %>%
-  mutate(date = as.yearmon(date, format = "%Y/%m/%d"))
+  mutate(date = format(lubridate::ymd(date), "%b %Y"))
 
 
 # General government net and gross debt
@@ -335,25 +336,25 @@ public_debt <- raw_debt %>%
 
 # General government net and gross debt (deflated)
 public_debt_deflated <- as_tibble(
-  t(public_debt), 
+  t(public_debt),
   rownames = "row_names"
   ) %>%
-  row_to_names(1) %>%
-  clean_names() %>%
+  janitor::row_to_names(1) %>%
+  janitor::clean_names() %>%
   select(!1) %>%
   mutate(
     date = seq(
-      from   = as.Date("2006/12/01"), 
-      length = nrow(.), 
+      from   = as.Date("2006/12/01"),
+      length = nrow(.),
       by     = "months"
       ),
     across(!date, as.numeric),
     across(
       !date,
-      ~deflate(
-        nominal_values = .x, 
-        nominal_dates  = date, 
-        real_date      = format(last(date), "%m/%Y"), 
+      ~deflateBR::deflate(
+        nominal_values = .x,
+        nominal_dates  = date,
+        real_date      = format(last(date), "%m/%Y"),
         index          = "ipca"
         )
       )
@@ -383,10 +384,10 @@ debt_stock <- as_tibble(
     variable = "Debt Stock",
     across(
       value,
-      ~deflate(
-        nominal_values = .x, 
-        nominal_dates  = date, 
-        real_date      = format(last(date), "%m/%Y"), 
+      ~deflateBR::deflate(
+        nominal_values = .x,
+        nominal_dates  = date,
+        real_date      = format(last(date), "%m/%Y"),
         index          = "ipca"
         )
       ),
@@ -397,7 +398,7 @@ debt_stock <- as_tibble(
 
 # Debt Risk Rating History
 rating  <- raw_rating %>%
-  rename_with(~c("Last update", "Agency", "Foreign currency", "Local currency", "Action")) %>% 
+  rename_with(~c("Last update", "Agency", "Foreign currency", "Local currency", "Action")) %>%
   mutate(
     `Foreign currency` = gsub("\\-", "--", `Foreign currency`),
     `Local currency`   = gsub("\\-", "--", `Local currency`)
@@ -408,24 +409,24 @@ rating  <- raw_rating %>%
 gov_portfolio <- t(raw_debt_stock) %>%
   as_tibble() %>%
   select(1, 7:10, 12:15) %>%
-  row_to_names(row_number = 1) %>%
+  janitor::row_to_names(row_number = 1) %>%
   rename("date" = 1) %>%
   mutate(
     date = myd(
       paste0(date, "/01"),
       locale = "Portuguese_Brazil.1252"
       )
-    ) %>% 
+    ) %>%
   pivot_longer(
-    cols      = -date, 
-    names_to  = "id", 
+    cols      = -date,
+    names_to  = "id",
     values_to = "value"
     ) %>%
   mutate(
     value   = as.numeric(value)*1000,
     date_my = paste(
-      month(date, label = TRUE), 
-      year(date), 
+      lubridate::month(date, label = TRUE),
+      lubridate::year(date),
       sep = " "
       )
     )

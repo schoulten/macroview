@@ -56,8 +56,8 @@ api_oecd <- list(
 
 
 # GDP
-str_gdp <- get_data_structure(api_oecd$dataset_qna) # dataset structure information
-raw_gdp_oecd <- get_dataset(
+str_gdp <- OECD::get_data_structure(api_oecd$dataset_qna) # dataset structure information
+raw_gdp_oecd <- OECD::get_dataset(
   dataset       = api_oecd$dataset_qna,
   filter        = list(api_oecd$filter_gdp),
   pre_formatted = TRUE
@@ -65,8 +65,8 @@ raw_gdp_oecd <- get_dataset(
 
 
 # Unemployment Rate
-str_unemployment <- get_data_structure(api_oecd$dataset_stlabour) # dataset structure information
-raw_unemployment_oecd <- get_dataset(
+str_unemployment <- OECD::get_data_structure(api_oecd$dataset_stlabour) # dataset structure information
+raw_unemployment_oecd <- OECD::get_dataset(
   dataset       = api_oecd$dataset_stlabour,
   filter        = list(api_oecd$filter_unemployment),
   pre_formatted = TRUE
@@ -74,8 +74,8 @@ raw_unemployment_oecd <- get_dataset(
 
 
 # Inflation
-str_inflation <- get_data_structure(api_oecd$dataset_mei) # dataset structure information
-raw_inflation_oecd <- get_dataset(
+str_inflation <- OECD::get_data_structure(api_oecd$dataset_mei) # dataset structure information
+raw_inflation_oecd <- OECD::get_dataset(
   dataset       = api_oecd$dataset_mei,
   filter        = list(api_oecd$filter_inflation),
   pre_formatted = TRUE
@@ -83,7 +83,7 @@ raw_inflation_oecd <- get_dataset(
 
 
 # Interest rate
-raw_int_rate <- get_dataset(
+raw_int_rate <- OECD::get_dataset(
   dataset       = api_oecd$dataset_mei,
   filter        = list(api_oecd$filter_int_rate),
   pre_formatted = TRUE
@@ -136,7 +136,7 @@ inflation_oecd <- raw_inflation_oecd %>%
     by = c("location" = "id")
     ) %>%
   mutate(
-    date = paste0(date, "-01") %>% str_replace_all("-", "/"),
+    date = paste0(date, "-01") %>% stringr::str_replace_all("-", "/"),
     across(
       any_of("status"),
       ~recode(
@@ -161,7 +161,7 @@ unemployment_oecd <- raw_unemployment_oecd %>%
     by = c("location" = "id")
     ) %>%
   mutate(
-    date = paste0(date, "-01") %>% str_replace_all("-", "/"),
+    date = paste0(date, "-01") %>% stringr::str_replace_all("-", "/"),
     across(
       any_of("status"),
       ~recode(
@@ -188,7 +188,7 @@ int_rate_oecd <- raw_int_rate %>%
     by = c("location" = "id")
   ) %>%
   mutate(
-    date = paste0(date, "-01") %>% str_replace_all("-", "/"),
+    date = paste0(date, "-01") %>% stringr::str_replace_all("-", "/"),
     across(
       any_of("status"),
       ~recode(

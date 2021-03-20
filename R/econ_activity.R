@@ -98,7 +98,7 @@ api_bcb <- list(
 
 
 # GDP growth (rate of change of the quarterly volume index from IBGE)
-raw_gdp <- get_sidra(api = api_sidra$api_gdp) %>%
+raw_gdp <- sidrar::get_sidra(api = api_sidra$api_gdp) %>%
   select(
     date     = "Trimestre (Código)",
     variable = "Variável",
@@ -109,7 +109,7 @@ raw_gdp <- get_sidra(api = api_sidra$api_gdp) %>%
 
 
 # GDP (values at current prices from IBGE)
-raw_gdp_cur_prices <- get_sidra(api = api_sidra$api_gdp_brl) %>%
+raw_gdp_cur_prices <- sidrar::get_sidra(api = api_sidra$api_gdp_brl) %>%
   select(
     date    = "Trimestre (Código)",
     sector  = "Setores e subsetores",
@@ -119,7 +119,7 @@ raw_gdp_cur_prices <- get_sidra(api = api_sidra$api_gdp_brl) %>%
 
 
 # PMC (retail trade from IBGE)
-raw_pmc <- get_sidra(api = api_sidra$api_pmc) %>%
+raw_pmc <- sidrar::get_sidra(api = api_sidra$api_pmc) %>%
   select(
     date     = "Mês (Código)",
     variable = "Variável",
@@ -129,7 +129,7 @@ raw_pmc <- get_sidra(api = api_sidra$api_pmc) %>%
 
 
 # PMC (expanded retail trade from IBGE)
-raw_pmc_expanded <- get_sidra(api = api_sidra$api_pmc_expanded) %>%
+raw_pmc_expanded <- sidrar::get_sidra(api = api_sidra$api_pmc_expanded) %>%
   select(
     date     = "Mês (Código)",
     variable = "Variável",
@@ -139,7 +139,7 @@ raw_pmc_expanded <- get_sidra(api = api_sidra$api_pmc_expanded) %>%
 
 
 # PMS (Monthly Service Survey from IBGE)
-raw_pms <- get_sidra(api = api_sidra$api_pms) %>%
+raw_pms <- sidrar::get_sidra(api = api_sidra$api_pms) %>%
   select(
     date     = "Mês (Código)",
     variable = "Variável",
@@ -149,7 +149,7 @@ raw_pms <- get_sidra(api = api_sidra$api_pms) %>%
 
 
 # PIM (Monthly Industrial Survey from IBGE - YoY rate of change)
-raw_pim <- get_sidra(api = api_sidra$api_pim) %>%
+raw_pim <- sidrar::get_sidra(api = api_sidra$api_pim) %>%
   select(
     date     = "Mês (Código)",
     variable = "Seções e atividades industriais (CNAE 2.0)",
@@ -164,7 +164,7 @@ download.file(
   destfile = "./data/icva.xlsx",
   mode     = "wb"
   )
-raw_icva <- read_excel("./data/icva.xlsx")
+raw_icva <- readxl::read_excel("./data/icva.xlsx")
 
 
 # Vehicle Production (ANFAVEA)
@@ -173,14 +173,14 @@ download.file(
   destfile = file.path("./data", basename(url_list$url_anfavea)),
   mode     = "wb"
   )
-raw_vehicle <- read_excel(
+raw_vehicle <- readxl::read_excel(
   path = file.path("./data", basename(url_list$url_anfavea)),
   skip = 4
   )
 
 
 # Installed Capacity Utilization Level (NUCI/FGV)
-raw_nuci <- gbcbd_get_series(
+raw_nuci <- GetBCBData::gbcbd_get_series(
   id          = api_bcb$api_nuci,
   first.date  = "2001-01-01",
   use.memoise = FALSE
@@ -188,7 +188,7 @@ raw_nuci <- gbcbd_get_series(
 
 
 # IBC-Br (economic activity index from Central Bank of Brazil)
-raw_ibc <- gbcbd_get_series(
+raw_ibc <- GetBCBData::gbcbd_get_series(
   id          = api_bcb$api_ibc,
   first.date  = "2003-01-27",
   use.memoise = FALSE
@@ -224,11 +224,11 @@ gdp <- raw_gdp %>%
       "Exportação de bens e serviços"               = "Exports",
       "Importação de bens e serviços (-)"           = "Imports"
     ),
-    date = parse_date_time(
+    date = lubridate::parse_date_time(
       date,
       orders = "Yq"
       ) %>%
-      quarter(with_year = TRUE)
+      lubridate::quarter(with_year = TRUE)
   ) %>%
   arrange(date)
 
@@ -265,19 +265,19 @@ icva <- raw_icva %>%
 
 # Vehicle Production
 vehicle <- raw_vehicle %>%
-  clean_names() %>%
+  janitor::clean_names() %>%
   select(
     date  = x1,
     value = producao_5
     ) %>%
   mutate(date = lubridate::as_date(date)) %>%
-  na_if(0) %>%
-  drop_na()
+  dplyr::na_if(0) %>%
+  tidyr::drop_na()
 
 
 # Installed Capacity Utilization Level (NUCI/FGV)
 nuci <- raw_nuci %>%
-  clean_names() %>%
+  janitor::clean_names() %>%
   rename_with(~c("date", "value"), 1:2) %>%
   filter(date == last(date))
 
@@ -360,7 +360,7 @@ ibc_growth <- raw_ibc %>%
       format(date, "%Y/%m/%d")
       )
   ) %>%
-  drop_na()
+  tidyr::drop_na()
 
 
 # PMC growth
@@ -378,7 +378,7 @@ pmc <- bind_rows(
       "Índice de receita nominal de vendas no comércio varejista"          = "Retail sales revenue"
       )
     ) %>%
-  drop_na()
+  tidyr::drop_na()
 
 
 # PMS growth
@@ -391,7 +391,7 @@ pms <- raw_pms %>%
       ),
     date     = ymd_sidra(date) # function from /R/utils.R
     ) %>%
-  drop_na()
+  tidyr::drop_na()
 
 
 # PIM growth
@@ -406,7 +406,7 @@ pim <- raw_pim %>%
       ),
     date = ymd_sidra(date) # function from /R/utils.R
   ) %>%
-  drop_na()
+  tidyr::drop_na()
 
 
 

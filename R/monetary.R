@@ -43,27 +43,27 @@ source("./R/utils.R")
 
 # List of parameters to get data from Central Bank (API)
 api_bcb <- dplyr::lst(
-  
+
   # Interest Rate (short-term) - % p.y.
   api_interest_rate = c(
     "SELIC Target rate" = 432,  # Defined by COPOM/BCB - daily
     "CDI Rate"          = 4389, # CDI in annual terms (basis 252) - daily
     "SELIC Rate"        = 4189  # Selic accumulated in the month in annual terms (basis 252) - monthly
     ),
-  
+
   # Inflation's market expectations for the next 12 months (IPCA indicator)
   api_inflation_expec = "IPCA",
-  
+
   # SELIC annual market expectations
   api_selic_expec = "Meta para taxa over-selic",
-  
+
   # Currency rates
-  symbol = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR") %>% 
+  symbol = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR") %>%
       purrr::set_names(.),
-  
+
   currencies = tibble(
     currency = c(
-      "US Dollar", 
+      "US Dollar",
       "Euro",
       "Argentine Peso",
       "Mexican Peso",
@@ -76,40 +76,40 @@ api_bcb <- dplyr::lst(
       ),
     symbol = symbol
     )
-  
+
   )
 
 
 # List of parameters to get data from IPEADATA (API)
 api_ipeadata <- list(
-  
+
   # EMBI+ Risk-Brasil - daily - JP Morgan
   api_embi = "JPM366_EMBI366",
-  
+
   # Reference rate - swaps - DI fixed rate - 360 days - period average - monthly - B3
   api_swaps = "BMF12_SWAPDI36012",
-  
+
   # Market expectations for inflation over the next 12 months - monthly mean
   api_inflation = "BM12_IPCAEXP1212"
-  
+
   )
 
 
 # List of parameters to get data from SIDRA/IBGE website
 api_sidra <- list(
-  
+
   # Consumer Price Index - IPCA
   api_ipca = "/t/1737/n1/all/v/2265/p/all/d/v2265%202"
-  
+
   )
 
 
 # List of parameters to get data from Yahoo Finance (API)
 api_yahoo <- list(
-  
+
   # Ibovespa index (B3)
   api_ibov = "^BVSP"
-  
+
   )
 
 
@@ -121,14 +121,14 @@ api_yahoo <- list(
 
 
 # Interest Rate, short-term, % p.y.
-raw_interest_rate <- gbcbd_get_series(
+raw_interest_rate <- GetBCBData::gbcbd_get_series(
   id          = api_bcb$api_interest_rate,
   first.date  = "2001-11-07",
   use.memoise = FALSE
   )
 
 # Inflation's market expectations for the next 12 months
-raw_inflation_expec <- get_inflation_12m(
+raw_inflation_expec <- meedr::get_inflation_12m(
   indicator   = api_bcb$api_inflation_expec,
   first_date  = NULL,
   smoothed    = "yes",
@@ -136,7 +136,7 @@ raw_inflation_expec <- get_inflation_12m(
   )
 
 # SELIC annual market expectations
-raw_selic_expec <- get_annual(
+raw_selic_expec <- meedr::get_annual(
   indicator      = api_bcb$api_selic_expec,
   first_date     = NULL,
   detail         = "Fim do ano",
@@ -171,7 +171,7 @@ raw_ibovespa <- tidyquant::tq_get(
   )
 
 # Consumer Price Index - IPCA (accumulated variation in 12 months)
-raw_ipca_12m <- get_sidra(api = api_sidra$api_ipca) %>%
+raw_ipca_12m <- sidrar::get_sidra(api = api_sidra$api_ipca) %>%
   select(
     date     = "Mês (Código)",
     variable = "Variável",
@@ -188,7 +188,7 @@ raw_ipca_12m <- get_sidra(api = api_sidra$api_ipca) %>%
 
 
 # Interest Rate (SELIC target), short-term, % p.y.
-selic <- raw_interest_rate %>% 
+selic <- raw_interest_rate %>%
   select(
     date = "ref.date",
     variable = "series.name",
@@ -198,7 +198,7 @@ selic <- raw_interest_rate %>%
     date == max(date),
     variable == "SELIC Target rate"
     ) %>%
-  pull(value) %>% 
+  pull(value) %>%
   paste0("%")
 
 
@@ -229,7 +229,7 @@ interest_rate <- raw_interest_rate %>%
     variable = "series.name",
     value
     ) %>%
-  group_by(variable) %>% 
+  group_by(variable) %>%
   timetk::condense_period(
     .date_var = date,
     .period   = "1 month",
@@ -245,9 +245,9 @@ interest_rate <- raw_interest_rate %>%
 
 # Real interest rates (ex-ante and ex-post)
 real_interest_rate <- bind_rows(
-  
+
   # Ex-ante
-  { 
+  {
     inner_join(
       raw_swaps,
       raw_inflation_next_12m,
@@ -261,19 +261,19 @@ real_interest_rate <- bind_rows(
       mutate(
         value    = (((1 + (swaps / 100)) / (1 + (inflation_next_12m / 100))) - 1) * 100, # Fisher Equation
         variable = "Ex-ante"
-        ) %>% 
+        ) %>%
       select(date, variable, value)
     },
-  
+
   # Ex-post
-  { 
+  {
     raw_ipca_12m %>%
       mutate(
         date = lubridate::ymd(paste0(date, "01"))
         ) %>%
-      drop_na() %>%
+      tidyr::drop_na() %>%
       select(
-        date, 
+        date,
         ipca_12m = value
         ) %>%
       inner_join(
@@ -287,10 +287,10 @@ real_interest_rate <- bind_rows(
         ) %>%
       mutate(
         value    = (((1 + (selic_12m / 100)) / (1 + (ipca_12m / 100))) - 1) * 100, # Fisher Equation
-        variable = "Ex-post") %>% 
+        variable = "Ex-post") %>%
     select(date, variable, value)
     }
-  
+
   )
 
 
@@ -299,7 +299,7 @@ currency <- raw_currency %>%
   group_by(
     symbol,
     date = format(date, "%Y-%m-01")
-    ) %>% 
+    ) %>%
   summarise(value = mean(ask)) %>%
   mutate( # functions from /R/utils.R
     mom  = (value / dplyr::lag(value) - 1) * 100,
@@ -307,14 +307,14 @@ currency <- raw_currency %>%
     ytd  = (value / dplyr::lag(value, 12) - 1) * 100,
     yoy  = (roll_sum_k(value, 12) / roll_sum_k(dplyr::lag(value, 12), 12) - 1) * 100,
     across(where(is.numeric), ~round(., 2))
-    ) %>% 
+    ) %>%
   slice_tail(n = 1) %>%
-  ungroup() %>% 
+  ungroup() %>%
   left_join(
     api_bcb$currencies,
     by = c("symbol" = "symbol")
     ) %>%
-  arrange(order(api_bcb$currencies$symbol)) %>% 
+  arrange(order(api_bcb$currencies$symbol)) %>%
   select(8, 3, 4:7) %>%
   rename_with(
     ~c("Currency",
@@ -346,7 +346,7 @@ selic_expec <- raw_selic_expec %>%
     .date_var = date,
     .period   = "1 month",
     .side     = "end"
-    ) %>% 
+    ) %>%
   mutate(
     date_my  = format(date, "%b %Y"),
     date     = format(date, "%Y/%m/01"),
@@ -367,7 +367,7 @@ ettj <- raw_ettj %>%
     variable      = "Yield curve (ETTJ IPCA)"
     ) %>%
   select(date_ref, business_days, date_ref_full, date_query, variable, value)
-  
+
 
 # Ibovespa index (B3)
 ibovespa <- raw_ibovespa %>%
@@ -379,7 +379,7 @@ ibovespa <- raw_ibovespa %>%
   mutate(
     date_my = format(date, "%b %Y"),
     date = format(date, "%Y/%m/01")
-    ) 
+    )
 
 
 # EMBI+ Risk-Brasil - daily - JP Morgan
