@@ -2,6 +2,7 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr
+#' @importFrom utils download.file lsf.str
 #' @return RDATA
 #' @export
 #'
@@ -69,15 +70,6 @@ resource/0402cb77-5e4c-4414-966f-0e87d802a29a/download/2.1.xlsx",
 
   # Debt Risk Rating History (URL to download spreadsheet data from National Treasury)
   url_rating = "https://sisweb.tesouro.gov.br/apex/f?p=2810:2::CSV:NO:RP::"
-
-  )
-
-
-# List of parameters to get data from SIDRA/IBGE website
-api_sidra <- list(
-
-  # Consumer Price Index - IPCA
-  api_ipca_index = "/t/1737/n1/all/v/2266/p/all/d/v2266%2013"
 
   )
 
@@ -188,11 +180,11 @@ balance_accounts <- tibble(
 # Central Government Primary Balance
 download.file(
   url      = url_list$url_treasury,
-  destfile = "./data/treasury.xlsx",
+  destfile = "./inst/extdata/treasury.xlsx",
   mode     = "wb"
   )
 raw_treasury <- readxl::read_xlsx(
-  path      = "./data/treasury.xlsx",
+  path      = "./inst/extdata/treasury.xlsx",
   sheet     = "1.1-A",
   col_names = FALSE,
   skip      = 5,
@@ -214,11 +206,11 @@ raw_gdp_monthly <- GetBCBData::gbcbd_get_series(
 # General government net and gross debt
 download.file(
   url      = url_list$url_debt,
-  destfile = "./data/debt.xls",
+  destfile = "./inst/extdata/debt.xls",
   mode     = "wb"
   )
 raw_debt <- readxl::read_excel(
-  path      = "./data/debt.xls",
+  path      = "./inst/extdata/debt.xls",
   sheet     = "R$ milhões",
   skip      = 8,
   col_names = FALSE,
@@ -227,23 +219,14 @@ raw_debt <- readxl::read_excel(
   janitor::clean_names()
 
 
-# Consumer Price Index (IPCA/IBGE)
-raw_ipca_index <- sidrar::get_sidra(api = api_sidra$api_ipca_index)$Valor %>%
-  ts(
-    start     = c(1979, 12),
-    frequency = 12
-    ) %>%
-  window(start = c(2006, 12))
-
-
 # Federal Public Debt stock (R$ billion)
 download.file(
   url      = url_list$url_debt_stock,
-  destfile = "./data/dpf.xlsx",
+  destfile = "./inst/extdata/dpf.xlsx",
   mode     = "wb"
   )
 raw_debt_stock <- readxl::read_excel(
-  path      = "./data/dpf.xlsx",
+  path      = "./inst/extdata/dpf.xlsx",
   skip      = 4,
   col_names = FALSE
   )
@@ -252,10 +235,10 @@ raw_debt_stock <- readxl::read_excel(
 # Debt Risk Rating History
 download.file(
   url      = url_list$url_rating,
-  destfile = "./data/rating.csv",
+  destfile = "./inst/extdata/rating.csv",
   mode     = "wb"
   )
-raw_rating <- rio::import("./data/rating.csv")
+raw_rating <- rio::import("./inst/extdata/rating.csv")
 
 
 
@@ -460,7 +443,7 @@ rm(
 # Save RDATA file
 save(
   list  = ls(),
-  file  = file.path(file.path("./data"), "fiscal.Rdata"),
+  file  = file.path(file.path("./inst/extdata"), "fiscal.Rdata"),
   envir = environment()
   )
 

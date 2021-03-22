@@ -2,8 +2,8 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr PNADcIBGE
-#' @
 #' @importFrom PNADcIBGE pnadc_labeller
+#' @importFrom utils lsf.str
 #' @return RDATA
 #' @export
 #'
@@ -372,7 +372,7 @@ rm(
 # Save RDATA file
 save(
   list  = ls(),
-  file  = file.path(file.path("./data"), "labor.Rdata"),
+  file  = file.path(file.path("./inst/extdata"), "labor.Rdata"),
   envir = environment()
   )
 

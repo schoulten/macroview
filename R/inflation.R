@@ -2,6 +2,7 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr
+#' @importFrom utils lsf.str
 #' @return RDATA
 #' @export
 #'
@@ -287,7 +288,7 @@ rm(
 # Save RDATA file
 save(
   list  = ls(),
-  file  = file.path(file.path("./data"), "inflation.Rdata"),
+  file  = file.path(file.path("./inst/extdata"), "inflation.Rdata"),
   envir = environment()
   )
 

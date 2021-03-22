@@ -2,6 +2,7 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr tidyr
+#' @importFrom utils download.file lsf.str
 #' @return RDATA
 #' @export
 #'
@@ -170,20 +171,20 @@ raw_pim <- sidrar::get_sidra(api = api_sidra$api_pim) %>%
 # ICVA (Cielo)
 download.file(
   url      = url_list$url_icva,
-  destfile = "./data/icva.xlsx",
+  destfile = "./inst/extdata/icva.xlsx",
   mode     = "wb"
   )
-raw_icva <- readxl::read_excel("./data/icva.xlsx")
+raw_icva <- readxl::read_excel("./inst/extdata/icva.xlsx")
 
 
 # Vehicle Production (ANFAVEA)
 download.file(
   url      = url_list$url_anfavea,
-  destfile = file.path("./data", basename(url_list$url_anfavea)),
+  destfile = file.path("./inst/extdata", basename(url_list$url_anfavea)),
   mode     = "wb"
   )
 raw_vehicle <- readxl::read_excel(
-  path = file.path("./data", basename(url_list$url_anfavea)),
+  path = file.path("./inst/extdata", basename(url_list$url_anfavea)),
   skip = 4
   )
 
@@ -437,7 +438,7 @@ rm(
 # Save RDATA file
 save(
   list  = ls(),
-  file  = file.path(file.path("./data"), "econ_activity.Rdata"),
+  file  = file.path(file.path("./inst/extdata"), "econ_activity.Rdata"),
   envir = environment()
   )
 
