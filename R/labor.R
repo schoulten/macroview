@@ -2,6 +2,7 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr PNADcIBGE
+#' @
 #' @importFrom PNADcIBGE pnadc_labeller
 #' @return RDATA
 #' @export
@@ -31,7 +32,7 @@ etl_labor <- function(){
 #   "rvest",
 #   "here"
 #   )
-
+attachNamespace("PNADcIBGE")
 
 
 # Parameters --------------------------------------------------------------
