@@ -7,7 +7,7 @@
 #' @export
 #'
 retry <- function(foo, tries) {
-  message(paste0("Trying expression \nRemaining tries:", tries, "\n\n"))
+  message(paste0("Trying expression... \nRemaining tries: ", tries, "\n"))
   withRestarts(
     tryCatch(
       { foo },

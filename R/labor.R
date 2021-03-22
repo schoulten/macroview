@@ -32,7 +32,8 @@ etl_labor <- function(){
 #   "rvest",
 #   "here"
 #   )
-attachNamespace("PNADcIBGE")
+
+if (!"package:PNADcIBGE" %in% search()) { attachNamespace("PNADcIBGE") }
 
 
 # Parameters --------------------------------------------------------------
