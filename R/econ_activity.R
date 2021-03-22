@@ -1,3 +1,12 @@
+#' ETL Economic activity
+#'
+#' @encoding UTF-8
+#' @import dplyr tidyr
+#' @return RDATA
+#' @export
+#'
+etl_econ_activity <- function(){
+
 ### Economic activity ###
 
 
@@ -9,17 +18,17 @@
 
 
 # Install/load packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  "tidyverse",
-  "sidrar",
-  "readxl",
-  "lubridate",
-  "GetBCBData",
-  "zoo",
-  "mgsub",
-  "janitor"
-  )
+# if (!require("pacman")) install.packages("pacman")
+# pacman::p_load(
+#   "tidyverse",
+#   "sidrar",
+#   "readxl",
+#   "lubridate",
+#   "GetBCBData",
+#   "zoo",
+#   "mgsub",
+#   "janitor"
+#   )
 
 
 
@@ -30,7 +39,7 @@ pacman::p_load(
 
 
 # Load useful functions
-source("./R/utils.R")
+# source("./R/utils.R")
 
 
 # List of URLs to get data from different sources
@@ -419,10 +428,17 @@ imported_data_eco_activity <- mget(ls(pattern = "raw_|api_|url_"))
 
 
 # Remove unnecessary objects
-rm(list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),  # remove function objects
-   envir = .GlobalEnv)
+rm(
+  list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),  # remove function objects
+  envir = environment()
+  )
 
 
 # Save RDATA file
-save.image(file = file.path(file.path("./data"), "econ_activity.Rdata"))
+save(
+  list  = ls(),
+  file  = file.path(file.path("./data"), "econ_activity.Rdata"),
+  envir = environment()
+  )
 
+}

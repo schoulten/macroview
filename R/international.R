@@ -1,3 +1,12 @@
+#' ETL International economy
+#'
+#' @encoding UTF-8
+#' @import dplyr
+#' @return RDATA
+#' @export
+#'
+etl_international <- function(){
+
 ### International economy ###
 
 
@@ -9,8 +18,8 @@
 
 
 # Install/load packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load("OECD", "tidyverse")
+# if (!require("pacman")) install.packages("pacman")
+# pacman::p_load("OECD", "tidyverse")
 
 
 
@@ -218,3 +227,4 @@ rm(list  = c(lsf.str(), ls(pattern = "raw_|api_|str_")),  # remove function obje
 # Save RDATA file
 save.image(file = file.path(file.path("./data"), "international.Rdata"))
 
+}

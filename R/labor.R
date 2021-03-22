@@ -1,3 +1,13 @@
+#' ETL Labor market
+#'
+#' @encoding UTF-8
+#' @import dplyr PNADcIBGE
+#' @importFrom PNADcIBGE pnadc_labeller
+#' @return RDATA
+#' @export
+#'
+etl_labor <- function(){
+
 ### Labor market ###
 
 
@@ -9,18 +19,18 @@
 
 
 # Install/load packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  "PNADcIBGE",
-  "tidyverse",
-  "lubridate",
-  "sidrar",
-  "janitor",
-  "survey",
-  "convey",
-  "rvest",
-  "here"
-  )
+# if (!require("pacman")) install.packages("pacman")
+# pacman::p_load(
+#   "PNADcIBGE",
+#   "tidyverse",
+#   "lubridate",
+#   "sidrar",
+#   "janitor",
+#   "survey",
+#   "convey",
+#   "rvest",
+#   "here"
+#   )
 
 
 
@@ -31,7 +41,7 @@ pacman::p_load(
 
 
 # Load useful functions
-source("./R/utils.R")
+# source("./R/utils.R")
 
 
 # List of parameters to get data from IBGE website
@@ -359,3 +369,4 @@ rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
 # Save RDATA file
 save.image(file = file.path(file.path("./data"), "labor.Rdata"))
 
+}

@@ -1,3 +1,12 @@
+#' ETL Fiscal Policy
+#'
+#' @encoding UTF-8
+#' @import dplyr
+#' @return RDATA
+#' @export
+#'
+etl_fiscal <- function(){
+
 ### Fiscal Policy ###
 
 
@@ -9,18 +18,18 @@
 
 
 # Install/load packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  "readxl",
-  "tidyverse",
-  "sidrar",
-  "GetBCBData",
-  "zoo",
-  "janitor",
-  "rio",
-  "deflateBR",
-  "lubridate"
-  )
+# if (!require("pacman")) install.packages("pacman")
+# pacman::p_load(
+#   "readxl",
+#   "tidyverse",
+#   "sidrar",
+#   "GetBCBData",
+#   "zoo",
+#   "janitor",
+#   "rio",
+#   "deflateBR",
+#   "lubridate"
+#   )
 
 
 # Set the default language of date in R
@@ -35,7 +44,7 @@ Sys.setlocale("LC_TIME", "English")
 
 
 # Load useful functions
-source("./R/utils.R")
+# source("./R/utils.R")
 
 
 # Disable scientific notation
@@ -182,7 +191,7 @@ download.file(
   destfile = "./data/treasury.xlsx",
   mode     = "wb"
   )
-raw_treasury <- read_xlsx(
+raw_treasury <- readxl::read_xlsx(
   path      = "./data/treasury.xlsx",
   sheet     = "1.1-A",
   col_names = FALSE,
@@ -191,11 +200,11 @@ raw_treasury <- read_xlsx(
   ) %>%
   t() %>%
   as_tibble() %>%
-  clean_names()
+  janitor::clean_names()
 
 
 # Accumulated GDP in the last 12 months - Current values (R$ million)
-raw_gdp_monthly <- gbcbd_get_series(
+raw_gdp_monthly <- GetBCBData::gbcbd_get_series(
   id          = api_bcb$api_gdp_12m,
   first.date  = "1997-01-01",
   use.memoise = FALSE
@@ -208,18 +217,18 @@ download.file(
   destfile = "./data/debt.xls",
   mode     = "wb"
   )
-raw_debt <- read_excel(
+raw_debt <- readxl::read_excel(
   path      = "./data/debt.xls",
   sheet     = "R$ milhões",
   skip      = 8,
   col_names = FALSE,
   n_max     = 48
   ) %>%
-  clean_names()
+  janitor::clean_names()
 
 
 # Consumer Price Index (IPCA/IBGE)
-raw_ipca_index <- get_sidra(api = api_sidra$api_ipca_index)$Valor %>%
+raw_ipca_index <- sidrar::get_sidra(api = api_sidra$api_ipca_index)$Valor %>%
   ts(
     start     = c(1979, 12),
     frequency = 12
@@ -233,7 +242,7 @@ download.file(
   destfile = "./data/dpf.xlsx",
   mode     = "wb"
   )
-raw_debt_stock <- read_excel(
+raw_debt_stock <- readxl::read_excel(
   path      = "./data/dpf.xlsx",
   skip      = 4,
   col_names = FALSE
@@ -246,7 +255,7 @@ download.file(
   destfile = "./data/rating.csv",
   mode     = "wb"
   )
-raw_rating <- import("./data/rating.csv")
+raw_rating <- rio::import("./data/rating.csv")
 
 
 
@@ -449,3 +458,4 @@ rm(list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),  # remove function obje
 # Save RDATA file
 save.image(file = file.path(file.path("./data"), "fiscal.Rdata"))
 
+}

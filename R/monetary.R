@@ -1,3 +1,13 @@
+#' ETL Monetary policy
+#'
+#' @encoding UTF-8
+#' @import dplyr
+#' @importFrom purrr map_dfr
+#' @return RDATA
+#' @export
+#'
+etl_monetary <- function(){
+
 ### Monetary policy ###     TODO: create retry for API wrappers
 
 
@@ -9,21 +19,21 @@
 
 
 # Install/load packages
-if (!require("pacman")) install.packages("pacman")
-if (!require("meedr")) devtools::install_github("schoulten/meedr")
-pacman::p_load(
-  "tibbletime",
-  "tidyverse",
-  "GetBCBData",
-  "lubridate",
-  "zoo",
-  "sidrar",
-  "GetTDData",
-  "meedr",
-  "ipeadatar",
-  "tidyquant",
-  "timetk"
-  )
+# if (!require("pacman")) install.packages("pacman")
+# if (!require("meedr")) devtools::install_github("schoulten/meedr")
+# pacman::p_load(
+#   "tibbletime",
+#   "tidyverse",
+#   "GetBCBData",
+#   "lubridate",
+#   "zoo",
+#   "sidrar",
+#   "GetTDData",
+#   "meedr",
+#   "ipeadatar",
+#   "tidyquant",
+#   "timetk"
+#   )
 
 
 # Set the default language of date in R
@@ -38,7 +48,7 @@ Sys.setlocale("LC_TIME", "English")
 
 
 # Load useful functions
-source("./R/utils.R")
+# source("./R/utils.R")
 
 
 # List of parameters to get data from Central Bank (API)
@@ -145,7 +155,7 @@ raw_selic_expec <- meedr::get_annual(
   )
 
 # Currency rates
-raw_currency <- map_dfr(
+raw_currency <- purrr::map_dfr(
   api_bcb$symbol,
   ~rbcb::get_currency(.x, as = "tibble", start_date = Sys.Date() - 3 * 365, end_date = Sys.Date()),
   .id = "symbol"
@@ -414,3 +424,4 @@ rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
 # Save RDATA file
 save.image(file = file.path(file.path("./data"), "monetary.Rdata"))
 
+}

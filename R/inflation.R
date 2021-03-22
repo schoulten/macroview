@@ -1,3 +1,12 @@
+#' ETL Inflation
+#'
+#' @encoding UTF-8
+#' @import dplyr
+#' @return RDATA
+#' @export
+#'
+etl_inflation <- function(){
+
 ### Inflation ###
 
 
@@ -9,14 +18,14 @@
 
 
 # Install/load packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  "sidrar",
-  "tidyverse",
-  "lubridate",
-  "GetBCBData",
-  "janitor"
-  )
+# if (!require("pacman")) install.packages("pacman")
+# pacman::p_load(
+#   "sidrar",
+#   "tidyverse",
+#   "lubridate",
+#   "GetBCBData",
+#   "janitor"
+#   )
 
 
 # Set the default language of date in R
@@ -31,7 +40,7 @@ Sys.setlocale("LC_TIME", "English")
 
 
 # Load useful functions
-source("./R/utils.R")
+# source("./R/utils.R")
 
 
 # List of parameters to get data from SIDRA/IBGE website
@@ -276,3 +285,4 @@ rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
 # Save RDATA file
 save.image(file = file.path(file.path("./data"), "inflation.Rdata"))
 
+}
