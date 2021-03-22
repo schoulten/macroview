@@ -249,7 +249,11 @@ gdp_growth <- gdp %>%
     sector   == "GDP" &
     variable == "Accumulated in 4 Quarters (%)"
   ) %>%
-  filter(date == last(date))
+  filter(date == last(date)) %>%
+  mutate(
+    date  = stringr::str_replace(date, "(\\d{4}).(\\d{1})", "\\1 Q\\2"),
+    value = paste0(value, "%")
+    )
 
 
 # GDP, Current Prices (R$ trillions)
@@ -258,7 +262,12 @@ gdp_cur_prices <- raw_gdp_cur_prices %>%
   arrange(date) %>%
   slice_tail(n = 4) %>%
   summarise(
-    value = (sum(value) / 1e+06) %>% round(2)
+    value = paste0("R$ ", round(sum(value) / 1e+06, 2), "b")
+    ) %>%
+  mutate(
+    date  = stringr::str_replace(
+      last(raw_gdp_cur_prices$date), "(\\d{4})0(\\d{1})", "\\1 Q\\2"
+      )
     )
 
 
