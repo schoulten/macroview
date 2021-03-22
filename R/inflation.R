@@ -278,11 +278,17 @@ imported_data_inflation <- mget(ls(pattern = "raw_|api_"))
 
 
 # Remove unnecessary objects
-rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
-   envir = .GlobalEnv)
+rm(
+  list  = c(lsf.str(), ls(pattern = "raw_|api_")),
+  envir = environment()
+  )
 
 
 # Save RDATA file
-save.image(file = file.path(file.path("./data"), "inflation.Rdata"))
+save(
+  list  = ls(),
+  file  = file.path(file.path("./data"), "inflation.Rdata"),
+  envir = environment()
+  )
 
 }

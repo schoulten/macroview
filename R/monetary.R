@@ -417,11 +417,17 @@ imported_data_monetary <- mget(ls(pattern = "raw_|api_"))
 
 
 # Remove unnecessary objects
-rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
-   envir = .GlobalEnv)
+rm(
+  list  = c(lsf.str(), ls(pattern = "raw_|api_")),
+  envir = environment()
+  )
 
 
 # Save RDATA file
-save.image(file = file.path(file.path("./data"), "monetary.Rdata"))
+save(
+  list  = ls(),
+  file  = file.path(file.path("./data"), "monetary.Rdata"),
+  envir = environment()
+  )
 
 }

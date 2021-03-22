@@ -357,16 +357,22 @@ gini <- survey::svyby(~VD4020, by = ~UF, raw_pnadct_svy, convey::svygini, na.rm 
 
 
 # Aggregate data
-rm(raw_pnadct_svy)
+rm(raw_pnadct_svy, envir = environment())
 imported_data_labor <- mget(ls(pattern = "raw_|api_"))
 
 
 # Remove unnecessary objects
-rm(list  = c(lsf.str(), ls(pattern = "raw_|api_")),  # remove function objects
-   envir = .GlobalEnv)
+rm(
+  list  = c(lsf.str(), ls(pattern = "raw_|api_")),
+  envir = environment()
+  )
 
 
 # Save RDATA file
-save.image(file = file.path(file.path("./data"), "labor.Rdata"))
+save(
+  list  = ls(),
+  file  = file.path(file.path("./data"), "labor.Rdata"),
+  envir = environment()
+  )
 
 }

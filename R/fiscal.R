@@ -451,11 +451,17 @@ imported_data_fiscal <- mget(ls(pattern = "raw_|api_|url_"))
 
 
 # Remove unnecessary objects
-rm(list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),  # remove function objects
-   envir = .GlobalEnv)
+rm(
+  list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),
+  envir = environment()
+  )
 
 
 # Save RDATA file
-save.image(file = file.path(file.path("./data"), "fiscal.Rdata"))
+save(
+  list  = ls(),
+  file  = file.path(file.path("./data"), "fiscal.Rdata"),
+  envir = environment()
+  )
 
 }

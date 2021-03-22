@@ -429,7 +429,7 @@ imported_data_eco_activity <- mget(ls(pattern = "raw_|api_|url_"))
 
 # Remove unnecessary objects
 rm(
-  list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),  # remove function objects
+  list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),
   envir = environment()
   )
 

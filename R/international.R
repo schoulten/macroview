@@ -220,11 +220,17 @@ imported_data_international <- mget(ls(pattern = "raw_|api_|str_"))
 
 
 # Remove unnecessary objects
-rm(list  = c(lsf.str(), ls(pattern = "raw_|api_|str_")),  # remove function objects
-   envir = .GlobalEnv)
+rm(
+  list  = c(lsf.str(), ls(pattern = "raw_|api_|str_")),
+  envir = environment()
+  )
 
 
 # Save RDATA file
-save.image(file = file.path(file.path("./data"), "international.Rdata"))
+save(
+  list  = ls(),
+  file  = file.path(file.path("./data"), "international.Rdata"),
+  envir = environment()
+  )
 
 }
