@@ -26,7 +26,7 @@ knitr::opts_knit$set(progress = TRUE)
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   "rmarkdown",
-  "D3plusR",
+  "highcharter",
   "tidyverse",
   "flexdashboard",
   "htmlwidgets",
@@ -48,7 +48,7 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
 
 ```
 
-
+<!-- Overview section -->
 
 Economic activity {data-navmenu="Explorar" data-icon="fa-chart-line"}
 =====================================
@@ -129,26 +129,19 @@ Col {data-width=575}
 ### GDP trend {.no-title}
 
 ```{r gdp_trend, fig.height=4}
-
 gdp_growth_sector %>%
-  d3plus(data = .,
-         id = "sector",
-         type = "line",
-         percent_var = "value",
-         number_text = "%") %>%
-  d3plusX("date", grid = FALSE) %>%
-  d3plusY("value") %>%
-  d3plusOrder("date", sort = "asc") %>%
-  d3plusTooltip(c("date", "value")) %>%
-  d3plusAxes(ticks = FALSE, background = list(color = "#FFFFFF", stroke = 0)) %>%
-  d3plusLegend(value = TRUE, data = FALSE,
-               order = list(value = "sector"), size = 60) %>%
-  d3plusColor("sector") %>%
-  d3plusTitle(value = "Crescimento do PIB e setores",
-              sub = "Taxa acumulada em 4 trimestres (CNT/IBGE)",
-              font = list(size = 13, weight = 800))
+  hchart("line", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
+  hc_title(text = "GDP growth by sectors") %>%
+  hc_subtitle(text = "Accumulated growth rate in 4 quarters") %>%
+  hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px")) %>%
+  hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
+  hc_xAxis(title = FALSE) %>%
+  hc_tooltip(shared = TRUE) %>% 
+  hc_add_theme(theme_fortietwo)
 ```
 
+
+<!-- Other sections -->
 
 
 Sobre {data-icon="fa-file-alt"}
