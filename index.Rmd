@@ -33,27 +33,18 @@ pacman::p_load(
   "kableExtra"
   )
 
+# Set the default language of date in R
+Sys.setlocale("LC_TIME", "English")
+
 ```
 
 ```{r data, include=FALSE}
 
 # Load RDATA files
 
-rdata <- c(
-  "econ_activity",
-  "fiscal",
-  "inflation",
-  "international",
-  "monetary",
-  "labor"
-  )
-
-purrr::map(
-  paste0("./inst/extdata/", rdata, ".Rdata"), 
-  ~ load(.x, .GlobalEnv)
-  )
-
-rm(rdata)
+c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") %>%
+  paste0("./inst/extdata/", ., ".Rdata") %>% 
+  purrr::map( ~ load(.x, .GlobalEnv))
 
 ```
 
@@ -305,7 +296,7 @@ Col {data-width=375}
 
 ### GDP growth in 4 quarters (`r gdp_growth$date`)
 
-```{r}
+```{r gdp_growth}
 gdp_growth %>% 
   pull(value) %>% 
   valueBox(
@@ -315,46 +306,55 @@ gdp_growth %>%
     )
 ```
 
-
 ### GDP at current prices in 4 quarters (`r gdp_cur_prices$date`)
 
-```{r}
+```{r gdp_current_prices}
 gdp_cur_prices %>%
   pull(value) %>%
   valueBox(
     value = .,
-    icon = "fa-dollar-sign",
+    icon  = "fa-dollar-sign",
     color = "success"
     )
 ```
 
+### Cielo retail index (`r format(icva$date, "%B, %Y")` - ICVA)
 
-### Índice Cielo do Varejo (`r format(as.Date(icva$date), format = "%B/%y")` - ICVA)
-```{r}
+```{r icva}
 icva %>%
-  mutate(real_sa = paste0(real_sa, "%")) %>% 
-  pull(real_sa) %>% 
-  valueBox(value = ., icon = 'fa-store', color =  ifelse(. < 0, "warning", "success"))
+  pull(value) %>% 
+  valueBox(
+    value = .,
+    icon  = "fa-store",
+    color =  ifelse(. < 0, "warning", "success")
+    )
 ```
 
-### Produção de Veículos (`r format(tail(as.Date(veiculos$dates), 1), format = "%B/%y")` - ANFAVEA)
+### Vehicle production (`r format(vehicle$date, "%B, %Y")` - ANFAVEA)
 
-```{r}
-veiculos %>%
-  slice_tail(n = 1) %>%
-  mutate(producao = paste0(round(producao/1000, digits = 2) %>% format(decimal.mark = ","), " mil")) %>%
-  pull(producao) %>%
-  valueBox(value = ., icon = 'fa-car', color =  ifelse(. < max(veiculos$producao)/2, "warning", "success"))
+```{r vehicle_production}
+vehicle %>%
+  pull(value) %>%
+  valueBox(
+    value = .,
+    icon  = "fa-car"
+    )
 ```
 
+### Installed Capacity Utilization Level (`r format(nuci$date, "%B, %Y")` - FGV)
 
-### Utilização da Capacidade Instalada (`r format(tail(as.Date(dados_uci_sa$date), 1), format = "%B/%y")` - FGV)
-
-```{r}
-gauge(as.numeric(uci), min = 0, max = 100, symbol = '%',
-      gaugeSectors(success = c(85, 100),
-                   warning = c(50, 85),
-                   danger = c(0, 50)))
+```{r nuci_fgv}
+gauge(
+  value  = nuci$value,
+  min    = 0,
+  max    = 100,
+  symbol = "%",
+  gaugeSectors(
+    success = c(85, 100),
+    warning = c(50, 85),
+    danger  = c(0, 50)
+    )
+  )
 ```
 
 

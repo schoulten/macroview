@@ -275,7 +275,7 @@ gdp_cur_prices <- raw_gdp_cur_prices %>%
 icva <- raw_icva %>%
   rename_with(~c("date", "nominal", "nominal_sa", "real", "real_sa")) %>%
   mutate(
-    value = real_sa*100, # convert to % format
+    value = paste0(real_sa * 100, "%"), # convert to % format
     date  = lubridate::as_date(date),
     ) %>%
   filter(date == last(date)) %>%
@@ -289,9 +289,14 @@ vehicle <- raw_vehicle %>%
     date  = x1,
     value = producao_5
     ) %>%
-  mutate(date = lubridate::as_date(date)) %>%
   dplyr::na_if(0) %>%
-  tidyr::drop_na()
+  tidyr::drop_na() %>%
+  mutate(
+    date = lubridate::as_date(date),
+    value = round(value / 1e3, 1) %>% paste0("k")
+    ) %>%
+  filter(date == last(date))
+
 
 
 # Installed Capacity Utilization Level (NUCI/FGV)
