@@ -234,11 +234,7 @@ gdp <- raw_gdp %>%
       "Exportação de bens e serviços"               = "Exports",
       "Importação de bens e serviços (-)"           = "Imports"
     ),
-    date = lubridate::parse_date_time(
-      date,
-      orders = "Yq"
-      ) %>%
-      lubridate::quarter(with_year = TRUE)
+    date = stringr::str_replace(date, "(\\d{4})0(\\d{1})", "\\1 Q\\2")
   ) %>%
   arrange(date)
 
@@ -250,10 +246,7 @@ gdp_growth <- gdp %>%
     variable == "Accumulated in 4 Quarters (%)"
   ) %>%
   filter(date == last(date)) %>%
-  mutate(
-    date  = stringr::str_replace(date, "(\\d{4}).(\\d{1})", "\\1 Q\\2"),
-    value = paste0(value, "%")
-    )
+  mutate(value = paste0(value, "%"))
 
 
 # GDP, Current Prices (R$ trillions)
@@ -325,11 +318,7 @@ levels_gdp <- c(
 footnote_gdp <- gdp %>%
   slice_tail(n = 1) %>%
   mutate(
-    note = paste0(
-      "Note: updated until ",
-      stringr::str_replace(date, "(\\d{4}).(\\d{1}$)", "\\1 Q\\2"),
-      "."
-      )
+    note = paste0("Note: updated until ", date, ".")
     ) %>%
   pull(note)
 
@@ -364,7 +353,9 @@ gdp_growth_sector <- gdp %>%
       "GDP"
       )
     ) %>%
-  select(date, sector, value)
+  select(date, sector, value) %>%
+  group_by(sector) %>%
+  slice_tail(n = 8)
 
 
 # IBC-Br growth by region
