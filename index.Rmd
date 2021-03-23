@@ -46,6 +46,8 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
   paste0("./inst/extdata/", ., ".Rdata") %>% 
   purrr::map( ~ load(.x, .GlobalEnv))
 
+source("./R/hc_theme.R")
+
 ```
 
 <!-- Overview section -->
@@ -138,6 +140,22 @@ gdp_growth_sector %>%
   hc_xAxis(title = FALSE) %>%
   hc_tooltip(shared = TRUE) %>% 
   hc_add_theme(theme_fortietwo)
+```
+
+### IBC-Br trend {.no-title}
+
+```{r ibcbr_trend}
+ibc_growth %>%
+  hchart("line", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
+  hc_title(text = "IBC-Br growth by region") %>%
+  hc_subtitle(text = "Accumulated growth rate in 12 months") %>%
+  hc_credits(enabled = TRUE, text = "Source: BCB", style = list(fontSize = "12px")) %>%
+  hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
+  hc_xAxis(title = FALSE) %>%
+  hc_tooltip(shared = TRUE) %>% 
+  hc_add_theme(theme_fortietwo) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
 ```
 
 

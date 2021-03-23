@@ -366,14 +366,8 @@ ibc_growth <- raw_ibc %>%
     ) %>%
   group_by(variable) %>%
   mutate(
-    yoy = yoy_growth_rate( # function from /R/utils.R
-      col   = value,
-      round = 2
-      ),
-    date = as.character(
-      format(date, "%Y/%m/%d")
-      )
-  ) %>%
+    yoy = yoy_growth_rate(col = value, round = 2) # function from /R/utils.R
+    ) %>%
   tidyr::drop_na()
 
 
