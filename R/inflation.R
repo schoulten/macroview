@@ -252,7 +252,13 @@ inflation_target <- raw_ipca_target %>%
 ipca_trend <- ipca %>%
   filter(
     variable %in% c("Month over Month (%)", "Year over Year (%)")
-    )
+    ) %>%
+  pivot_wider(
+    id_cols = date,
+    names_from = variable,
+    values_from = value
+    ) %>%
+  tidyr::drop_na()
 
 
 # Diffusion index - Consumer Price Index (IPCA)

@@ -303,8 +303,10 @@ Col {data-width=650}
 ### Inflation trend {.no-title}
 
 ```{r section2_ipca_trend}
-ipca_trend %>% 
-  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:2]) %>%
+hchart(ipca_trend, "column", hcaes(x = date, y = `Month over Month (%)`),
+       color = colors[1], name = "Month over Month", showInLegend = TRUE) %>%
+  hc_add_series(ipca_trend, "line", hcaes(x = date, y = `Year over Year (%)`),
+                color = colors[2], name = "Year over Year", showInLegend = TRUE) %>% 
   ftplot(
     title    = "Inflation trend (IPCA)",
     subtitle = "Monthly and accumulated variation in 12 months (%)",
