@@ -55,7 +55,7 @@ source("./R/ftplot.R")
 
 <!-- Overview section -->
 
-Economic activity {data-navmenu="Explorar" data-icon="fa-chart-line"}
+Economic activity {data-navmenu="Sections" data-icon="fa-chart-line"}
 =====================================
 
 Col {data-width=375}
@@ -209,7 +209,35 @@ gdp_measures %>%
 pmc %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:4]) %>%
   ftplot(
-    title    = "Retail trade indicator: PMC/IBGE",
+    title    = "Retail trade index: PMC/IBGE",
+    subtitle = "Monthly percentage change (compared to the same month in the previous year)",
+    source   = "IBGE"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+### Services (PMS)
+
+```{r pms}
+pms %>%
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:2]) %>%
+  ftplot(
+    title    = "Revenue and volume of services index: PMS/IBGE",
+    subtitle = "Monthly percentage change (compared to the same month in the previous year)",
+    source   = "IBGE"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+### Industry (PIM-PF)
+
+```{r pim}
+pim %>%
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:4]) %>%
+  ftplot(
+    title    = "Industrial production: PIM-PF/IBGE",
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
     ) %>%

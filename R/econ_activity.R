@@ -391,7 +391,7 @@ pms <- raw_pms %>%
       "Índice de receita nominal de serviços" = "Revenue",
       "Índice de volume de serviços"          = "Volume"
       ),
-    date     = ymd_sidra(date) # function from /R/utils.R
+    date     = lubridate::ym(date),
     ) %>%
   tidyr::drop_na()
 
@@ -406,7 +406,7 @@ pim <- raw_pim %>%
       "3 Indústrias de transformação"                                   = "Manufacturing industries",
       "3.29 Fabricação de veículos automotores, reboques e carrocerias" = "Manufacture of motor vehicles"
       ),
-    date = ymd_sidra(date) # function from /R/utils.R
+    date = lubridate::ym(date),
   ) %>%
   tidyr::drop_na()
 
