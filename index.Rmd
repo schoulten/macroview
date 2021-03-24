@@ -379,6 +379,20 @@ ipca_cores %>%
   hc_navigator(enabled = TRUE)
 ```
 
+### IGP trend
+
+```{r section2_igp}
+igp %>%
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:3]) %>%
+  ftplot(
+    title    = "General Price Index (IGP)",
+    subtitle = "Monthly percentage change",
+    source   = "FGV"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
+```
+
 
 
 Labor market {data-navmenu="Sections" data-icon="fa-users"}
