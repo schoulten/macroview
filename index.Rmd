@@ -365,6 +365,19 @@ ipca_groups %>%
     )
 ```
 
+### CPI cores
+
+```{r section2_ipca_cores}
+ipca_cores %>%
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:5]) %>%
+  ftplot(
+    title    = "CPI cores (IPCA)",
+    subtitle = "Monthly percentage change",
+    source   = "BCB"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
+```
 
 
 
