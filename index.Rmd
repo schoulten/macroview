@@ -62,56 +62,57 @@ Col {data-width=375}
 -----------------------------------------------------------------------
 
 
-### GDP growth in 4 quarters (`r gdp_growth$date`)
+### GDP growth in 4 quarters (`r gdp_growth$date` - IBGE)
 
-```{r gdp_growth}
+```{r section1_gdp_growth}
 gdp_growth %>%
   pull(value) %>%
   valueBox(
     value = .,
     icon  = "fa-chart-line",
-    color =  ifelse(. < 0, "warning", "success")
+    color =  ifelse(. < 0, "#b22200", "#282f6b")
     )
 ```
 
-### GDP at current prices in 4 quarters (`r gdp_cur_prices$date`)
+### GDP at current prices in 4 quarters (`r gdp_cur_prices$date` - IBGE)
 
-```{r gdp_current_prices}
+```{r section1_gdp_current_prices}
 gdp_cur_prices %>%
   pull(value) %>%
   valueBox(
     value = .,
     icon  = "fa-dollar-sign",
-    color = "success"
+    color = "#224f20"
     )
 ```
 
 ### Cielo retail index (`r format(icva$date, "%B, %Y")` - ICVA)
 
-```{r icva}
+```{r section1_icva}
 icva %>%
   pull(value) %>%
   valueBox(
     value = .,
     icon  = "fa-store",
-    color =  ifelse(. < 0, "warning", "success")
+    color =  ifelse(. < 0, "#b22200", "#282f6b")
     )
 ```
 
 ### Vehicle production (`r format(vehicle$date, "%B, %Y")` - ANFAVEA)
 
-```{r vehicle_production}
+```{r section1_vehicle_production}
 vehicle %>%
   pull(value) %>%
   valueBox(
     value = .,
-    icon  = "fa-car"
+    icon  = "fa-car",
+    color = "#5f487c"
     )
 ```
 
 ### Installed Capacity Utilization Level (`r format(nuci$date, "%B, %Y")` - FGV)
 
-```{r nuci_fgv}
+```{r section1_nuci_fgv}
 gauge(
   value  = nuci$value,
   min    = 0,
@@ -120,7 +121,8 @@ gauge(
   gaugeSectors(
     success = c(85, 100),
     warning = c(50, 85),
-    danger  = c(0, 50)
+    danger  = c(0, 50),
+    colors = c("#224f20", "#b35c1e", "#b22200")
     )
   )
 ```
@@ -133,7 +135,7 @@ Col {data-width=575}
 
 ### GDP trend {.no-title}
 
-```{r gdp_trend}
+```{r section1_gdp_trend}
 gdp_growth_sector %>%
   hchart("column", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
   ftplot(
@@ -145,7 +147,7 @@ gdp_growth_sector %>%
 
 ### IBC-Br trend {.no-title}
 
-```{r ibcbr_trend}
+```{r section1_ibcbr_trend}
 ibc_growth %>%
   hchart("line", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
   ftplot(
@@ -163,7 +165,7 @@ Col {data-width=500 .tabset}
 
 ### GDP approaches
 
-```{r gdp_approaches}
+```{r section1_gdp_approaches}
 gdp_measures %>%
   gt(rowname_col = "sector") %>%
   tab_source_note(footnote_gdp) %>% 
@@ -205,7 +207,7 @@ gdp_measures %>%
 
 ### Retail (PMC)
 
-```{r pmc}
+```{r section1_pmc}
 pmc %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:4]) %>%
   ftplot(
@@ -219,7 +221,7 @@ pmc %>%
 
 ### Services (PMS)
 
-```{r pms}
+```{r section1_pms}
 pms %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:2]) %>%
   ftplot(
@@ -233,7 +235,7 @@ pms %>%
 
 ### Industry (PIM-PF)
 
-```{r pim}
+```{r section1_pim}
 pim %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:4]) %>%
   ftplot(
@@ -246,8 +248,88 @@ pim %>%
 ```
 
 
+Inflation {data-navmenu="Sections" data-icon="fa-hand-holding-usd"}
+=====================================
 
-<!-- Other sections -->
+
+Col {data-width=350}
+-----------------------------------------------------------------------
+
+
+### Inflation over 12 months (`r format(ipca_yoy$date, "%B, %Y")` - IPCA/IBGE)
+
+```{r section2_inflation_12m}
+ipca_yoy %>%
+  pull(value) %>%
+  valueBox(
+    value = .,
+    icon  = "fa-chart-bar",
+    color =  ifelse(. > inflation_target$value, "#b22200", "#282f6b")
+    )
+```
+
+### Inflation target for (`r inflation_target$date` - CMN/BCB)
+
+```{r section2_inflation_target}
+inflation_target %>% 
+  mutate(value = paste0(value, "%")) %>%
+  pull(value) %>%
+  valueBox(
+    value = .,
+    icon = "fa-bullseye",
+    color = "#5f487c"
+    )
+```
+
+### Diffusion index (IPCA) {.no-title}
+
+```{r section2_diffusion_ipca}
+ipca_diffusion %>%
+  hchart("area", hcaes(x = date, y = value, group = variable), color = colors[1]) %>%
+  ftplot(
+    title    = "Diffusion index - IPCA",
+    subtitle = "",
+    source   = "BCB"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+
+Col {data-width=650}
+-----------------------------------------------------------------------
+
+
+### Inflation trend {.no-title}
+
+```{r section2_ipca_trend}
+ipca_trend %>% 
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:2]) %>%
+  ftplot(
+    title    = "Inflation trend (IPCA)",
+    subtitle = "Monthly and accumulated variation in 12 months (%)",
+    source   = "IBGE"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+
+Labor market {data-navmenu="Sections" data-icon="fa-users"}
+=====================================
+
+
+
+
+Fiscal policy {data-navmenu="Sections" data-icon="fa-gavel"}
+=====================================
+
+
+
+Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
+=====================================
+
+
 
 
 Sobre {data-icon="fa-file-alt"}
@@ -284,72 +366,5 @@ LinkedIn: <https://www.linkedin.com/in/schoulten/>
 #### **Dúvidas/sugestões/correções**
 E-mail: <contato@gecefurg.com.br>
 
-
-
-Fontes {data-icon="fa-table"}
-=====================================
-
-### Fontes {.no-title}
-#### Fonte dos dados
-Os dados são extraídos de diversas fontes, detalhadas abaixo, importados através de pacotes do **R** específicos.
-
-
-
-
-```{r}
-
-fontes <- tibble(
-
-  Tema = c(rep("Nível de Atividade", 8),
-
-           rep("Inflação", 5),
-
-           rep("Mercado de Trabalho", 7),
-
-           rep("Política Fiscal", 7),
-
-           rep("Política Monetária", 12),
-
-           rep("Economia Internacional", 4)),
-
-
-  `Variável` = c("Produto Interno Bruto - PIB", "Índice Cielo do Varejo Ampliado - ICVA", "Produção de Veículos (autoveículos total)", "Utilização da Capacidade Instalada - indústria de transformação", "Índice de Atividade Econômica Regional - IBCR", "Pesquisa Mensal de Comércio - PMC", "Pesquisa Mensal de Serviços - PMS", "Pesquisa Industrial Mensal - Produção Física - PIM-PF",
-
-               "Índice Nacional de Preços ao Consumidor Amplo - IPCA", "Meta de inflação", "Índice de Difusão - IPCA", "Núcleos do IPCA", "Índice Geral de Preços - IGP",
-
-               "Pessoas Ocupadas", "Pessoas Desocupadas", "Taxa de Desemprego", "Nível da Ocupação", "Taxa de Participação", "Rendimento", "Índice de Gini",
-
-               "Resultado Primário do Governo Central", "Receita Líquida do Governo Central", "Despesa Total do Governo Central", "Saldo da Conta Única do Tesouro Nacional", "Classificação de Risco da Dívida", "Estoque da Dívida Pública Federal", "Composição da carteira de Títulos Públicos do Tesouro Nacional",
-
-               "Meta da Taxa de Juros SELIC", "Meta de Inflação", "Expectativas de Inflação 12 meses à frente", "SELIC Meta", "SELIC Efetiva", "CDI", "Taxa de Juros Real (ex-ante e ex-post)", "Cotação de moedas (mercado cambial)", "Expectativas da Taxa SELIC", "Estrutura a Termo da Taxa de Juros - ETTJ", "Índice Bovespa", "Risco-Brasil EMBI+",
-
-               "Produto Interno Bruto - PIB", "Taxa de Desemprego", "Taxa de Inflação", "Taxa de Juros"),
-
-
-  Fonte = c("IBGE", "Cielo", "ANFAVEA", "FGV", "BCB", rep("IBGE", 3),
-
-            "IBGE", "CMN", rep("BCB", 2), "FGV",
-
-            rep("PNADC/IBGE", 6), "GECE (cálculo próprio)",
-
-            rep("STN e IBGE", 3), "BCB e IBGE", "STN", "BCB e IBGE", "BCB",
-
-            "COPOM/BCB", "CMN", rep("BCB", 4), "B3, BCB e IBGE", rep("BCB", 2), "ANBIMA", "B3", "JP Morgan",
-
-            rep("OCDE", 4))
-  )
-
-
-fontes %>%
-  kable(escape = FALSE) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-                full_width = T,
-                position = "left",
-                font_size = 12,
-                fixed_thead = list(enabled = T, background = "#cbcdd1"),
-                protect_latex = TRUE) %>%
-  column_spec(1:3, bold = T)
-
-```
 
 

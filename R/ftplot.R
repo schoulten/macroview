@@ -1,3 +1,16 @@
+#' Easy plot highcharter personal theme
+#'
+#' @param hc
+#' @param title
+#' @param subtitle
+#' @param source
+#' @param range_n
+#' @param navigator
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ftplot <- function(
   hc,
   title,
@@ -5,7 +18,9 @@ ftplot <- function(
   source,
   range_n,
   navigator = FALSE
-  ){hc %>%
+  )
+  {
+  hc %>%
     hc_title(text = title) %>%
     hc_subtitle(text = subtitle) %>%
     hc_credits(enabled = TRUE, text = paste0("Source: ", source), style = list(fontSize = "12px")) %>%
@@ -22,6 +37,4 @@ ftplot <- function(
     hc_tooltip(shared = TRUE) %>%
     hc_add_theme(theme_fortietwo) %>%
     hc_navigator(enabled = navigator)
-}
-
-
+  }

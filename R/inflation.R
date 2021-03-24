@@ -177,7 +177,7 @@ ipca <- raw_ipca %>%
       "IPCA - Variação acumulada em 3 meses"  = "Quarter to Date (%)",
       "IPCA - Variação acumulada em 6 meses"  = "Semester to Date (%)"
       ),
-    date = ymd_sidra(date) # function from /R/utils.R
+    date = lubridate::ym(date)
     ) %>%
   tidyr::drop_na()
 
@@ -214,13 +214,13 @@ ipca_groups <- raw_ipca_groups %>%
 
 
 # Footnote for Consumer Price Index by groups - IPCA
-footnote_ipca_grupos <- raw_ipca_groups %>%
+footnote_ipca_groups <- raw_ipca_groups %>%
   filter(date == max(date)) %>%
   slice_tail(n = 1) %>%
   mutate(
     date = paste0(
       "Note: data for ",
-      format(as.Date(ymd_sidra(date), "%Y/%m/%d"), "%B %Y"), # function from /R/utils.R
+      format(lubridate::ym(date), "%B %Y"),
       "."
       )
     ) %>%
@@ -229,14 +229,15 @@ footnote_ipca_grupos <- raw_ipca_groups %>%
 
 # Consumer Price Index by Metropolitan Region - IPCA
 ipca_region <- raw_ipca_region %>%
-  mutate(date = ymd_sidra(date)) # function from /R/utils.R
+  mutate(date = lubridate::ym(date))
 
 
 # Consumer Price Index (Year over Year (%)) - IPCA
 ipca_yoy <- ipca %>%
   filter(
     date == max(date) & variable == "Year over Year (%)"
-    )
+    ) %>%
+  mutate(value = paste0(value, "%"))
 
 
 # Inflation-targeting (current year)
