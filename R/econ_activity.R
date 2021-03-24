@@ -369,12 +369,9 @@ ibc_growth <- raw_ibc %>%
 
 
 # PMC growth
-pmc <- bind_rows(
-  raw_pmc_expanded,
-  raw_pmc
-  ) %>%
+pmc <- bind_rows(raw_pmc_expanded, raw_pmc) %>%
   mutate(
-    date     = ymd_sidra(date), # function from /R/utils.R
+    date     = lubridate::ym(date),
     variable = recode(
       variable,
       "Índice de volume de vendas no comércio varejista ampliado"          = "Retail sales volume expanded",

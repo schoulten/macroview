@@ -206,7 +206,15 @@ gdp_measures %>%
 ### Retail (PMC)
 
 ```{r pmc}
-
+pmc %>%
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:4]) %>%
+  ftplot(
+    title    = "Retail trade indicator: PMC/IBGE",
+    subtitle = "Monthly percentage change (compared to the same month in the previous year)",
+    source   = "IBGE"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
 ```
 
 
