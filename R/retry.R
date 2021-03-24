@@ -6,7 +6,7 @@
 #' @return Output of expression or error
 #' @export
 #'
-retry <- function(foo, tries) {
+retry <- function(foo, tries = 5) {
   message(paste0("Trying expression... \nRemaining tries: ", tries, "\n"))
   withRestarts(
     tryCatch(

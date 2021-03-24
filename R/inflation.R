@@ -69,7 +69,7 @@ api_bcb <- list(
 
   # Diffusion index - Consumer Price Index (IPCA)
   api_ipca_diffusion = c(
-    "Diffusion index (PCI)" = 21379
+    "Diffusion index (CPI)" = 21379
     ),
 
   # CPI cores - IPCA
@@ -188,7 +188,7 @@ ipca_groups <- raw_ipca_groups %>%
   mutate(
     Group = recode(
       group,
-      "Índice geral"                = "PCI (IPCA)",
+      "Índice geral"                = "CPI (IPCA)",
       "1.Alimentação e bebidas"     = "Food and drink",
       "2.Habitação"                 = "Housing",
       "3.Artigos de residência"     = "Residence articles",
@@ -201,8 +201,8 @@ ipca_groups <- raw_ipca_groups %>%
       ),
     variable = recode(
       variable,
-      "IPCA - Variação mensal"           = "MoM (%)",
-      "IPCA - Variação acumulada no ano" = "YTD (%)"
+      "IPCA - Variação mensal"           = "MoM",
+      "IPCA - Variação acumulada no ano" = "YTD"
       )
     ) %>%
   select(-date) %>%

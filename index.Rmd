@@ -202,7 +202,6 @@ gdp_measures %>%
     footnotes.padding = 3,
     data_row.padding = 6
     )
-
 ```
 
 ### Retail (PMC)
@@ -312,26 +311,59 @@ hchart(ipca_trend, "column", hcaes(x = date, y = `Month over Month (%)`),
     subtitle = "Monthly and accumulated variation in 12 months (%)",
     source   = "IBGE"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
-  hc_navigator(enabled = TRUE)
+  hc_rangeSelector(selected = 4, enabled = TRUE)
 ```
 
 ### Inflation by metropolitan region {.no-title}
 
 ```{r section2_ipca_region}
 ipca_region %>%
-  hchart("line", hcaes(x = date, y = value, group = region), color = colors) %>%
+  hchart("column", hcaes(x = date, y = value, group = region), color = colors) %>%
   ftplot(
     title    = "Inflation by metropolitan region - IPCA",
     subtitle = "Monthly percentage change",
     source   = "IBGE"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
-  hc_navigator(enabled = TRUE)
+  hc_rangeSelector(selected = 0, enabled = TRUE)
 ```
 
 
+Col {data-width=400 .tabset}
+-----------------------------------------------------------------------
 
+
+### CPI components
+
+```{r section2_ipca_groups}
+ipca_groups %>%
+  gt(rowname_col = "Group") %>%
+  tab_source_note(footnote_ipca_groups) %>% 
+  tab_source_note("Source: IPCA/IBGE") %>%
+  tab_footnote(
+    footnote = "Month over Month: monthly percentage change",
+    locations = cells_column_labels(columns = vars(`MoM`))
+    ) %>% 
+  tab_footnote(
+    footnote = "Year to Date: percentage change accumulated in the year",
+    locations = cells_column_labels(columns = vars(`YTD`))
+    ) %>% 
+  data_color(
+    columns = 2:3,
+    colors = scales::col_numeric(
+      colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
+      reverse = TRUE,
+      domain = c(min(ipca_groups[2:3]), max(ipca_groups[2:3]))
+      )
+    ) %>%
+  fmt_percent(columns = 2:3, scale_values = FALSE, decimals = 1) %>%
+  cols_width(2:3 ~ px(120)) %>% 
+  tab_options(
+    column_labels.font.weight = "bold",
+    stub.font.weight = "bold",
+    footnotes.padding = 3,
+    data_row.padding = 6
+    )
+```
 
 
 
