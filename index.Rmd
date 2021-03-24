@@ -181,7 +181,7 @@ gdp_measures %>%
     locations = cells_column_labels(columns = vars(`Year to Date`))
     ) %>% 
   tab_footnote(
-    footnote = "Growth rate accumulated in four quarters (compared to the same period of the previous year)",
+    footnote = "Growth rate accumulated in 4 quarters (compared to the same period of the previous year)",
     locations = cells_column_labels(columns = vars(`Accumulated in 4 Quarters`))
     ) %>%
   data_color(
@@ -196,10 +196,19 @@ gdp_measures %>%
   cols_width(2:5 ~ px(125)) %>% 
   tab_options(
     column_labels.font.weight = "bold",
-    stub.font.weight = "bold"
+    stub.font.weight = "bold",
+    footnotes.padding = 3,
+    data_row.padding = 6
     )
 
 ```
+
+### Retail (PMC)
+
+```{r pmc}
+
+```
+
 
 
 <!-- Other sections -->

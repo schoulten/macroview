@@ -228,8 +228,8 @@ gdp <- raw_gdp %>%
       "Indústria - total"                           = "Industry",
       "Serviços - total"                            = "Services",
       "PIB a preços de mercado"                     = "GDP",
-      "Despesa de consumo das famílias"             = "Private consumption",
-      "Despesa de consumo da administração pública" = "Government spending",
+      "Despesa de consumo das famílias"             = "Consumption",
+      "Despesa de consumo da administração pública" = "Government",
       "Formação bruta de capital fixo"              = "Investment",
       "Exportação de bens e serviços"               = "Exports",
       "Importação de bens e serviços (-)"           = "Imports"
@@ -307,8 +307,8 @@ levels_gdp <- c(
   "Agriculture",
   "Industry",
   "Services",
-  "Private consumption",
-  "Government spending",
+  "Consumption",
+  "Government",
   "Investment",
   "Exports",
   "Imports"
