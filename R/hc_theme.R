@@ -1,4 +1,5 @@
 colors <- c("#282f6b", "#b22200", "#eace3f", "#224f20", "#5f487c", "#b35c1e")
+colors10 <- c(colors, "#419391", "#549e9c", "#839c56",  "#3b89bc")
 
 theme_fortietwo <-
   highcharter::hc_theme_merge(

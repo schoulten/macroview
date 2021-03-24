@@ -316,6 +316,25 @@ hchart(ipca_trend, "column", hcaes(x = date, y = `Month over Month (%)`),
   hc_navigator(enabled = TRUE)
 ```
 
+### Inflation by metropolitan region {.no-title}
+
+```{r section2_ipca_region}
+ipca_region %>%
+  hchart("line", hcaes(x = date, y = value, group = region), color = colors) %>%
+  ftplot(
+    title    = "Inflation by metropolitan region - IPCA",
+    subtitle = "Monthly percentage change",
+    source   = "IBGE"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+
+
+
+
+
 
 Labor market {data-navmenu="Sections" data-icon="fa-users"}
 =====================================

@@ -54,7 +54,7 @@ api_sidra <- list(
   api_ipca_groups = "/t/7060/n1/all/v/63,69/p/all/c315/7169,7170,7445,7486,7558,7625,7660,7712,7766,7786/d/v63%202,v69%202",
 
     # Consumer Price Index by Metropolitan Region - IPCA (parameters from SIDRA/IBGE website)
-  api_ipca_region = "/t/7060/n7/all/v/69/p/all/c315/7169/d/v69%202"
+  api_ipca_region = "/t/7060/n7/all/v/63/p/all/c315/7169/d/v63%202"
 
   )
 
@@ -229,7 +229,17 @@ footnote_ipca_groups <- raw_ipca_groups %>%
 
 # Consumer Price Index by Metropolitan Region - IPCA
 ipca_region <- raw_ipca_region %>%
-  mutate(date = lubridate::ym(date))
+  mutate(
+    date = lubridate::ym(date),
+    variable = recode(
+      variable,
+      "IPCA - Variação mensal" = "Monthly percentage change"
+      )
+    ) %>%
+  filter(region %in% c(
+    "Belém - PA", "Fortaleza - CE", "Rio de Janeiro - RJ",
+    "São Paulo - SP", "Curitiba - PR", "Porto Alegre - RS")
+    )
 
 
 # Consumer Price Index (Year over Year (%)) - IPCA
