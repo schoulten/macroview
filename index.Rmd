@@ -30,7 +30,10 @@ pacman::p_load(
   "tidyverse",
   "flexdashboard",
   "htmlwidgets",
-  "kableExtra"
+  "kableExtra",
+  "gt",
+  "scales",
+  "colorspace"
   )
 
 # Set the default language of date in R
@@ -131,16 +134,6 @@ Col {data-width=575}
 ### GDP trend {.no-title}
 
 ```{r gdp_trend}
-# gdp_growth_sector %>%
-#   hchart("line", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
-#   hc_title(text = "GDP growth by sectors") %>%
-#   hc_subtitle(text = "Accumulated growth rate in 4 quarters") %>%
-#   hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px")) %>%
-#   hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
-#   hc_xAxis(title = FALSE) %>%
-#   hc_tooltip(shared = TRUE) %>% 
-#   hc_add_theme(theme_fortietwo)
-
 gdp_growth_sector %>%
   hchart("column", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
   ftplot(
@@ -153,17 +146,6 @@ gdp_growth_sector %>%
 ### IBC-Br trend {.no-title}
 
 ```{r ibcbr_trend}
-# ibc_growth %>%
-#   hchart("column", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
-#   hc_title(text = "IBC-Br growth by region") %>%
-#   hc_subtitle(text = "Accumulated growth rate in 12 months") %>%
-#   hc_credits(enabled = TRUE, text = "Source: BCB", style = list(fontSize = "12px")) %>%
-#   hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
-#   hc_xAxis(title = FALSE) %>%
-#   hc_tooltip(shared = TRUE) %>% 
-#   hc_add_theme(theme_fortietwo) %>%
-#   hc_rangeSelector(selected = 2, enabled = TRUE)
-
 ibc_growth %>%
   hchart("line", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
   ftplot(
@@ -172,7 +154,59 @@ ibc_growth %>%
     source   = "BCB"
     ) %>%
   hc_rangeSelector(selected = 4, enabled = TRUE)
+```
 
+
+Col {data-width=500 .tabset}
+-----------------------------------------------------------------------
+
+
+### GDP approaches (%)
+
+```{r gdp_approaches}
+gdp_measures %>%
+  gt(rowname_col = "sector") %>%
+  data_color(
+    columns = 2:5,
+    colors = scales::col_numeric(
+      colorspace::diverge_hcl(n =20, palette = "Blue-Red 3"),
+      reverse = TRUE,
+      domain = c(min(gdp_measures[2:5]), max(gdp_measures[2:5]))
+      )
+    ) %>%
+  tab_header("GDP approaches") %>%
+  tab_source_note("Source: IBGE") %>%
+  fmt_percent(columns = 2:5, scale_values = FALSE, decimals = 1) %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "red"),
+      cell_text(weight = "bold")
+      ),
+    locations = cells_body(
+      columns = "sector"
+    )
+  ) %>% 
+  cols_width(2:5 ~ px(125))
+
+
+
+  # kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+  #               full_width = T,
+  #               position = "left",
+  #               font_size = 12,
+  #               fixed_thead = list(enabled = T, background = "#cbcdd1")) %>%
+  # column_spec(1, bold = T) %>%
+  # row_spec(1, bold = T) %>%
+  # pack_rows(index = c(" " = 1, "Ótica da Oferta" = 3, "Ótica da Demanda" = 5)) %>%
+  # add_indent(1) %>%
+  # footnote(general_title = trim.pib,
+  #          general = "\ 
+  #          Margem: Taxa trimestre contra trimestre imediatamente anterior \
+  #          Interanual: Taxa trimestral (em relação ao mesmo período do ano anterior) \
+  #          Acumulado no ano: Taxa acumulada ao longo do ano (em relação ao mesmo período do ano anterior) \
+  #          Anual: Taxa acumulada em quatro trimestres (em relação ao mesmo período do ano anterior) \
+  #          \
+  #          Fonte: IBGE")
 ```
 
 

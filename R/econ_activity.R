@@ -333,13 +333,10 @@ gdp_measures <- gdp %>%
     ) %>%
   relocate(1, 5, 2, 4, 3) %>%
   mutate(
-    sector = factor(
-      sector,
-      levels = levels_gdp
-      )
+    sector = factor(sector, levels = levels_gdp),
     ) %>%
-  rename("Indicator" = sector) %>%
-  arrange(Indicator)
+  rename_with(~stringr::str_remove(.x, " \\(%\\)"), cols = 2:5) %>%
+  arrange(sector)
 
 
 # GDP growth by sectors
