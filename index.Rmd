@@ -161,52 +161,44 @@ Col {data-width=500 .tabset}
 -----------------------------------------------------------------------
 
 
-### GDP approaches (%)
+### GDP approaches
 
 ```{r gdp_approaches}
 gdp_measures %>%
   gt(rowname_col = "sector") %>%
+  tab_source_note(footnote_gdp) %>% 
+  tab_source_note("Source: IBGE") %>%
+  tab_footnote(
+    footnote = "Growth rate for the quarter versus the immediately preceding quarter",
+    locations = cells_column_labels(columns = vars(`Quarter over Quarter`))
+    ) %>% 
+  tab_footnote(
+    footnote = "Quarterly growth rate (compared to the same period of the previous year)",
+    locations = cells_column_labels(columns = vars(`Year over Year`))
+    ) %>% 
+  tab_footnote(
+    footnote = "Accumulated growth rate over the year (compared to the same period of the previous year)",
+    locations = cells_column_labels(columns = vars(`Year to Date`))
+    ) %>% 
+  tab_footnote(
+    footnote = "Growth rate accumulated in four quarters (compared to the same period of the previous year)",
+    locations = cells_column_labels(columns = vars(`Accumulated in 4 Quarters`))
+    ) %>%
   data_color(
     columns = 2:5,
     colors = scales::col_numeric(
-      colorspace::diverge_hcl(n =20, palette = "Blue-Red 3"),
+      colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
       reverse = TRUE,
       domain = c(min(gdp_measures[2:5]), max(gdp_measures[2:5]))
       )
     ) %>%
-  tab_header("GDP approaches") %>%
-  tab_source_note("Source: IBGE") %>%
   fmt_percent(columns = 2:5, scale_values = FALSE, decimals = 1) %>%
-  tab_style(
-    style = list(
-      cell_fill(color = "red"),
-      cell_text(weight = "bold")
-      ),
-    locations = cells_body(
-      columns = "sector"
+  cols_width(2:5 ~ px(125)) %>% 
+  tab_options(
+    column_labels.font.weight = "bold",
+    stub.font.weight = "bold"
     )
-  ) %>% 
-  cols_width(2:5 ~ px(125))
 
-
-
-  # kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-  #               full_width = T,
-  #               position = "left",
-  #               font_size = 12,
-  #               fixed_thead = list(enabled = T, background = "#cbcdd1")) %>%
-  # column_spec(1, bold = T) %>%
-  # row_spec(1, bold = T) %>%
-  # pack_rows(index = c(" " = 1, "Ótica da Oferta" = 3, "Ótica da Demanda" = 5)) %>%
-  # add_indent(1) %>%
-  # footnote(general_title = trim.pib,
-  #          general = "\ 
-  #          Margem: Taxa trimestre contra trimestre imediatamente anterior \
-  #          Interanual: Taxa trimestral (em relação ao mesmo período do ano anterior) \
-  #          Acumulado no ano: Taxa acumulada ao longo do ano (em relação ao mesmo período do ano anterior) \
-  #          Anual: Taxa acumulada em quatro trimestres (em relação ao mesmo período do ano anterior) \
-  #          \
-  #          Fonte: IBGE")
 ```
 
 
