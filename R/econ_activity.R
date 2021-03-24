@@ -354,7 +354,7 @@ gdp_growth_sector <- gdp %>%
       )
     ) %>%
   select(date, sector, value) %>%
-  slice_tail(n = 48)
+  slice_tail(n = 20)
 
 
 # IBC-Br growth by region

@@ -47,7 +47,7 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
   purrr::map( ~ load(.x, .GlobalEnv))
 
 source("./R/hc_theme.R")
-
+source("./R/ftplot.R")
 ```
 
 <!-- Overview section -->
@@ -130,32 +130,49 @@ Col {data-width=575}
 
 ### GDP trend {.no-title}
 
-```{r gdp_trend, fig.height=4}
+```{r gdp_trend}
+# gdp_growth_sector %>%
+#   hchart("line", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
+#   hc_title(text = "GDP growth by sectors") %>%
+#   hc_subtitle(text = "Accumulated growth rate in 4 quarters") %>%
+#   hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px")) %>%
+#   hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
+#   hc_xAxis(title = FALSE) %>%
+#   hc_tooltip(shared = TRUE) %>% 
+#   hc_add_theme(theme_fortietwo)
+
 gdp_growth_sector %>%
-  hchart("line", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
-  hc_title(text = "GDP growth by sectors") %>%
-  hc_subtitle(text = "Accumulated growth rate in 4 quarters") %>%
-  hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px")) %>%
-  hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
-  hc_xAxis(title = FALSE) %>%
-  hc_tooltip(shared = TRUE) %>% 
-  hc_add_theme(theme_fortietwo)
+  hchart("column", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
+  ftplot(
+    title    = "GDP growth by sectors",
+    subtitle = "Accumulated growth rate in 4 quarters",
+    source   = "IBGE"
+    )
 ```
 
 ### IBC-Br trend {.no-title}
 
 ```{r ibcbr_trend}
+# ibc_growth %>%
+#   hchart("column", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
+#   hc_title(text = "IBC-Br growth by region") %>%
+#   hc_subtitle(text = "Accumulated growth rate in 12 months") %>%
+#   hc_credits(enabled = TRUE, text = "Source: BCB", style = list(fontSize = "12px")) %>%
+#   hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
+#   hc_xAxis(title = FALSE) %>%
+#   hc_tooltip(shared = TRUE) %>% 
+#   hc_add_theme(theme_fortietwo) %>%
+#   hc_rangeSelector(selected = 2, enabled = TRUE)
+
 ibc_growth %>%
   hchart("line", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
-  hc_title(text = "IBC-Br growth by region") %>%
-  hc_subtitle(text = "Accumulated growth rate in 12 months") %>%
-  hc_credits(enabled = TRUE, text = "Source: BCB", style = list(fontSize = "12px")) %>%
-  hc_yAxis(labels = list(format = "{value}%"), title = FALSE) %>%
-  hc_xAxis(title = FALSE) %>%
-  hc_tooltip(shared = TRUE) %>% 
-  hc_add_theme(theme_fortietwo) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
-  hc_navigator(enabled = TRUE)
+  ftplot(
+    title    = "IBC-Br growth by region",
+    subtitle = "Accumulated growth rate in 12 months",
+    source   = "BCB"
+    ) %>%
+  hc_rangeSelector(selected = 4, enabled = TRUE)
+
 ```
 
 
