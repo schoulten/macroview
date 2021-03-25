@@ -191,7 +191,7 @@ gdp_measures %>%
     colors = scales::col_numeric(
       colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
       reverse = TRUE,
-      domain = c(min(gdp_measures[2:5]), max(gdp_measures[2:5]))
+      domain = c(-max_abs(gdp_measures[2:5]), max_abs(gdp_measures[2:5]))
       )
     ) %>%
   fmt_percent(columns = 2:5, scale_values = FALSE, decimals = 1) %>%
@@ -352,7 +352,7 @@ ipca_groups %>%
     colors = scales::col_numeric(
       colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
       reverse = TRUE,
-      domain = c(min(ipca_groups[2:3]), max(ipca_groups[2:3]))
+      domain = c(-max_abs(ipca_groups[2:3]), max_abs(ipca_groups[2:3]))
       )
     ) %>%
   fmt_percent(columns = 2:3, scale_values = FALSE, decimals = 1) %>%
