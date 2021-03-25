@@ -110,3 +110,12 @@ clean_inflation_bcb <- function(df){
 
 }
 
+
+
+# Get max abs value from a DF ---------------------------------------------
+
+max_abs <- function(x) {
+
+  max(abs(x))
+
+  }

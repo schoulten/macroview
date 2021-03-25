@@ -191,7 +191,7 @@ gdp_measures %>%
     colors = scales::col_numeric(
       colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
       reverse = TRUE,
-      domain = c(min(gdp_measures[2:5]), max(gdp_measures[2:5]))
+      domain = c(-max_abs(gdp_measures[2:5]), max_abs(gdp_measures[2:5]))
       )
     ) %>%
   fmt_percent(columns = 2:5, scale_values = FALSE, decimals = 1) %>%
@@ -249,7 +249,6 @@ pim %>%
 
 Inflation {data-navmenu="Sections" data-icon="fa-hand-holding-usd"}
 =====================================
-
 
 Col {data-width=350}
 -----------------------------------------------------------------------
@@ -352,7 +351,7 @@ ipca_groups %>%
     colors = scales::col_numeric(
       colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
       reverse = TRUE,
-      domain = c(min(ipca_groups[2:3]), max(ipca_groups[2:3]))
+      domain = c(-max_abs(ipca_groups[2:3]), max_abs(ipca_groups[2:3]))
       )
     ) %>%
   fmt_percent(columns = 2:3, scale_values = FALSE, decimals = 1) %>%
@@ -394,10 +393,68 @@ igp %>%
 ```
 
 
-
 Labor market {data-navmenu="Sections" data-icon="fa-users"}
 =====================================
 
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+### # Employed (`r big_numbers$date` - IBGE)
+
+```{r section3_employed}
+big_numbers %>% 
+  pull(employed) %>% 
+  valueBox(
+    value = .,
+    icon = "fa-users",
+    color = "#282f6b"
+    )
+```
+
+### # Unemployed (`r big_numbers$date` - IBGE)
+
+```{r section3_unemployed}
+big_numbers %>% 
+  pull(unemployed) %>% 
+  valueBox(
+    value = .,
+    icon = "fa-user-times",
+    color = "#b22200"
+    )
+```
+
+### Employment by category {.no-title}
+
+```{r section3_employment_category}
+teste = employment_category %>%
+  hchart("item", hcaes(y = value, color = variable), color = colors) %>%
+  ftplot(
+    title    = "Employment by category",
+    subtitle = "In millions of people",
+    source   = "IBGE"
+    )
+
+# 
+# hcout <-  highchart() %>%
+#   hc_title(
+#     text = "Employment by category",
+#     style = list(fontSize = "15px")
+#   ) %>% 
+#   hc_chart(
+#     data = employment_category$value,
+#     type = "item"
+#   ) %>% 
+#   hc_xAxis(
+#     categories = employment_category$variable
+#   ) %>% 
+#   hc_yAxis(
+#     visible = TRUE
+#   ) %>% 
+#   hc_tooltip(
+#     outside = TRUE
+#   )
+            
+```
 
 
 
