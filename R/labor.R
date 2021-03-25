@@ -125,7 +125,11 @@ big_numbers <- raw_pnadct %>%
   summarise(n = round(sum(V1028) / 1e6, 1)) %>%
   tidyr::drop_na() %>%
   pivot_wider(names_from = VD4002, values_from = n) %>%
-  rename_with(~c("employed", "unemployed"))
+  rename_with(~c("employed", "unemployed")) %>%
+  mutate(
+    across(everything(), ~paste0(., " million")),
+    date = paste0(api_ibge[[2]][[3]], " Q", api_ibge[[2]][[2]])
+    )
 
 
 # Employment by category in the main job

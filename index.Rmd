@@ -250,7 +250,6 @@ pim %>%
 Inflation {data-navmenu="Sections" data-icon="fa-hand-holding-usd"}
 =====================================
 
-
 Col {data-width=350}
 -----------------------------------------------------------------------
 
@@ -394,9 +393,35 @@ igp %>%
 ```
 
 
-
 Labor market {data-navmenu="Sections" data-icon="fa-users"}
 =====================================
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+### # Employed (`r big_numbers$date` - IBGE)
+
+```{r section3_employed}
+big_numbers %>% 
+  pull(employed) %>% 
+  valueBox(
+    value = .,
+    icon = "fa-users",
+    color = "#282f6b"
+    )
+```
+
+### # Unemployed (`r big_numbers$date` - IBGE)
+
+```{r section3_employed}
+big_numbers %>% 
+  pull(unemployed) %>% 
+  valueBox(
+    value = .,
+    icon = "fa-user-times",
+    color = "#b22200"
+    )
+```
 
 
 
