@@ -413,7 +413,7 @@ big_numbers %>%
 
 ### # Unemployed (`r big_numbers$date` - IBGE)
 
-```{r section3_employed}
+```{r section3_unemployed}
 big_numbers %>% 
   pull(unemployed) %>% 
   valueBox(
@@ -423,6 +423,17 @@ big_numbers %>%
     )
 ```
 
+### Employment by category {.no-title}
+
+```{r section3_employment_category}
+employment_category %>%
+  hchart("item", hcaes(x = date, y = value, group = variable), color = colors) %>%
+  ftplot(
+    title    = "Employment by category",
+    subtitle = "In millions of people",
+    source   = "IBGE"
+    )
+```
 
 
 
