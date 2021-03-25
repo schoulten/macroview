@@ -1,0 +1,92 @@
+# library(dplyr)
+# library(stringr)
+# library(purrr)
+# library(highcharter)
+# n <- 6
+# set.seed(123)
+# colors <- c("#d35400", "#2980b9", "#2ecc71", "#f1c40f", "#2c3e50", "#7f8c8d")
+# colors2 <- c("#000004", "#3B0F70", "#8C2981", "#DE4968", "#FE9F6D", "#FCFDBF")
+# df <- data.frame(x = seq_len(n) - 1) %>%
+#   mutate(
+#     y = 10 + x + 10 * sin(x - 1),
+#     z = 5 + (x*y) - median(x*y),
+#     e = 10 * abs(rnorm(length(x))) + 2,
+#     e = round(e, 1),
+#     low = y - e,
+#     high = y + e,
+#     value = round(y - 1),
+#     name = sample(fruit[str_length(fruit) <= 5], size = n),
+#     color = rep(colors, length.out = n)
+#   ) %>%
+#   mutate_if(is.numeric, round, 1) %>%
+#   select(-e)
+# df <- df %>%
+#   mutate(
+#     # label = name,
+#     from = name[c(1, 1, 1, 2, 3, 4)],
+#     to   = name[c(3, 4, 5, 3, 6, 6)],
+#     weight = c(1, 1, 1, 1, 2, 2)
+#   )
+#
+#
+# create_hc <- function(t = "dumbbell") {
+#
+#   dont_rm_high_and_low <- c(
+#     "arearange",
+#     "areasplinerange",
+#     "polarcolumnrange",
+#     "columnrange",
+#     "errorbar",
+#     "dumbbell"
+#   )
+#
+#   if(!t %in% dont_rm_high_and_low) df <- df %>% select(-low, -high)
+#
+#   is_polar <- str_detect(t, "polar")
+#   type     <- str_remove(t, "polar")
+#   title    <- str_c(ifelse(is_polar, "polar ", ""), type)
+#   invt     <- ifelse(t %in% c("dumbbell", "organization"), TRUE, FALSE)
+#   yvisible <- ifelse(t %in% c("streamgraph", "timeline"), FALSE, TRUE)
+#   xvisible <- ifelse(t %in% c(""), FALSE, TRUE)
+#
+#   hcout <-  highchart() %>%
+#     hc_title(
+#       text = title,
+#       style = list(fontSize = "15px")
+#     ) %>%
+#     hc_chart(
+#       type = type,
+#       polar = is_polar,
+#       inverted = invt
+#     ) %>%
+#     hc_xAxis(
+#       categories = df$name
+#     ) %>%
+#     hc_yAxis(
+#       visible = yvisible
+#     ) %>%
+#     hc_tooltip(
+#       outside = TRUE
+#     ) %>%
+#     hc_add_series(
+#       df,
+#       name = "Fruit Consumption",
+#       showInLegend = FALSE
+#     )
+#
+#   hcout
+#
+# }
+#
+#
+#
+#
+#
+# hcs <- c("item")  %>%   map(create_hc)
+#
+#
+#
+# hcs %>%
+#   {print(hw_grid(.)); .} %>%
+#   map(tags$div, class = "col-sm-4") %>%
+#   tags$div(class = "row")
