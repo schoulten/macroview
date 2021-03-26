@@ -426,13 +426,35 @@ big_numbers %>%
 ### Employment by category {.no-title}
 
 ```{r section3_employment_category}
-teste = employment_category %>%
-  hchart("item", hcaes(y = value, color = variable), color = colors) %>%
-  ftplot(
-    title    = "Employment by category",
-    subtitle = "In millions of people",
-    source   = "IBGE"
+
+testando <- highchart() %>%
+  hc_chart(type = "item") %>% 
+  hc_title(text = "Employment by category") %>% 
+  hc_series(
+    list(
+      name = "Employment",
+      keys = c("name", "y", "color"),
+      data = list(
+        list("Employee in the private sector", 39.870, "#282f6b"),
+        list("Domestic worker", 4.902, "#b22200"),
+        list("Employee in the public sector", 12.162, "#eace3f"),
+        list("Auxiliary family worker", 2.051, "#224f20"),
+        list("Employer", 3.922, "#5f487c"),
+        list("Own account", 23.272, "#b35c1e")
+      )
     )
+  )
+
+
+
+
+# teste = employment_category %>%
+#   hchart("item", hcaes(y = value, color = variable), color = colors) %>%
+#   ftplot(
+#     title    = "Employment by category",
+#     subtitle = "In millions of people",
+#     source   = "IBGE"
+#     )
 
 # 
 # hcout <-  highchart() %>%
