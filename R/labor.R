@@ -151,7 +151,7 @@ employment_category <- raw_employment %>%
       "Empregador"                    = "Employer",
       "Conta própria"                 = "Own account",
       ),
-    value    = value * 1e3
+    value    = (value / 1e3) %>% round(2)
     )
 #num_txt_ocupacao <- c("Mil", "Milhão", "Milhões", "Bilhão", "Bilhões")
 

@@ -426,62 +426,31 @@ big_numbers %>%
 ### Employment by category {.no-title}
 
 ```{r section3_employment_category}
-
-testando <- highchart() %>%
+highchart() %>%
   hc_chart(type = "item") %>% 
-  hc_title(text = "Employment by category") %>% 
+  hc_title(text = "Employment by category") %>%
+  hc_subtitle(text = "In millions of employees") %>%
+  hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px")) %>%
+  hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>') %>%
   hc_series(
     list(
-      name = "Employment",
+      name = "Employees",
       keys = c("name", "y", "color"),
-      data = list(
-        list("Employee in the private sector", 39.870, "#282f6b"),
-        list("Domestic worker", 4.902, "#b22200"),
-        list("Employee in the public sector", 12.162, "#eace3f"),
-        list("Auxiliary family worker", 2.051, "#224f20"),
-        list("Employer", 3.922, "#5f487c"),
-        list("Own account", 23.272, "#b35c1e")
-      ),
+      data = {
+        employment_category %>% 
+          select(-date) %>%
+          mutate(color = colors) %>%
+          unname() %>%
+          transpose(.names = NULL)
+        },
       dataLabels = list(
         enabled = TRUE,
-        format = "{point.label}"
+        format = "{point.name} million"
       ),
       center = c("50%", "88%"),
-      size = "20%"
+      size = "50%"
     )
   )
-
-
-
-
-# teste = employment_category %>%
-#   hchart("item", hcaes(y = value, color = variable), color = colors) %>%
-#   ftplot(
-#     title    = "Employment by category",
-#     subtitle = "In millions of people",
-#     source   = "IBGE"
-#     )
-
-# 
-# hcout <-  highchart() %>%
-#   hc_title(
-#     text = "Employment by category",
-#     style = list(fontSize = "15px")
-#   ) %>% 
-#   hc_chart(
-#     data = employment_category$value,
-#     type = "item"
-#   ) %>% 
-#   hc_xAxis(
-#     categories = employment_category$variable
-#   ) %>% 
-#   hc_yAxis(
-#     visible = TRUE
-#   ) %>% 
-#   hc_tooltip(
-#     outside = TRUE
-#   )
-            
 ```
 
 
