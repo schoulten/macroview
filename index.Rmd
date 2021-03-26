@@ -441,7 +441,13 @@ testando <- highchart() %>%
         list("Auxiliary family worker", 2.051, "#224f20"),
         list("Employer", 3.922, "#5f487c"),
         list("Own account", 23.272, "#b35c1e")
-      )
+      ),
+      dataLabels = list(
+        enabled = TRUE,
+        format = "{point.label}"
+      ),
+      center = c("50%", "88%"),
+      size = "20%"
     )
   )
 
