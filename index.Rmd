@@ -426,10 +426,12 @@ big_numbers %>%
 ### Employment by category {.no-title}
 
 ```{r section3_employment_category}
-highchart() %>%
+testing= highchart() %>%
   hc_chart(type = "item") %>% 
   hc_title(text = "Employment by category") %>%
-  hc_subtitle(text = "In millions of employees") %>%
+  hc_subtitle(
+    text = paste0("In millions of employees, updated until ", employment_category$date[1])
+    ) %>%
   hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px")) %>%
   hc_legend(labelFormat = '{name} <span style="opacity: 0.4">{y}</span>') %>%
   hc_series(
