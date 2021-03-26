@@ -178,6 +178,7 @@ unemployment <- raw_unemployment %>%
     names_from  = variable,
     values_from = value
     ) %>%
+  slice_tail(n = 24) %>%
   mutate(across(employed:unemployed, ~ . * 1e3))
 
 
