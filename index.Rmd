@@ -528,9 +528,6 @@ Col {data-width=450 .tabset}
 ### Unemployment by states
 
 ```{r section3_unemployment_states}
-unemployment_states %<>%
-  rename("woe-name" = states)
-
 hcmap(
   map               = "countries/br/br-all",
   data              = unemployment_states,
@@ -554,6 +551,18 @@ hcmap(
   hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px"))
 ```
 
+### Occupation level
+
+```{r section3_occupation_level}
+occupation_level %>%
+  hchart(
+    "line", hcaes(x = date, y = value, group = gender), color = colors[1:3]) %>%
+  ftplot(
+    title    = "Labor force occupation level",
+    subtitle = "Quarterly data (PNADC-T)",
+    source   = "IBGE"
+    )
+```
 
 
 

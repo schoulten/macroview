@@ -245,18 +245,6 @@ states <- tibble(
   )
 
 
-# Dictionary for the map plot
-dict_unemployment <- list(
-  unemployment_rate = "Unemployment rate",
-  employed          = "Employed",
-  unemployed        = "Unemployed",
-  date              = "Trimestre",
-  isolar            = "Isolate",
-  ocultar           = "Hide"
-  )
-# num_txt_desemprego_map <- c("Mil", "Milhão", "Milhões", "Bilhão", "Bilhões")
-
-
 # Unemployment rate by states
 unemployment_states <- raw_pnadct %>%
   group_by(
@@ -277,7 +265,8 @@ unemployment_states <- raw_pnadct %>%
     date              = paste0(api_ibge[[2]][[3]], " Q", api_ibge[[2]][[2]])
     ) %>%
   arrange(-unemployment_rate) %>%
-  left_join(states, by = "states")
+  left_join(states, by = "states") %>%
+  rename("woe-name" = states)
 
 
 # Labor force occupation level
@@ -291,6 +280,7 @@ occupation_level <- raw_labor_force %>%
   filter(
     variable == "Nível de ocupação, na semana de referência, das pessoas de 14 anos ou mais de idade"
     ) %>%
+  slice_tail(n = 48) %>%
   mutate(
     date = stringr::str_replace(date, "(\\d{4})0(\\d{1}$)", "\\1 Q\\2"),
     variable = "Labor force occupation level",
