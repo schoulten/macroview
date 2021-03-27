@@ -334,7 +334,8 @@ income <- raw_income %>%
       stringr::str_replace
       )
     ) %>%
-  tidyr::drop_na()
+  tidyr::drop_na() %>%
+  slice_tail(n = 80)
 
 
 # Gini index by state
@@ -348,7 +349,8 @@ gini <- survey::svyby(~VD4020, by = ~UF, raw_pnadct_svy, convey::svygini, na.rm 
   as_tibble() %>%
   mutate(
     quarter  = paste0(raw_pnadct$Ano[1], " Q", raw_pnadct$Trimestre[1]),
-    variable = "Gini index"
+    variable = "Gini index",
+    value = round(value, 2)
     ) %>%
   select(
     quarter,
@@ -356,7 +358,8 @@ gini <- survey::svyby(~VD4020, by = ~UF, raw_pnadct_svy, convey::svygini, na.rm 
     states,
     variable,
     "value" = VD4020
-    )
+    ) %>%
+  arrange(states)
 
 
 
