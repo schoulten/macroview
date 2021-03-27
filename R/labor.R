@@ -200,8 +200,17 @@ unemployment_gender_color <- raw_pnadct %>%
   tidyr::replace_na(list(unemployed = 0)) %>%
   group_by(gender, color) %>%
   mutate(
-    unemployment_rate = unemployed / (unemployed + employed) * 100,
-    date              = paste0(api_ibge[[2]][[3]], " Q", api_ibge[[2]][[2]])
+    unemployment_rate = (unemployed / (unemployed + employed) * 100) %>% round(2),
+    date              = paste0(api_ibge[[2]][[3]], " Q", api_ibge[[2]][[2]]),
+    gender = recode(gender, "Homem" = "Man", "Mulher" = "Woman"),
+    color = recode(
+      color,
+      "Branca" = "White",
+      "Preta" = "Black",
+      "Amarela" = "Yellow",
+      "Parda" = "Brown",
+      "Indígena" = "Indian"
+      )
     ) %>%
   filter(color != "Ignorado")
 

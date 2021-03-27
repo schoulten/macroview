@@ -51,6 +51,7 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
 
 source("./R/hc_theme.R")
 source("./R/ftplot.R")
+source("./R/utils.R")
 ```
 
 <!-- Overview section -->
@@ -475,6 +476,17 @@ unemployment %>%
     )
 ```
 
+### Unemployment rate by gender and color {.no-title}
+
+```{r section3_unemployment_gender_color}
+unemployment_gender_color %>%
+  hchart("column", hcaes(x = color, y = unemployment_rate, group = gender), color = colors[1:2]) %>%
+  ftplot(
+    title    = "Unemployment rate by gender and color",
+    subtitle = "Quarterly Disclosure (PNADC-T)",
+    source   = "IBGE"
+    )
+```
 
 
 
