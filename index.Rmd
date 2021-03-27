@@ -564,6 +564,19 @@ occupation_level %>%
     )
 ```
 
+### Participation rate
+
+```{r section3_occupation_level}
+participation_rate %>%
+  hchart(
+    "line", hcaes(x = date, y = value, group = gender), color = colors[1:3]) %>%
+  ftplot(
+    title    = "Labor force participation rate",
+    subtitle = "Quarterly data (PNADC-T)",
+    source   = "IBGE"
+    )
+```
+
 
 
 Fiscal policy {data-navmenu="Sections" data-icon="fa-gavel"}

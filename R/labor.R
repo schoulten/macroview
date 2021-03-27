@@ -303,6 +303,7 @@ participation_rate <- raw_labor_force %>%
   filter(
     variable == "Taxa de participação na força de trabalho, na semana de referência, das pessoas de 14 anos ou mais de idade"
     ) %>%
+  slice_tail(n = 48) %>%
   mutate(
     date = stringr::str_replace(date, "(\\d{4})0(\\d{1}$)", "\\1 Q\\2"),
     variable = "Labor force participation rate",
