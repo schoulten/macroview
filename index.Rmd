@@ -312,7 +312,7 @@ ipca_diffusion %>%
 ```
 
 
-Col {data-width=650}
+Col {data-width=550}
 -----------------------------------------------------------------------
 
 
@@ -355,7 +355,7 @@ ipca_region %>%
 ```
 
 
-Col {data-width=400 .tabset}
+Col {data-width=450 .tabset}
 -----------------------------------------------------------------------
 
 
@@ -383,12 +383,13 @@ ipca_groups %>%
       )
     ) %>%
   fmt_percent(columns = 2:3, scale_values = FALSE, decimals = 1) %>%
-  cols_width(2:3 ~ px(120)) %>% 
+  cols_width(2:3 ~ px(130)) %>%
+  cols_width(1 ~ px(180)) %>%
   tab_options(
     column_labels.font.weight = "bold",
-    stub.font.weight = "bold",
-    footnotes.padding = 3,
-    data_row.padding = 6
+    stub.font.weight          = "bold",
+    footnotes.padding         = 3,
+    data_row.padding          = 6
     )
 ```
 
