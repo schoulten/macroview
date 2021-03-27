@@ -284,7 +284,9 @@ inflation_target %>%
 
 ```{r section2_diffusion_ipca}
 ipca_diffusion %>%
-  hchart("area", hcaes(x = date, y = value, group = variable), color = colors[1]) %>%
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[1], fillOpacity = 0.5) %>%
   ftplot(
     title    = "Diffusion index - IPCA",
     subtitle = "",
@@ -468,7 +470,9 @@ Column {data-width=525}
 
 ```{r section3_unemployment}
 unemployment %>%
-  hchart("area", hcaes(x = date, y = unemployment_rate), color = colors[1]) %>%
+  hchart(
+    "area", hcaes(x = date, y = unemployment_rate), color = colors[1],
+    name = "Unemployment rate", fillOpacity = 0.5) %>%
   ftplot(
     title    = "Unemployment rate",
     subtitle = "Quarterly Disclosure (PNADC-T)",
