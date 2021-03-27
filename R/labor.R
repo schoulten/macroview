@@ -152,7 +152,8 @@ employment_category <- raw_employment %>%
       "Conta própria"                 = "Own account",
       ),
     value    = (value / 1e3) %>% round(2)
-    )
+    ) %>%
+  arrange(desc(value))
 #num_txt_ocupacao <- c("Mil", "Milhão", "Milhões", "Bilhão", "Bilhões")
 
 

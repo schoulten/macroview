@@ -156,7 +156,10 @@ ibc_growth %>%
     subtitle = "Accumulated growth rate in 12 months",
     source   = "BCB"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE)
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    )
 ```
 
 
@@ -215,7 +218,10 @@ pmc %>%
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
   hc_navigator(enabled = TRUE)
 ```
 
@@ -229,7 +235,10 @@ pms %>%
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
   hc_navigator(enabled = TRUE)
 ```
 
@@ -243,7 +252,10 @@ pim %>%
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
   hc_navigator(enabled = TRUE)
 ```
 
@@ -292,7 +304,10 @@ ipca_diffusion %>%
     subtitle = "",
     source   = "BCB"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
   hc_navigator(enabled = TRUE)
 ```
 
@@ -317,7 +332,10 @@ hchart(
     subtitle = "Monthly and accumulated variation in 12 months (%)",
     source   = "IBGE"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE)
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    )
 ```
 
 ### Inflation by metropolitan region {.no-title}
@@ -330,7 +348,10 @@ ipca_region %>%
     subtitle = "Monthly percentage change",
     source   = "IBGE"
     ) %>%
-  hc_rangeSelector(selected = 0, enabled = TRUE)
+  hc_rangeSelector(
+    selected = 0, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    )
 ```
 
 
@@ -381,7 +402,10 @@ ipca_cores %>%
     subtitle = "Monthly percentage change",
     source   = "BCB"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
   hc_navigator(enabled = TRUE)
 ```
 
@@ -395,7 +419,10 @@ igp %>%
     subtitle = "Monthly percentage change",
     source   = "FGV"
     ) %>%
-  hc_rangeSelector(selected = 4, enabled = TRUE) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
   hc_navigator(enabled = TRUE)
 ```
 
@@ -446,7 +473,7 @@ highchart() %>%
       name = "Employees",
       keys = c("name", "y", "color"),
       data = {
-        employment_category %>% 
+        employment_category %>%
           select(-date) %>%
           mutate(color = colors) %>%
           unname() %>%

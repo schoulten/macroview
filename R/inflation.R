@@ -194,7 +194,7 @@ ipca_groups <- raw_ipca_groups %>%
       "3.Artigos de residência"     = "Residence articles",
       "4.Vestuário"                 = "Clothing",
       "5.Transportes"               = "Transportation",
-      "6.Saúde e cuidados pessoais" = "Health and personal care",
+      "6.Saúde e cuidados pessoais" = "Health care",
       "7.Despesas pessoais"         = "Personal expenses",
       "8.Educação"                  = "Education",
       "9.Comunicação"               = "Communication"
