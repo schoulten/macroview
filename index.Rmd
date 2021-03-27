@@ -33,7 +33,8 @@ pacman::p_load(
   "kableExtra",
   "gt",
   "scales",
-  "colorspace"
+  "colorspace",
+  "magrittr"
   )
 
 # Set the default language of date in R
@@ -503,7 +504,7 @@ unemployment %>%
     name = "Unemployment rate", fillOpacity = 0.5) %>%
   ftplot(
     title    = "Unemployment rate",
-    subtitle = "Quarterly Disclosure (PNADC-T)",
+    subtitle = "Quarterly data (PNADC-T)",
     source   = "IBGE"
     )
 ```
@@ -515,10 +516,44 @@ unemployment_gender_color %>%
   hchart("column", hcaes(x = color, y = unemployment_rate, group = gender), color = colors[1:2]) %>%
   ftplot(
     title    = "Unemployment rate by gender and color",
-    subtitle = "Quarterly Disclosure (PNADC-T)",
+    subtitle = "Quarterly data (PNADC-T)",
     source   = "IBGE"
     )
 ```
+
+
+Col {data-width=450 .tabset}
+-----------------------------------------------------------------------
+
+### Unemployment by states
+
+```{r section3_unemployment_states}
+unemployment_states %<>%
+  rename("woe-name" = states)
+
+hcmap(
+  map               = "countries/br/br-all",
+  data              = unemployment_states,
+  joinBy            = "woe-name",
+  value             = "unemployment_rate",
+  name              = "Unemployment rate",
+  download_map_data = TRUE,
+  dataLabels        = list(
+    enabled = TRUE,
+    format = "{point.name}"
+    ),
+  mapNavigation = list(
+    enabled = TRUE,
+    buttonOptions = list(
+      verticalAlign = "bottom"
+      )
+    )
+  ) %>% 
+  hc_title(text = "Unemployment rate by states") %>% 
+  hc_subtitle(text = "Quarterly data (PNADC-T)") %>%
+  hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px"))
+```
+
 
 
 

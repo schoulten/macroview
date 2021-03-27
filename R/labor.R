@@ -273,7 +273,7 @@ unemployment_states <- raw_pnadct %>%
   rename_with(~c("employed", "unemployed"), 2:3) %>%
   tidyr::replace_na(list(employed = 0, unemployed = 0)) %>%
   mutate(
-    unemployment_rate = unemployed / (unemployed + employed) * 100,
+    unemployment_rate = (unemployed / (unemployed + employed) * 100) %>% round(2),
     date              = paste0(api_ibge[[2]][[3]], " Q", api_ibge[[2]][[2]])
     ) %>%
   arrange(-unemployment_rate) %>%
