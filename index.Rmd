@@ -551,7 +551,7 @@ hcmap(
   hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px"))
 ```
 
-### Occupation level
+### Occupation
 
 ```{r section3_occupation_level}
 occupation_level %>%
@@ -564,7 +564,7 @@ occupation_level %>%
     )
 ```
 
-### Participation rate
+### Participation
 
 ```{r section3_participation_rate}
 participation_rate %>%
@@ -591,7 +591,7 @@ income %>%
   hc_yAxis(labels = list(format = "R$ {value}"))
 ```
 
-### Gini index
+### Gini
 
 ```{r section3_gini}
 gini %>%
