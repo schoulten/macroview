@@ -348,12 +348,12 @@ gini <- survey::svyby(~VD4020, by = ~UF, raw_pnadct_svy, convey::svygini, na.rm 
   left_join(states, by = "states") %>%
   as_tibble() %>%
   mutate(
-    quarter  = paste0(raw_pnadct$Ano[1], " Q", raw_pnadct$Trimestre[1]),
+    date  = paste0(raw_pnadct$Ano[1], " Q", raw_pnadct$Trimestre[1]),
     variable = "Gini index",
     value = round(VD4020, 2)
     ) %>%
   select(
-    quarter,
+    date,
     code,
     states,
     variable,

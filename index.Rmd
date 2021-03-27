@@ -12,7 +12,7 @@ output:
 
 <style>                     
 .navbar {
-  background-color:#253F90;
+  background-color:#282f6b;
 }
 </style> 
 
@@ -60,7 +60,7 @@ source("./R/utils.R")
 Economic activity {data-navmenu="Sections" data-icon="fa-chart-line"}
 =====================================
 
-Col {data-width=375}
+Column {data-width=375}
 -----------------------------------------------------------------------
 
 
@@ -131,7 +131,7 @@ gauge(
 
 
 
-Col {data-width=575}
+Column {data-width=575}
 -----------------------------------------------------------------------
 
 
@@ -164,7 +164,7 @@ ibc_growth %>%
 ```
 
 
-Col {data-width=500 .tabset}
+Column {data-width=500 .tabset}
 -----------------------------------------------------------------------
 
 
@@ -264,7 +264,7 @@ pim %>%
 Inflation {data-navmenu="Sections" data-icon="fa-hand-holding-usd"}
 =====================================
 
-Col {data-width=350}
+Column {data-width=350}
 -----------------------------------------------------------------------
 
 
@@ -313,7 +313,7 @@ ipca_diffusion %>%
 ```
 
 
-Col {data-width=550}
+Column {data-width=550}
 -----------------------------------------------------------------------
 
 
@@ -356,7 +356,7 @@ ipca_region %>%
 ```
 
 
-Col {data-width=450 .tabset}
+Column {data-width=450 .tabset}
 -----------------------------------------------------------------------
 
 
@@ -516,13 +516,15 @@ unemployment_gender_color %>%
   hchart("column", hcaes(x = color, y = unemployment_rate, group = gender), color = colors[1:2]) %>%
   ftplot(
     title    = "Unemployment rate by gender and color",
-    subtitle = "Quarterly data (PNADC-T)",
+    subtitle = paste0(
+      "Quarterly data, updated until ", unemployment_gender_color$date[1], " (PNADC-T)"
+      ),
     source   = "IBGE"
     )
 ```
 
 
-Col {data-width=500 .tabset}
+Column {data-width=500 .tabset}
 -----------------------------------------------------------------------
 
 ### Unemployment by states
@@ -547,7 +549,10 @@ hcmap(
     )
   ) %>% 
   hc_title(text = "Unemployment rate by states") %>% 
-  hc_subtitle(text = "Quarterly data (PNADC-T)") %>%
+  hc_subtitle(text = paste0(
+      "Quarterly data, updated until ", unemployment_states$date[1], " (PNADC-T)"
+      )
+      ) %>%
   hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px"))
 ```
 
@@ -598,19 +603,58 @@ gini %>%
   hchart(
     "bar", hcaes(x = states, y = value), color = colors[1], name = "Gini") %>%
   ftplot(
-    title    = "Gini index",
-    subtitle = "Quarterly data (PNADC-T)",
+    title    = "Gini index by states",
+    subtitle = paste0(
+      "Quarterly data, updated until ", gini$date[1], " (PNADC-T)"
+      ),
     source   = "IBGE"
     ) %>%
   hc_yAxis(labels = list(format = "{value}"))
 ```
 
 
-
-
 Fiscal policy {data-navmenu="Sections" data-icon="fa-gavel"}
 =====================================
 
+Column {data-width=450}
+-----------------------------------------------------------------------
+
+### Central Government Primary Deficit {.no-title}
+
+```{r section4_primary_deficit}
+primary_deficit %>%
+  hchart(
+    "area", hcaes(x = date, y = value), color = colors[1],
+    name = "Primary Deficit", fillOpacity = 0.5
+    ) %>%
+  ftplot(
+    title    = "Central Government Primary Deficit",
+    subtitle = "Accumulated in 12 months (% GDP)",
+    source   = "STN and IBGE"
+    ) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+### Central Government Net Revenue and Total Expenditure {.no-title}
+
+```{r section4_revenue_spending}
+revenue_spending %>%
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:2]) %>%
+  ftplot(
+    title    = "Central Government Net Revenue and Total Expenditure",
+    subtitle = "Accumulated in 12 months and deflated by the IPCA index (% GDP)",
+    source   = "STN and IBGE"
+    ) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
+  hc_navigator(enabled = TRUE)
+```
 
 
 Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}

@@ -258,10 +258,10 @@ treasury <- raw_treasury %>%
   mutate(
     across(where(is.character), as.numeric),
     date = seq(
-      from   = as.Date("1997/01/01"),
+      from   = as.Date("1997-01-01"),
       length = nrow(raw_treasury)-1,
       by     = "months"
-      ) %>% format("%Y/%m/%d")
+      )
     ) %>%
   tidyr::drop_na()
 
@@ -273,8 +273,7 @@ treasury_accum_12m <- treasury %>%
     ) %>%
   left_join(
     raw_gdp_monthly %>%
-      mutate(date = format(ref.date, "%Y/%m/%d")) %>%
-      select(date, gdp_accum_12m = value),
+      select(date = ref.date, gdp_accum_12m = value),
     by = "date"
     ) %>%
   tidyr::drop_na()
@@ -290,7 +289,10 @@ treasury_accum_12m_gdp <- treasury_accum_12m %>%
 # Primary Deficit accumulated in 12 months (% GDP)
 primary_deficit <- treasury_accum_12m_gdp %>%
   select(date, value = 68) %>%
-  mutate(id = "Primary Deficit")
+  mutate(
+    value = round(value, 2),
+    variable = "Primary Deficit"
+    )
 
 
 # Revenues and spending
@@ -336,7 +338,7 @@ public_debt_deflated <- as_tibble(
   select(!1) %>%
   mutate(
     date = seq(
-      from   = as.Date("2006/12/01"),
+      from   = as.Date("2006-12-01"),
       length = nrow(.),
       by     = "months"
       ),
@@ -357,7 +359,6 @@ public_debt_deflated <- as_tibble(
 single_account <- public_debt_deflated[,c(31,49)] %>%
   mutate(
     value    =  disponibilidades_do_governo_federal_no_bacen*-1,
-    date     = format(date, "%Y/%m/%d"),
     variable = "Single Account balance"
     ) %>%
   select(!1)
@@ -382,10 +383,10 @@ debt_stock <- as_tibble(
         real_date      = format(last(date), "%m/%Y"),
         index          = "ipca"
         )
-      ),
-    date     = format(date, "%Y/%m/%d")) %>%
+      )
+    ) %>%
   select(date, value, variable) %>%
-  filter(date >= "2006/12/01")
+  filter(date >= "2006-12-01")
 
 
 # Debt Risk Rating History
@@ -393,7 +394,8 @@ rating  <- raw_rating %>%
   rename_with(~c("Last update", "Agency", "Foreign currency", "Local currency", "Action")) %>%
   mutate(
     `Foreign currency` = gsub("\\-", "--", `Foreign currency`),
-    `Local currency`   = gsub("\\-", "--", `Local currency`)
+    `Local currency`   = gsub("\\-", "--", `Local currency`),
+    `Last update` = lubridate::dmy(`Last update`, locale = "Portuguese_Brazil.1252")
     )
 
 
