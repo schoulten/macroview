@@ -306,7 +306,8 @@ revenue_spending <- treasury_accum_12m_gdp %>%
     cols      = -date,
     names_to  = "variable",
     values_to = "value"
-    )
+    ) %>%
+  mutate(value = round(value, 2))
 
 
 # Detailed revenues and spending for the last period

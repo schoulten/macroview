@@ -34,7 +34,8 @@ pacman::p_load(
   "gt",
   "scales",
   "colorspace",
-  "magrittr"
+  "magrittr",
+  "rlist"
   )
 
 # Set the default language of date in R
@@ -654,6 +655,79 @@ revenue_spending %>%
     inputEnabled = FALSE, dropdown = "always"
     ) %>%
   hc_navigator(enabled = TRUE)
+```
+
+
+Column {data-width=450}
+-----------------------------------------------------------------------
+
+### Detailed accounts of Central Government Income and Expenditure {.no-title}
+
+```{r section4_revenue_spending_detail}
+highchart() %>%
+  hc_add_series(
+    type = "treemap",
+    layoutAlgorithm = "squarified",
+    allowDrillToNode = TRUE,
+    levels = list(
+      list(level = 1, 
+           dataLabels = list(enabled = TRUE, style = list(fontSize = "25px")), 
+           borderWidth = 8
+           ),
+      list(level = 2, dataLabels = list(enabled = TRUE), borderWidth = 5),
+      list(level = 3, dataLabels = list(enabled = TRUE), borderWidth = 3)
+    ),
+    data = list(
+      data = list(
+        # LEVEL I
+        list(
+          id = unique(revenue_spending_detail$group_1)[1] %>%
+            stringr::str_replace_all("[[:blank:]]", "_") %>% stringr::str_to_lower(),
+          name = unique(revenue_spending_detail$group_1)[1],
+          color = colors[1],
+          showInLegend = TRUE
+          ),
+        list(
+          id = unique(revenue_spending_detail$group_1)[2] %>%
+            stringr::str_replace_all("[[:blank:]]", "_") %>% stringr::str_to_lower(),
+          name = unique(revenue_spending_detail$group_1)[2],
+          color = colors[2]
+          ),
+        list(
+          id = unique(revenue_spending_detail$group_1)[3] %>%
+            stringr::str_replace_all("[[:blank:]]", "_") %>% stringr::str_to_lower(),
+          name = unique(revenue_spending_detail$group_1)[3],
+          color = colors[3]
+          )
+        )
+      ) %>%
+      list.append(
+        # LEVEL II
+        {revenue_spending_detail %>%
+            select("name" = group_2, "parent" = group_1, value) %>%
+            mutate(parent = stringr::str_replace_all(parent, "[[:blank:]]", "_") %>%
+                     stringr::str_to_lower()) %>%
+            group_by(name, parent) %>%
+            summarise(value = sum(value)) %>%
+            mutate(id = stringr::str_replace_all(name, "[[:blank:]]", "_") %>%
+                     stringr::str_to_lower()) %>%
+            transpose()
+        },
+        # LEVEL III
+        {revenue_spending_detail %>%
+            select("name" = group_3, "parent" = group_2, value) %>%
+            mutate(parent = stringr::str_replace_all(parent, "[[:blank:]]", "_") %>%
+                     stringr::str_to_lower()) %>%
+            transpose()
+        }
+      ) %>%
+      flatten()
+    ) %>% 
+   ftplot(
+    title    = "Detailed accounts of Central Government Income and Expenditure",
+    subtitle = "Accumulated in 12 months and deflated by the IPCA index (% GDP)",
+    source   = "STN and IBGE"
+    )
 ```
 
 

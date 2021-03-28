@@ -25,7 +25,8 @@ ftplot <- function(
     hc_subtitle(text = subtitle) %>%
     hc_credits(enabled = TRUE, text = paste0("Source: ", source), style = list(fontSize = "12px")) %>%
     hc_xAxis(title = FALSE) %>%
-    hc_yAxis(labels = list(format = "{value}%"), title = FALSE,
+    hc_yAxis(labels = list(format = "{value}%"),
+             title = FALSE,
              plotLines = list(
                list(
                  value = 0,
