@@ -402,25 +402,21 @@ gov_portfolio <- t(raw_debt_stock) %>%
   as_tibble() %>%
   select(1, 7:10, 12:15) %>%
   janitor::row_to_names(row_number = 1) %>%
-  rename("date" = 1) %>%
-  mutate(
-    date = myd(
-      paste0(date, "/01"),
-      locale = "Portuguese_Brazil.1252"
-      )
+  rename(
+    "date"             = 1,
+    "Securitized Debt" = "Dívida Securitizada",
+    "Others"           = "Demais"
     ) %>%
+  mutate(
+    date = myd(paste0(date, "/01"), locale = "Portuguese_Brazil.1252"),
+    date_my = format(date, "%B, %Y"),
+    across(2:9, as.numeric) %>% round(2)
+    ) %>%
+  filter(date == max(date)) %>%
   pivot_longer(
-    cols      = -date,
-    names_to  = "id",
+    cols      = -c(date, date_my),
+    names_to  = "variable",
     values_to = "value"
-    ) %>%
-  mutate(
-    value   = as.numeric(value)*1000,
-    date_my = paste(
-      lubridate::month(date, label = TRUE),
-      lubridate::year(date),
-      sep = " "
-      )
     )
 
 

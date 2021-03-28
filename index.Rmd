@@ -759,7 +759,7 @@ Column {data-width=450 .tabset}
 
 ### Debt Stock
 
-```{r}
+```{r section4_debt_stock}
 debt_stock %>% 
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
@@ -776,6 +776,24 @@ debt_stock %>%
   hc_navigator(enabled = TRUE) %>%
   hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
 ```
+
+### Government Securities Portfolio
+
+```{r section4_gov_portfolio}
+gov_portfolio %>% 
+  hchart(
+    "pie", hcaes(y = value, name = variable, color = colors10[1:8]),
+    name = "Government Securities") %>%
+  ftplot(
+    title    = "Details of the National Treasury Securities portfolio",
+    subtitle = sprintf("R$ billion (%s)", gov_portfolio$date_my[1]),
+    source   = "BCB"
+    ) %>%
+  hc_tooltip(
+    pointFormat =  '<b>R$ {point.value:,.0f}</b>'
+  )
+```
+
 
 
 Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
