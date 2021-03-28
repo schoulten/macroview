@@ -636,8 +636,7 @@ primary_deficit %>%
   hc_rangeSelector(
     selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
     inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 ### Central Government Net Revenue and Total Expenditure {.no-title}
@@ -653,8 +652,7 @@ revenue_spending %>%
   hc_rangeSelector(
     selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
     inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 
@@ -671,11 +669,11 @@ highchart() %>%
     allowDrillToNode = TRUE,
     levels = list(
       list(level = 1, 
-           dataLabels = list(enabled = TRUE, style = list(fontSize = "25px")), 
-           borderWidth = 8
+           dataLabels = list(enabled = TRUE, style = list(fontSize = "20px")), 
+             borderWidth = 5
            ),
-      list(level = 2, dataLabels = list(enabled = TRUE), borderWidth = 5),
-      list(level = 3, dataLabels = list(enabled = TRUE), borderWidth = 3)
+      list(level = 2, dataLabels = list(enabled = TRUE), borderWidth = 3),
+      list(level = 3, dataLabels = list(enabled = TRUE), borderWidth = 1)
     ),
     tooltip = list(valueDecimals = 2, valuePrefix = "R$ "),
     data = list(
@@ -724,7 +722,7 @@ highchart() %>%
       flatten()
     ) %>% 
    ftplot(
-    title    = "Detailed accounts of Central Government Income and Expenditure",
+    title    = "Detailed Central Government Accounts",
     subtitle = sprintf(
       "Accumulated in 12 months and deflated by the IPCA index, R$ million (%s)",
       revenue_spending_detail$date[1]
@@ -749,7 +747,6 @@ single_account %>%
     selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
     inputEnabled = FALSE, dropdown = "always"
     ) %>%
-  hc_navigator(enabled = TRUE) %>%
   hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
 ```
 
@@ -791,6 +788,12 @@ gov_portfolio %>%
     ) %>%
   hc_tooltip(
     pointFormat =  '<b>R$ {point.value:,.0f}</b>'
+  ) %>% 
+  hc_plotOptions(
+    pie = list(
+      allowPointSelect = TRUE,
+      cursor = 'pointer'
+    )
   )
 ```
 
