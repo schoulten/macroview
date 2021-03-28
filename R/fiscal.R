@@ -370,10 +370,7 @@ debt_stock <- as_tibble(
   t(raw_debt_stock[c(1,3),-1])
   ) %>%
   mutate(
-    date     = myd(
-      paste0(V1, "/01"),
-      locale = "Portuguese_Brazil.1252"
-      ),
+    date     = myd(paste0(V1, "/01"), locale = "Portuguese_Brazil.1252"),
     value    = as.numeric(V2),
     variable = "Debt Stock",
     across(
@@ -383,7 +380,7 @@ debt_stock <- as_tibble(
         nominal_dates  = date,
         real_date      = format(last(date), "%m/%Y"),
         index          = "ipca"
-        )
+        ) %>% round(2)
       )
     ) %>%
   select(date, value, variable) %>%

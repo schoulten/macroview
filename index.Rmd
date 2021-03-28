@@ -739,7 +739,7 @@ highchart() %>%
 single_account %>% 
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[1], fillOpacity = 0.5) %>%
+    color = colors[4], fillOpacity = 0.5) %>%
   ftplot(
     title    = "Single Account balance",
     subtitle = "Deflated by the IPCA index, R$ million",
@@ -754,6 +754,28 @@ single_account %>%
 ```
 
 
+Column {data-width=450 .tabset}
+-----------------------------------------------------------------------
+
+### Debt Stock
+
+```{r}
+debt_stock %>% 
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[2], fillOpacity = 0.5) %>%
+  ftplot(
+    title    = "Federal Public Debt Stock",
+    subtitle = "Deflated by the IPCA index, R$ billion",
+    source   = "BCB and IBGE"
+    ) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
+  hc_navigator(enabled = TRUE) %>%
+  hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
+```
 
 
 Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
