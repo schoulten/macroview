@@ -321,7 +321,7 @@ revenue_spending_detail <- treasury_accum_12m %>%
     ) %>%
   select(-variable) %>%
   bind_cols(balance_accounts) %>%
-  mutate(date = format(lubridate::ymd(date), "%b %Y"))
+  mutate(date = format(lubridate::ymd(date), "%B, %Y"))
 
 
 # General government net and gross debt
@@ -359,7 +359,7 @@ public_debt_deflated <- as_tibble(
 # Single Account balance
 single_account <- public_debt_deflated[,c(31,49)] %>%
   mutate(
-    value    =  disponibilidades_do_governo_federal_no_bacen*-1,
+    value    =  (disponibilidades_do_governo_federal_no_bacen * -1) %>% round(2),
     variable = "Single Account balance"
     ) %>%
   select(!1)

@@ -594,7 +594,7 @@ income %>%
     subtitle = "Quarterly data (PNADC-T)",
     source   = "IBGE"
     ) %>%
-  hc_yAxis(labels = list(format = "R$ {value}"))
+  hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
 ```
 
 ### Gini
@@ -677,6 +677,7 @@ highchart() %>%
       list(level = 2, dataLabels = list(enabled = TRUE), borderWidth = 5),
       list(level = 3, dataLabels = list(enabled = TRUE), borderWidth = 3)
     ),
+    tooltip = list(valueDecimals = 2, valuePrefix = "R$ "),
     data = list(
       data = list(
         # LEVEL I
@@ -684,8 +685,7 @@ highchart() %>%
           id = unique(revenue_spending_detail$group_1)[1] %>%
             stringr::str_replace_all("[[:blank:]]", "_") %>% stringr::str_to_lower(),
           name = unique(revenue_spending_detail$group_1)[1],
-          color = colors[1],
-          showInLegend = TRUE
+          color = colors[1]
           ),
         list(
           id = unique(revenue_spending_detail$group_1)[2] %>%
@@ -725,10 +725,35 @@ highchart() %>%
     ) %>% 
    ftplot(
     title    = "Detailed accounts of Central Government Income and Expenditure",
-    subtitle = "Accumulated in 12 months and deflated by the IPCA index (% GDP)",
+    subtitle = sprintf(
+      "Accumulated in 12 months and deflated by the IPCA index, R$ million (%s)",
+      revenue_spending_detail$date[1]
+      ),
     source   = "STN and IBGE"
     )
 ```
+
+### Single Account balance {.no-title}
+
+```{r section4_single_account}
+single_account %>% 
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[1], fillOpacity = 0.5) %>%
+  ftplot(
+    title    = "Single Account balance",
+    subtitle = "Deflated by the IPCA index, R$ million",
+    source   = "BCB and IBGE"
+    ) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
+  hc_navigator(enabled = TRUE) %>%
+  hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
+```
+
+
 
 
 Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
