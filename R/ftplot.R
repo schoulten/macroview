@@ -16,11 +16,11 @@ ftplot <- function(
   title,
   subtitle,
   source,
-  range_n,
-  navigator = FALSE
+  range = TRUE,
+  navigator = TRUE
   )
   {
-  hc %>%
+  ftwo_plot <- hc %>%
     hc_title(text = title) %>%
     hc_subtitle(text = subtitle) %>%
     hc_credits(enabled = TRUE, text = paste0("Source: ", source), style = list(fontSize = "12px")) %>%
@@ -38,4 +38,13 @@ ftplot <- function(
     hc_tooltip(shared = TRUE) %>%
     hc_add_theme(theme_fortietwo) %>%
     hc_navigator(enabled = navigator)
+
+    if (range) {
+      ftwo_plot <- ftwo_plot %>%
+      hc_rangeSelector(
+        selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+        inputEnabled = FALSE, dropdown = "always"
+      )
+    } else ftwo_plot
+  ftwo_plot
   }
