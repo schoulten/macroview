@@ -828,7 +828,6 @@ Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
 Column {data-width=325}
 -----------------------------------------------------------------------
 
-
 ### SELIC Target rate in `r format(selic$date, "%B, %Y")` (COPOM/BCB)
 
 ```{r section5_target_selic}
@@ -862,15 +861,12 @@ inflation_expec %>%
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[1], fillOpacity = 0.5) %>%
   ftplot(
-    title    = "Market inflation expectations for the next 12 months",
-    subtitle = "For the IPCA index, end of the month",
-    source   = "BCB"
+    title     = "Market inflation expectations for the next 12 months",
+    subtitle  = "For the IPCA index, end of the month",
+    source    = "BCB",
+    range     = TRUE,
+    navigator = TRUE
     ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE) %>%
   hc_tooltip(xDateFormat = "%B %Y")
 ```
 
@@ -884,15 +880,10 @@ Column {data-width=500}
 interest_rate %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:3]) %>%
   ftplot(
-    title    = "Short-term interest rates",
-    subtitle = "Nominal rates, end of the month, in % p.a.",
-    source   = "BCB"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    title     = "Short-term interest rates",
+    subtitle  = "Nominal rates, end of the month, in % p.a.",
+    source    = "BCB"
+    )
 ```
 
 ### Real interest rates {.no-title}
