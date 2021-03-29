@@ -802,7 +802,7 @@ gov_portfolio %>%
 
 ```{r section4_rating}
 htmltools::div(
-  style='height:600px; overflow-y: scroll',
+  style = "height:600px; overflow-y: scroll",
   rating %>%
   gt() %>%
   tab_header(title = html(
@@ -856,6 +856,20 @@ htmltools::div(
 Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
 =====================================
 
+Column {data-width=325}
+-----------------------------------------------------------------------
+
+
+### SELIC Target rate (% p.a.)
+
+```{r section5_target_selic}
+selic %>% 
+  valueBox(
+    value = .,
+    icon = "fa-percentage",
+    color = "#5f487c"
+    )
+```
 
 
 

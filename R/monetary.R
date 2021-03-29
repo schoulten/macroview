@@ -198,7 +198,7 @@ raw_ipca_12m <- sidrar::get_sidra(api = api_sidra$api_ipca) %>%
 # This section performs data wrangling
 
 
-# Interest Rate (SELIC target), short-term, % p.y.
+# Interest Rate (SELIC target), short-term, % p.a.
 selic <- raw_interest_rate %>%
   select(
     date = "ref.date",
