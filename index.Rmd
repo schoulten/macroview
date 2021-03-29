@@ -670,9 +670,9 @@ highchart() %>%
     levels = list(
       list(level = 1, 
            dataLabels = list(enabled = TRUE, style = list(fontSize = "20px")), 
-             borderWidth = 5
+             borderWidth = 3
            ),
-      list(level = 2, dataLabels = list(enabled = TRUE), borderWidth = 3),
+      list(level = 2, dataLabels = list(enabled = TRUE), borderWidth = 2),
       list(level = 3, dataLabels = list(enabled = TRUE), borderWidth = 1)
     ),
     tooltip = list(valueDecimals = 2, valuePrefix = "R$ "),
@@ -797,6 +797,50 @@ gov_portfolio %>%
   )
 ```
 
+### Rating
+
+```{r section4_rating}
+rating %>%
+  gt() %>%
+  tab_header(title = html(
+    "<span style='color:black'><b>Debt Risk Rating History</b></span>")
+    ) %>%
+  tab_source_note(
+    html("<span style='color:black'>Source: STN</span>")
+    ) %>%
+  cols_hide(columns = vars("Action")) %>%
+  tab_style(
+    style     = list(cell_text(color = "black")),
+    locations = cells_body(columns = vars(
+      `Last update`, `Agency`, `Foreign currency`, `Local currency`))
+    ) %>%
+  tab_style(
+    style     = list(cell_text(weight = "bold")),
+    locations = cells_body(columns = vars(`Agency`))
+    ) %>%
+  tab_style(
+    style     = list(cell_text(color = "black")),
+    locations = cells_column_labels(vars(
+      `Last update`, `Agency`, `Foreign currency`, `Local currency`))
+    ) %>%
+  tab_options(
+    column_labels.font.weight         = "bold",
+    stub.font.weight                  = "bold",
+    footnotes.padding                 = 3,
+    data_row.padding                  = 6,
+    heading.background.color          = "#9397b5",
+    table.font.color                  = "black",
+    table.border.top.color            = "black",
+    column_labels.border.bottom.color = "black",
+    column_labels.border.bottom.width = px(3),
+    table.background.color            = "#9397b5",
+    table_body.hlines.color           =  "black",
+    table.border.bottom.color         = "black",
+    heading.border.bottom.color       = "black",
+    footnotes.border.bottom.color     = "black",
+    table_body.border.bottom.color    = "black"
+    )
+```
 
 
 Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}

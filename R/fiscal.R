@@ -391,8 +391,6 @@ debt_stock <- as_tibble(
 rating  <- raw_rating %>%
   rename_with(~c("Last update", "Agency", "Foreign currency", "Local currency", "Action")) %>%
   mutate(
-    `Foreign currency` = gsub("\\-", "--", `Foreign currency`),
-    `Local currency`   = gsub("\\-", "--", `Local currency`),
     `Last update` = lubridate::dmy(`Last update`, locale = "Portuguese_Brazil.1252")
     )
 
