@@ -297,7 +297,8 @@ real_interest_rate <- bind_rows(
     select(date, variable, value)
     }
 
-  )
+  ) %>%
+  mutate(value = round(value, 2))
 
 
 # Exchange rate (currency/R$)

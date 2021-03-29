@@ -926,6 +926,25 @@ interest_rate %>%
   hc_navigator(enabled = TRUE)
 ```
 
+### Real interest rates {.no-title}
+
+```{r}
+real_interest_rate %>%
+  hchart("area", hcaes(x = date, y = value, group = variable), color = colors[1:2],
+         fillOpacity = 0.1) %>%
+  ftplot(
+    title    = "Real interest rates",
+    subtitle = "In % p.a.",
+    source   = "B3, BCB and IBGE"
+    ) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+
 
 Sobre {data-icon="fa-file-alt"}
 =====================================
