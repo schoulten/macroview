@@ -867,7 +867,7 @@ selic %>%
   pull(value) %>%
   valueBox(
     value = .,
-    icon = "fa-percentage",
+    icon  = "fa-percentage",
     color = "#5f487c"
     )
 ```
@@ -880,10 +880,31 @@ inflation_target %>%
   pull(value) %>%
   valueBox(
     value = .,
-    icon = "fa-bullseye",
+    icon  = "fa-bullseye",
     color = "#5f487c"
     )
 ```
+
+### Inflation expectations {.no-title}
+
+```{r section5_inflation_expectations}
+inflation_expec %>%
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[1], fillOpacity = 0.5) %>%
+  ftplot(
+    title    = "Market inflation expectations for the next 12 months",
+    subtitle = "For the IPCA index",
+    source   = "BCB"
+    ) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
+  hc_navigator(enabled = TRUE)
+```
+
+
 
 
 Sobre {data-icon="fa-file-alt"}

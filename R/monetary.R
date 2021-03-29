@@ -225,11 +225,7 @@ inflation_expec <- raw_inflation_expec %>%
     .period   = "1 month",
     .side     = "end"
     ) %>%
-  mutate(
-    date_my = format(date, "%b %Y"),
-    date    = format(date, "%Y/%m/%d"),
-    .after  = "date"
-    )
+  mutate(date = format(date, "%Y-%m-01"))
 
 
 # Short-term interest rates
