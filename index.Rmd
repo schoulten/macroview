@@ -906,6 +906,25 @@ inflation_expec %>%
 ```
 
 
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Short-term interest rates {.no-title}
+
+```{r section5_interest_rates_trend}
+interest_rate %>%
+  hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:3]) %>%
+  ftplot(
+    title    = "Short-term interest rates",
+    subtitle = "Nominal rates, end of the month, in % p.a.",
+    source   = "BCB"
+    ) %>%
+  hc_rangeSelector(
+    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
+    inputEnabled = FALSE, dropdown = "always"
+    ) %>%
+  hc_navigator(enabled = TRUE)
+```
 
 
 Sobre {data-icon="fa-file-alt"}

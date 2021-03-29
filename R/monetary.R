@@ -225,7 +225,9 @@ inflation_expec <- raw_inflation_expec %>%
     .period   = "1 month",
     .side     = "end"
     ) %>%
-  mutate(date = format(date, "%Y-%m-01") %>% lubridate::ymd())
+  mutate(
+    date = format(date, "%Y-%m-01") %>% lubridate::ymd()
+    )
 
 
 # Short-term interest rates
@@ -243,9 +245,7 @@ interest_rate <- raw_interest_rate %>%
     ) %>%
   ungroup() %>%
   mutate(
-    date_my = format(date, "%b %Y"),
-    date    = format(date, "%Y/%m/%d"),
-    .after  = "date"
+    date = format(date, "%Y-%m-01") %>% lubridate::ymd()
     )
 
 
