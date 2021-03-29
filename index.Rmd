@@ -860,10 +860,11 @@ Column {data-width=325}
 -----------------------------------------------------------------------
 
 
-### SELIC Target rate (% p.a.)
+### SELIC Target rate in `r format(selic$date, "%B, %Y")` (COPOM/BCB)
 
 ```{r section5_target_selic}
-selic %>% 
+selic %>%
+  pull(value) %>%
   valueBox(
     value = .,
     icon = "fa-percentage",
@@ -871,6 +872,18 @@ selic %>%
     )
 ```
 
+### Inflation target for `r inflation_target$date` (CMN)
+
+```{r section5_target_inflation}
+inflation_target %>% 
+  mutate(value = paste0(value, "%")) %>%
+  pull(value) %>%
+  valueBox(
+    value = .,
+    icon = "fa-bullseye",
+    color = "#5f487c"
+    )
+```
 
 
 Sobre {data-icon="fa-file-alt"}

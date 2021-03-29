@@ -209,8 +209,7 @@ selic <- raw_interest_rate %>%
     date == max(date),
     variable == "SELIC Target rate"
     ) %>%
-  pull(value) %>%
-  paste0("%")
+  mutate(value = paste0(value, "%"))
 
 
 # Inflation expectations (IPCA)
