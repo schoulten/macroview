@@ -143,9 +143,11 @@ Column {data-width=575}
 gdp_growth_sector %>%
   hchart("column", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
   ftplot(
-    title    = "GDP growth by sectors",
-    subtitle = "Accumulated growth rate in 4 quarters",
-    source   = "IBGE"
+    title     = "GDP growth by sectors",
+    subtitle  = "Accumulated growth rate in 4 quarters",
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
     )
 ```
 
@@ -155,13 +157,11 @@ gdp_growth_sector %>%
 ibc_growth %>%
   hchart("line", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
   ftplot(
-    title    = "IBC-Br growth by region",
-    subtitle = "Accumulated growth rate in 12 months",
-    source   = "BCB"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
+    title     = "IBC-Br growth by region",
+    subtitle  = "Accumulated growth rate in 12 months",
+    source    = "BCB",
+    range     = TRUE,
+    navigator = FALSE
     )
 ```
 
@@ -220,12 +220,7 @@ pmc %>%
     title    = "Retail trade index: PMC/IBGE",
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 ### Services (PMS)
@@ -237,12 +232,7 @@ pms %>%
     title    = "Revenue and volume of services index: PMS/IBGE",
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 ### Industry (PIM-PF)
@@ -254,12 +244,7 @@ pim %>%
     title    = "Industrial production: PIM-PF/IBGE",
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 
@@ -936,12 +921,7 @@ real_interest_rate %>%
     title    = "Real interest rates",
     subtitle = "In % p.a.",
     source   = "B3, BCB and IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 
