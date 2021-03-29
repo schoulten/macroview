@@ -291,12 +291,7 @@ ipca_diffusion %>%
     title    = "Diffusion index - IPCA",
     subtitle = "",
     source   = "BCB"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 
@@ -316,13 +311,11 @@ hchart(
     color = colors[2], name = "Year over Year", showInLegend = TRUE
   ) %>% 
   ftplot(
-    title    = "Inflation trend (IPCA)",
-    subtitle = "Monthly and accumulated variation in 12 months (%)",
-    source   = "IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
+    title     = "Inflation trend (IPCA)",
+    subtitle  = "Monthly and accumulated variation in 12 months (%)",
+    source    = "IBGE",
+    range     = TRUE,
+    navigator = FALSE
     )
 ```
 
@@ -334,12 +327,10 @@ ipca_region %>%
   ftplot(
     title    = "Inflation by metropolitan region - IPCA",
     subtitle = "Monthly percentage change",
-    source   = "IBGE"
+    source   = "IBGE",
+    navigator = FALSE
     ) %>%
-  hc_rangeSelector(
-    selected = 0, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    )
+  hc_rangeSelector(selected = 0)
 ```
 
 
@@ -390,12 +381,7 @@ ipca_cores %>%
     title    = "CPI cores (IPCA)",
     subtitle = "Monthly percentage change",
     source   = "BCB"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 ### IGP trend
@@ -407,12 +393,7 @@ igp %>%
     title    = "General Price Index (IGP)",
     subtitle = "Monthly percentage change",
     source   = "FGV"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE)
+    )
 ```
 
 
