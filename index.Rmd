@@ -471,9 +471,11 @@ unemployment %>%
     "area", hcaes(x = date, y = unemployment_rate), color = colors[1],
     name = "Unemployment rate", fillOpacity = 0.5) %>%
   ftplot(
-    title    = "Unemployment rate",
-    subtitle = "Quarterly data (PNADC-T)",
-    source   = "IBGE"
+    title     = "Unemployment rate",
+    subtitle  = "Quarterly data (PNADC-T)",
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
     )
 ```
 
@@ -483,11 +485,13 @@ unemployment %>%
 unemployment_gender_color %>%
   hchart("column", hcaes(x = color, y = unemployment_rate, group = gender), color = colors[1:2]) %>%
   ftplot(
-    title    = "Unemployment rate by gender and color",
-    subtitle = paste0(
+    title     = "Unemployment rate by gender and color",
+    subtitle  = paste0(
       "Quarterly data, updated until ", unemployment_gender_color$date[1], " (PNADC-T)"
       ),
-    source   = "IBGE"
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
     )
 ```
 
@@ -507,10 +511,10 @@ hcmap(
   download_map_data = TRUE,
   dataLabels        = list(
     enabled = TRUE,
-    format = "{point.name}"
+    format  = "{point.name}"
     ),
   mapNavigation = list(
-    enabled = TRUE,
+    enabled       = TRUE,
     buttonOptions = list(
       verticalAlign = "bottom"
       )
@@ -531,9 +535,11 @@ occupation_level %>%
   hchart(
     "line", hcaes(x = date, y = value, group = gender), color = colors[1:3]) %>%
   ftplot(
-    title    = "Labor force occupation level",
-    subtitle = "Quarterly data (PNADC-T)",
-    source   = "IBGE"
+    title     = "Labor force occupation level",
+    subtitle  = "Quarterly data (PNADC-T)",
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
     )
 ```
 
@@ -544,9 +550,11 @@ participation_rate %>%
   hchart(
     "line", hcaes(x = date, y = value, group = gender), color = colors[1:3]) %>%
   ftplot(
-    title    = "Labor force participation rate",
-    subtitle = "Quarterly data (PNADC-T)",
-    source   = "IBGE"
+    title     = "Labor force participation rate",
+    subtitle  = "Quarterly data (PNADC-T)",
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
     )
 ```
 
@@ -557,9 +565,11 @@ income %>%
   hchart(
     "line", hcaes(x = date, y = value, group = age), color = colors) %>%
   ftplot(
-    title    = "Average real income from work, by age group",
-    subtitle = "Quarterly data (PNADC-T)",
-    source   = "IBGE"
+    title     = "Average real income from work, by age group",
+    subtitle  = "Quarterly data (PNADC-T)",
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
     ) %>%
   hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
 ```
@@ -571,11 +581,13 @@ gini %>%
   hchart(
     "bar", hcaes(x = states, y = value), color = colors[1], name = "Gini") %>%
   ftplot(
-    title    = "Gini index by states",
-    subtitle = paste0(
+    title     = "Gini index by states",
+    subtitle  = paste0(
       "Quarterly data, updated until ", gini$date[1], " (PNADC-T)"
       ),
-    source   = "IBGE"
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
     ) %>%
   hc_yAxis(labels = list(format = "{value}"))
 ```
