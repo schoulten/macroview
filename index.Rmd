@@ -35,7 +35,8 @@ pacman::p_load(
   "scales",
   "colorspace",
   "magrittr",
-  "rlist"
+  "rlist",
+  "htmltools"
   )
 
 # Set the default language of date in R
@@ -800,7 +801,9 @@ gov_portfolio %>%
 ### Rating
 
 ```{r section4_rating}
-rating %>%
+htmltools::div(
+  style='height:600px; overflow-y: scroll',
+  rating %>%
   gt() %>%
   tab_header(title = html(
     "<span style='color:black'><b>Debt Risk Rating History</b></span>")
@@ -811,6 +814,11 @@ rating %>%
   cols_hide(columns = vars("Action")) %>%
   tab_style(
     style     = list(cell_text(color = "black")),
+    locations = cells_body(columns = vars(
+      `Last update`, `Agency`, `Foreign currency`, `Local currency`))
+    ) %>%
+  tab_style(
+    style     = list(cell_fill(color = "#cae9ff")),
     locations = cells_body(columns = vars(
       `Last update`, `Agency`, `Foreign currency`, `Local currency`))
     ) %>%
@@ -828,18 +836,20 @@ rating %>%
     stub.font.weight                  = "bold",
     footnotes.padding                 = 3,
     data_row.padding                  = 6,
-    heading.background.color          = "#9397b5",
+    heading.background.color          = "#cae9ff",
     table.font.color                  = "black",
     table.border.top.color            = "black",
     column_labels.border.bottom.color = "black",
     column_labels.border.bottom.width = px(3),
-    table.background.color            = "#9397b5",
-    table_body.hlines.color           =  "black",
+    table.background.color            = "#cae9ff",
+    table_body.hlines.color           = "black",
     table.border.bottom.color         = "black",
     heading.border.bottom.color       = "black",
     footnotes.border.bottom.color     = "black",
-    table_body.border.bottom.color    = "black"
+    table_body.border.bottom.color    = "black",
+    container.overflow.y              = TRUE
     )
+  )
 ```
 
 
