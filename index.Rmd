@@ -608,13 +608,11 @@ primary_deficit %>%
     name = "Primary Deficit", fillOpacity = 0.5
     ) %>%
   ftplot(
-    title    = "Central Government Primary Deficit",
-    subtitle = "Accumulated in 12 months (% GDP)",
-    source   = "STN and IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
+    title     = "Central Government Primary Deficit",
+    subtitle  = "Accumulated in 12 months (% GDP)",
+    source    = "STN and IBGE",
+    range     = TRUE,
+    navigator = FALSE
     )
 ```
 
@@ -626,11 +624,9 @@ revenue_spending %>%
   ftplot(
     title    = "Central Government Net Revenue and Total Expenditure",
     subtitle = "Accumulated in 12 months and deflated by the IPCA index (% GDP)",
-    source   = "STN and IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
+    source   = "STN and IBGE",
+    range = TRUE,
+    navigator = FALSE
     )
 ```
 
@@ -720,11 +716,9 @@ single_account %>%
   ftplot(
     title    = "Single Account balance",
     subtitle = "Deflated by the IPCA index, R$ million",
-    source   = "BCB and IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
+    source    = "BCB and IBGE",
+    range     = TRUE,
+    navigator = FALSE
     ) %>%
   hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
 ```
@@ -743,13 +737,10 @@ debt_stock %>%
   ftplot(
     title    = "Federal Public Debt Stock",
     subtitle = "Deflated by the IPCA index, R$ billion",
-    source   = "BCB and IBGE"
-    ) %>%
-  hc_rangeSelector(
-    selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
-    inputEnabled = FALSE, dropdown = "always"
-    ) %>%
-  hc_navigator(enabled = TRUE) %>%
+    source   = "BCB and IBGE",
+    range = TRUE,
+    navigator = TRUE
+    )
   hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
 ```
 
