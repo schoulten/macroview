@@ -894,14 +894,15 @@ inflation_expec %>%
     color = colors[1], fillOpacity = 0.5) %>%
   ftplot(
     title    = "Market inflation expectations for the next 12 months",
-    subtitle = "For the IPCA index",
+    subtitle = "For the IPCA index, end of the month",
     source   = "BCB"
     ) %>%
   hc_rangeSelector(
     selected = 4, enabled = TRUE, allButtonsEnabled = TRUE,
     inputEnabled = FALSE, dropdown = "always"
     ) %>%
-  hc_navigator(enabled = TRUE)
+  hc_navigator(enabled = TRUE) %>%
+  hc_tooltip(xDateFormat = "%B %Y")
 ```
 
 

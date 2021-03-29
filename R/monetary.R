@@ -163,7 +163,7 @@ raw_currency <- purrr::map_dfr(
   )
 
 # EMBI+ Risco-Brasil
-raw_embi <- ipeadatar::ipeadata(api_ipeadata$api_embi) # improve this (use try or purrr::insistently)
+raw_embi <- ipeadatar::ipeadata(api_ipeadata$api_embi)
 
 # Swaps - DI fixed rate - 360 days
 raw_swaps <- ipeadatar::ipeadata(api_ipeadata$api_swaps)
@@ -225,7 +225,7 @@ inflation_expec <- raw_inflation_expec %>%
     .period   = "1 month",
     .side     = "end"
     ) %>%
-  mutate(date = format(date, "%Y-%m-01"))
+  mutate(date = format(date, "%Y-%m-01") %>% lubridate::ymd())
 
 
 # Short-term interest rates
