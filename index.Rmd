@@ -36,7 +36,8 @@ pacman::p_load(
   "colorspace",
   "magrittr",
   "rlist",
-  "htmltools"
+  "htmltools",
+  "sparkline"
   )
 
 # Set the default language of date in R
@@ -55,8 +56,11 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
 source("./R/hc_theme.R")
 source("./R/ftplot.R")
 source("./R/utils.R")
+source("./R/gt_sparkline.R")
 ```
 
+
+<!-- Icons by Freepik -->
 <!-- Overview section -->
 
 Economic activity {data-navmenu="Sections" data-icon="fa-chart-line"}
@@ -883,7 +887,7 @@ interest_rate %>%
 
 ### Real interest rates {.no-title}
 
-```{r}
+```{r section5_real_interest_rates}
 real_interest_rate %>%
   hchart("area", hcaes(x = date, y = value, group = variable), color = colors[1:2],
          fillOpacity = 0.1) %>%
@@ -901,29 +905,74 @@ Column {data-width=500 .tabset}
 ### Currency
 
 ```{r section5_currency}
-currency %>%
-  mutate(
-    flag = c("us", "eu", "ar", "mx", "cn", "tr", "ru", "in", "sa", "za") %>%
-      paste0("./inst/imgs/", ., ".png")
+currencies %>%
+  gt() %>%
+  tab_header(
+    title = gt::html("<b>Exchange rate performance</b>")
     ) %>%
-  select(-`QoQ %`) %>%
-  gt() %>% 
+  tab_source_note(
+    gt::html("Source: BCB")) %>%
+  tab_footnote(
+    footnote = footnote_currency,
+    locations = cells_column_labels(columns = vars(value))
+    ) %>%
+  tab_footnote(
+    footnote = "MoM: monthly percentage change",
+    locations = cells_column_labels(columns = vars(mom))
+    ) %>%
+  tab_footnote(
+    footnote = "YTD: percentage change in the year",
+    locations = cells_column_labels(columns = vars(ytd))
+    ) %>% 
+  tab_footnote(
+    footnote = "YoY: accumulated in 12 months percentage change against the same period of the previous year",
+    locations = cells_column_labels(columns = vars(yoy))
+    ) %>%
   tab_options(
     data_row.padding = px(2)
-  ) %>% 
+    ) %>%
   text_transform(
     locations = cells_body(columns = vars(flag)),
     fn = function(x){
-      map_chr(x, ~ local_image(
+      map_chr(x, ~ gt::local_image(
         filename = .x,
         height = 25
       ))
     }
-  ) %>% 
+    ) %>%
+  fmt_currency(
+    columns = vars(value),
+    currency = "BRL",
+    incl_space = TRUE
+    ) %>%
+  fmt_percent(
+    columns = vars(mom, ytd, yoy),
+    scale_values = FALSE
+    ) %>%
   cols_align(
     align = "center",
     columns = vars(flag)
-  )
+    ) %>%
+  cols_label(
+    flag     = "",
+    currency = "Currency",
+    value    = "CUR/BRL",
+    mom      = "MoM",
+    ytd      = "YTD",
+    yoy      = "YoY",
+    spark    = "Trend"
+    ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(TRUE)
+    ) %>%
+  cols_width(
+    vars(mom, ytd, yoy) ~ px(80)
+    ) %>%
+  gt_sparkline(spark, "spark") %>%
+  gt:::as.tags.gt_tbl() %>% 
+  htmltools::attachDependencies(htmlwidgets::getDependency("sparkline"))
+
 ```
 
 

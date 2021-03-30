@@ -302,40 +302,39 @@ real_interest_rate <- bind_rows(
 
 
 # Exchange rate (currency/R$)
-currency <- raw_currency %>%
+currencies <- raw_currency %>%
   group_by(
     symbol,
     date = format(date, "%Y-%m-01")
     ) %>%
-  summarise(value = mean(ask)) %>%
-  mutate( # functions from /R/utils.R
+  summarise(
+    value = mean(ask),
+    .groups = "drop"
+    ) %>%
+  group_by(symbol) %>%
+  mutate(
     mom  = (value / dplyr::lag(value) - 1) * 100,
-    qyoy = (roll_sum_k(value, 3) / roll_sum_k(dplyr::lag(value, 12), 3) - 1) * 100,
-    ytd  = (value / dplyr::lag(value, 12) - 1) * 100,
+    ytd  = (value / dplyr::lag(value, as.numeric(format(Sys.Date(), "%m"))-1) - 1) * 100,
     yoy  = (roll_sum_k(value, 12) / roll_sum_k(dplyr::lag(value, 12), 12) - 1) * 100,
-    across(where(is.numeric), ~round(., 2))
+    across(where(is.numeric), ~round(., 2)),
+    spark = list(value)
     ) %>%
   slice_tail(n = 1) %>%
   ungroup() %>%
   left_join(
     api_bcb$currencies,
-    by = c("symbol" = "symbol")
+    by = "symbol"
     ) %>%
   arrange(order(api_bcb$currencies$symbol)) %>%
-  select(8, 3, 4:7) %>%
-  rename_with(
-    ~c("Currency",
-       paste0("Exchange rate (", format(max(raw_currency$date), "%b %Y)")),
-       "MoM %",
-       "QoQ %",
-       "YTD %",
-       "YoY %"
-       )
+  select(8, 3:7) %>%
+  mutate(
+    flag = c("us", "eu", "ar", "mx", "cn", "tr", "ru", "in", "sa", "za") %>%
+      paste0("./inst/imgs/", ., ".png"), .before = currency
     )
 
 # Footnote
 footnote_currency <- paste0(
-  "Note: average monthly exchange rate, updated to ",
+  "Average monthly exchange rate, updated to ",
   format(max(raw_currency$date), "%B %d, %Y.")
   )
 
