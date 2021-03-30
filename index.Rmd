@@ -160,7 +160,6 @@ ibc_growth %>%
     title     = "IBC-Br growth by region",
     subtitle  = "Accumulated growth rate in 12 months",
     source    = "BCB",
-    range     = TRUE,
     navigator = FALSE
     )
 ```
@@ -314,7 +313,6 @@ hchart(
     title     = "Inflation trend (IPCA)",
     subtitle  = "Monthly and accumulated variation in 12 months (%)",
     source    = "IBGE",
-    range     = TRUE,
     navigator = FALSE
     )
 ```
@@ -611,7 +609,6 @@ primary_deficit %>%
     title     = "Central Government Primary Deficit",
     subtitle  = "Accumulated in 12 months (% GDP)",
     source    = "STN and IBGE",
-    range     = TRUE,
     navigator = FALSE
     )
 ```
@@ -625,7 +622,6 @@ revenue_spending %>%
     title    = "Central Government Net Revenue and Total Expenditure",
     subtitle = "Accumulated in 12 months and deflated by the IPCA index (% GDP)",
     source   = "STN and IBGE",
-    range = TRUE,
     navigator = FALSE
     )
 ```
@@ -697,12 +693,14 @@ highchart() %>%
       flatten()
     ) %>% 
    ftplot(
-    title    = "Detailed Central Government Accounts",
-    subtitle = sprintf(
+    title     = "Detailed Central Government Accounts",
+    subtitle  = sprintf(
       "Accumulated in 12 months and deflated by the IPCA index, R$ million (%s)",
       revenue_spending_detail$date[1]
       ),
-    source   = "STN and IBGE"
+    source    = "STN and IBGE",
+    range     = FALSE,
+    navigator = FALSE
     )
 ```
 
@@ -717,7 +715,6 @@ single_account %>%
     title    = "Single Account balance",
     subtitle = "Deflated by the IPCA index, R$ million",
     source    = "BCB and IBGE",
-    range     = TRUE,
     navigator = FALSE
     ) %>%
   hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
@@ -737,10 +734,8 @@ debt_stock %>%
   ftplot(
     title    = "Federal Public Debt Stock",
     subtitle = "Deflated by the IPCA index, R$ billion",
-    source   = "BCB and IBGE",
-    range = TRUE,
-    navigator = TRUE
-    )
+    source   = "BCB and IBGE"
+    ) %>%
   hc_yAxis(labels = list(format = "R$ {value:,.0f}"))
 ```
 
@@ -752,9 +747,11 @@ gov_portfolio %>%
     "pie", hcaes(y = value, name = variable, color = colors10[1:8]),
     name = "Government Securities") %>%
   ftplot(
-    title    = "Details of the National Treasury Securities portfolio",
-    subtitle = sprintf("R$ billion (%s)", gov_portfolio$date_my[1]),
-    source   = "BCB"
+    title     = "Details of the National Treasury Securities portfolio",
+    subtitle  = sprintf("R$ billion (%s)", gov_portfolio$date_my[1]),
+    source    = "BCB",
+    range     = FALSE,
+    navigator = FALSE
     ) %>%
   hc_tooltip(
     pointFormat =  '<b>R$ {point.value:,.0f}</b>'
@@ -863,9 +860,7 @@ inflation_expec %>%
   ftplot(
     title     = "Market inflation expectations for the next 12 months",
     subtitle  = "For the IPCA index, end of the month",
-    source    = "BCB",
-    range     = TRUE,
-    navigator = TRUE
+    source    = "BCB"
     ) %>%
   hc_tooltip(xDateFormat = "%B %Y")
 ```
@@ -898,6 +893,39 @@ real_interest_rate %>%
     source   = "B3, BCB and IBGE"
     )
 ```
+
+
+Column {data-width=500 .tabset}
+-----------------------------------------------------------------------
+
+### Currency
+
+```{r section5_currency}
+currency %>%
+  mutate(
+    flag = c("us", "eu", "ar", "mx", "cn", "tr", "ru", "in", "sa", "za") %>%
+      paste0("./inst/imgs/", ., ".png")
+    ) %>%
+  select(-`QoQ %`) %>%
+  gt() %>% 
+  tab_options(
+    data_row.padding = px(2)
+  ) %>% 
+  text_transform(
+    locations = cells_body(columns = vars(flag)),
+    fn = function(x){
+      map_chr(x, ~ local_image(
+        filename = .x,
+        height = 25
+      ))
+    }
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = vars(flag)
+  )
+```
+
 
 
 
