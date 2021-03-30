@@ -289,7 +289,7 @@ inflation_target %>%
 ipca_diffusion %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[1], fillOpacity = 0.5) %>%
+    color = colors[1], fillopacity = 0.1) %>%
   ftplot(
     title    = "Diffusion index - IPCA",
     subtitle = "",
@@ -471,7 +471,7 @@ Column {data-width=500}
 unemployment %>%
   hchart(
     "area", hcaes(x = date, y = unemployment_rate), color = colors[1],
-    name = "Unemployment rate", fillOpacity = 0.5) %>%
+    name = "Unemployment rate", fillopacity = 0.1) %>%
   ftplot(
     title     = "Unemployment rate",
     subtitle  = "Quarterly data (PNADC-T)",
@@ -607,7 +607,7 @@ Column {data-width=450}
 primary_deficit %>%
   hchart(
     "area", hcaes(x = date, y = value), color = colors[1],
-    name = "Primary Deficit", fillOpacity = 0.5
+    name = "Primary Deficit", fillopacity = 0.1
     ) %>%
   ftplot(
     title     = "Central Government Primary Deficit",
@@ -714,7 +714,7 @@ highchart() %>%
 single_account %>% 
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[4], fillOpacity = 0.5) %>%
+    color = colors[4], fillopacity = 0.1) %>%
   ftplot(
     title    = "Single Account balance",
     subtitle = "Deflated by the IPCA index, R$ million",
@@ -734,7 +734,7 @@ Column {data-width=450 .tabset}
 debt_stock %>% 
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[2], fillOpacity = 0.5) %>%
+    color = colors[2], fillopacity = 0.1) %>%
   ftplot(
     title    = "Federal Public Debt Stock",
     subtitle = "Deflated by the IPCA index, R$ billion",
@@ -860,7 +860,7 @@ inflation_target %>%
 inflation_expec %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[1], fillOpacity = 0.5) %>%
+    color = colors[1], fillopacity = 0.1) %>%
   ftplot(
     title     = "Market inflation expectations for the next 12 months",
     subtitle  = "For the IPCA index, end of the month",
