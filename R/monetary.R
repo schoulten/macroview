@@ -354,8 +354,7 @@ selic_expec <- raw_selic_expec %>%
     .side     = "end"
     ) %>%
   mutate(
-    date_my  = format(date, "%b %Y"),
-    date     = format(date, "%Y/%m/01"),
+    date     = format(date, "%Y-%m-01") %>% lubridate::ymd(),
     variable = recode(variable, "Meta para taxa over-selic" = "SELIC Target rate"),
     detail   = recode(detail, "Fim do ano" = "End of the year")
     )

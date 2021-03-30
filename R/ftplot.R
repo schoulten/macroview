@@ -46,5 +46,6 @@ ftplot <- function(
         inputEnabled = FALSE, dropdown = "always"
       )
     } else ftwo_plot
+
   ftwo_plot
   }

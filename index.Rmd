@@ -890,8 +890,10 @@ interest_rate %>%
 
 ```{r section5_real_interest_rates}
 real_interest_rate %>%
-  hchart("area", hcaes(x = date, y = value, group = variable), color = colors[1:2],
-         fillOpacity = 0.1) %>%
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[1:2], fillOpacity = 0.1
+    ) %>%
   ftplot(
     title     = "Real interest rates",
     subtitle  = "In % p.a.",
@@ -981,6 +983,21 @@ currencies %>%
   htmltools::attachDependencies(htmlwidgets::getDependency("sparkline"))
 ```
 
+### Interest rate expectations
+
+```{r section5_selic_expec}
+selic_expec %>%
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[1], fillOpacity = 0.1
+    ) %>%
+  ftplot(
+    title     = glue::glue("Interest rate expectations for {selic_expec$reference_date[1]}"),
+    subtitle  = "SELIC target rate expectations of the last business day of the month, for the end of the year",
+    source    = "BCB"
+    ) %>%
+  hc_tooltip(xDateFormat = "%B %Y")
+```
 
 
 
