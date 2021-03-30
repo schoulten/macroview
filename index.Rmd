@@ -881,7 +881,8 @@ interest_rate %>%
   ftplot(
     title     = "Short-term interest rates",
     subtitle  = "Nominal rates, end of the month, in % p.a.",
-    source    = "BCB"
+    source    = "BCB",
+    navigator = FALSE
     )
 ```
 
@@ -892,9 +893,10 @@ real_interest_rate %>%
   hchart("area", hcaes(x = date, y = value, group = variable), color = colors[1:2],
          fillOpacity = 0.1) %>%
   ftplot(
-    title    = "Real interest rates",
-    subtitle = "In % p.a.",
-    source   = "B3, BCB and IBGE"
+    title     = "Real interest rates",
+    subtitle  = "In % p.a.",
+    source    = "B3, BCB and IBGE",
+    navigator = FALSE
     )
 ```
 
@@ -902,7 +904,7 @@ real_interest_rate %>%
 Column {data-width=500 .tabset}
 -----------------------------------------------------------------------
 
-### Currency
+### Exchange rate
 
 ```{r section5_currency}
 currencies %>%
@@ -966,13 +968,17 @@ currencies %>%
     style = cell_text(weight = "bold"),
     locations = cells_column_labels(TRUE)
     ) %>%
-  cols_width(
-    vars(mom, ytd, yoy) ~ px(80)
+  data_color(
+    columns = 4:6,
+    colors = scales::col_numeric(
+      colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
+      reverse = TRUE,
+      domain = c(-max_abs(currencies[4:6]), max_abs(currencies[4:6]))
+      )
     ) %>%
   gt_sparkline(spark, "spark") %>%
   gt:::as.tags.gt_tbl() %>% 
   htmltools::attachDependencies(htmlwidgets::getDependency("sparkline"))
-
 ```
 
 
