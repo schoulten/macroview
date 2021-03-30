@@ -999,6 +999,24 @@ selic_expec %>%
   hc_tooltip(xDateFormat = "%B %Y")
 ```
 
+### Yield curve
+
+```{r section5_ettj}
+ettj %>%
+  hchart(
+    "area", hcaes(x = date_ref, y = value, group = variable),
+    color = colors[1], fillOpacity = 0.1
+    ) %>%
+  ftplot(
+    title     = "Yield curve (ETTJ IPCA)",
+    subtitle  = glue::glue("Term Structure of the Interest Rate, consulted on {ettj$date_query[1]} (% p.a./252)"),
+    source    = "Anbima",
+    range = FALSE
+    ) %>% 
+  hc_tooltip(xDateFormat = "%B %d, %Y")
+```
+
+
 
 
 Sobre {data-icon="fa-file-alt"}

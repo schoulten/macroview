@@ -365,13 +365,16 @@ ettj <- raw_ettj %>%
   filter(type == "real_return") %>%
   mutate(
     date_query    = format(current.date, "%B %d, %Y"),
-    date_ref      = format(ref.date, "%Y/%m/%d"),
-    date_ref_full = format(ref.date, "%B %d, %Y"),
-    business_days = as.character(n.biz.days),
     value         = round(value, 2),
     variable      = "Yield curve (ETTJ IPCA)"
     ) %>%
-  select(date_ref, business_days, date_ref_full, date_query, variable, value)
+  select(
+    date_ref = ref.date,
+    business_days = n.biz.days,
+    date_query,
+    variable,
+    value
+    )
 
 
 # Ibovespa index (B3)
