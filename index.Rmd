@@ -1016,7 +1016,25 @@ ettj %>%
   hc_tooltip(xDateFormat = "%B %d, %Y")
 ```
 
+### Ibovespa
 
+```{r section5_ibovespa}
+highchart(type = "stock") %>%
+  hc_yAxis_multiples(create_yaxis(2, height = c(2, 1), turnopposite = TRUE)) %>%
+  hc_add_series(ibovespa, yAxis = 0, name = "Ibovespa") %>%
+  hc_add_series(
+    ibovespa$BVSP.Volume,
+    color = "gray",
+    yAxis = 1,
+    name = "Volume",
+    type = "column"
+    ) %>%
+  hc_title(text = "Ibovespa index") %>%
+  hc_credits(enabled = TRUE, text = "Source: B3", style = list(fontSize = "12px")) %>%
+  hc_rangeSelector(selected = 1) %>%
+  hc_add_theme(theme_fortietwo)
+  
+```
 
 
 Sobre {data-icon="fa-file-alt"}

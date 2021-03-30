@@ -175,10 +175,10 @@ raw_inflation_next_12m <- ipeadatar::ipeadata(api_ipeadata$api_inflation)
 raw_ettj <- GetTDData::get.yield.curve()
 
 # Ibovespa index (B3)
-raw_ibovespa <- tidyquant::tq_get(
-  api_yahoo$api_ibov,
-  get  = "stock.prices",
-  from = "2007-01-02"
+raw_ibovespa <- quantmod::getSymbols(
+  Symbols     = "^BVSP",
+  src         = "yahoo",
+  auto.assign = FALSE
   )
 
 # Consumer Price Index - IPCA (accumulated variation in 12 months)
@@ -379,15 +379,7 @@ ettj <- raw_ettj %>%
 
 # Ibovespa index (B3)
 ibovespa <- raw_ibovespa %>%
-  timetk::condense_period(
-    .date_var = date,
-    .period   = "1 month",
-    .side     = "end"
-    ) %>%
-  mutate(
-    date_my = format(date, "%b %Y"),
-    date = format(date, "%Y/%m/01")
-    )
+  na.omit()
 
 
 # EMBI+ Risk-Brasil - daily - JP Morgan
