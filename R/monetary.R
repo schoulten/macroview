@@ -326,7 +326,7 @@ currencies <- raw_currency %>%
     by = "symbol"
     ) %>%
   arrange(order(api_bcb$currencies$symbol)) %>%
-  select(8, 3:7) %>%
+  select(8, 3, 7, 4:6) %>%
   mutate(
     flag = c("us", "eu", "ar", "mx", "cn", "tr", "ru", "in", "sa", "za") %>%
       paste0("./inst/imgs/", ., ".png"), .before = currency

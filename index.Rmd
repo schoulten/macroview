@@ -971,11 +971,11 @@ currencies %>%
     locations = cells_column_labels(TRUE)
     ) %>%
   data_color(
-    columns = 4:6,
+    columns = 5:7,
     colors = scales::col_numeric(
       colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
       reverse = TRUE,
-      domain = c(-max_abs(currencies[4:6]), max_abs(currencies[4:6]))
+      domain = c(-max_abs(currencies[5:7]), max_abs(currencies[5:7]))
       )
     ) %>%
   gt_sparkline(spark, "spark") %>%
@@ -1031,7 +1031,7 @@ highchart(type = "stock") %>%
     ) %>%
   hc_title(text = "Ibovespa index") %>%
   hc_credits(enabled = TRUE, text = "Source: B3", style = list(fontSize = "12px")) %>%
-  hc_rangeSelector(selected = 1) %>%
+  hc_rangeSelector(selected = 1, inputEnabled = FALSE) %>%
   hc_add_theme(theme_fortietwo)
   
 ```
