@@ -289,7 +289,7 @@ inflation_target %>%
 ipca_diffusion %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[1], fillopacity = 0.1) %>%
+    color = colors[1], fillOpacity = 0.1) %>%
   ftplot(
     title    = "Diffusion index - IPCA",
     subtitle = "",
@@ -471,7 +471,7 @@ Column {data-width=500}
 unemployment %>%
   hchart(
     "area", hcaes(x = date, y = unemployment_rate), color = colors[1],
-    name = "Unemployment rate", fillopacity = 0.1) %>%
+    name = "Unemployment rate", fillOpacity = 0.1) %>%
   ftplot(
     title     = "Unemployment rate",
     subtitle  = "Quarterly data (PNADC-T)",
@@ -607,7 +607,7 @@ Column {data-width=450}
 primary_deficit %>%
   hchart(
     "area", hcaes(x = date, y = value), color = colors[1],
-    name = "Primary Deficit", fillopacity = 0.1
+    name = "Primary Deficit", fillOpacity = 0.1
     ) %>%
   ftplot(
     title     = "Central Government Primary Deficit",
@@ -714,7 +714,7 @@ highchart() %>%
 single_account %>% 
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[4], fillopacity = 0.1) %>%
+    color = colors[4], fillOpacity = 0.1) %>%
   ftplot(
     title    = "Single Account balance",
     subtitle = "Deflated by the IPCA index, R$ million",
@@ -734,7 +734,7 @@ Column {data-width=450 .tabset}
 debt_stock %>% 
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[2], fillopacity = 0.1) %>%
+    color = colors[2], fillOpacity = 0.1) %>%
   ftplot(
     title    = "Federal Public Debt Stock",
     subtitle = "Deflated by the IPCA index, R$ billion",
@@ -860,7 +860,7 @@ inflation_target %>%
 inflation_expec %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
-    color = colors[1], fillopacity = 0.1) %>%
+    color = colors[1], fillOpacity = 0.1) %>%
   ftplot(
     title     = "Market inflation expectations for the next 12 months",
     subtitle  = "For the IPCA index, end of the month",
@@ -1026,50 +1026,24 @@ highchart(type = "stock") %>%
     ibovespa$BVSP.Volume,
     color = "gray",
     yAxis = 1,
-    name = "Volume",
-    type = "column"
+    name  = "Volume",
+    type  = "column"
     ) %>%
   hc_title(text = "Ibovespa index") %>%
   hc_credits(enabled = TRUE, text = "Source: B3", style = list(fontSize = "12px")) %>%
   hc_rangeSelector(selected = 1, inputEnabled = FALSE) %>%
-  hc_add_theme(theme_fortietwo)
-  
+  hc_add_theme(theme_fortietwo) %>%
+  hc_plotOptions(
+    candlestick = list(
+      color   = colors[2],
+      upColor = colors[4]
+      )
+    )
 ```
 
+### 
 
-Sobre {data-icon="fa-file-alt"}
+About {data-icon="fa-file-alt"}
 =====================================
 
-### Sobre {.no-title}
-#### **Painel Macro**
-Este projeto tem objetivo de apresentar dados macroeconômicos de forma dinâmica e interativa, contemplando alguns temas e variáveis importantes para acompanhamento de conjuntura econômica. Dividido em seis temas, o painel traz possibilidade de filtrar períodos das séries temporais, desagregar dados e selecionar variáveis nos gráficos interativos. **Explore os dados**!
-**Importante**: para análises dos dados consulte os [Boletins de Conjuntura](https://gecefurg.com.br/boletins/boletim-macro/) do GECE.
-
-
-
-
-#### **Informações técnicas**
-O painel foi criado utilizando **R**, uma linguagem de programação livre voltada para análise estatística, através da integração do **R Markdown** com o pacote `flexdashboard`, utilizado para criação de dashboards interativas. Os dados são extraídos de diversas fontes utilizando pacotes específicos disponibilizados no [CRAN](https://cran.r-project.org/), são tratados utilizando pacotes como `tidyverse`, `zoo`, `xts` e outros, e são apresentados graficamente com o pacote `D3plusR` e em tabelas com o `kableExtra`.
-
-
-
-
-#### **GECE**
-Criado em agosto de 2017, o GECE tem como objetivo realizar análises de conjuntura econômica no que tange os principais indicadores macroeconômicos e ambientais. Atualmente é vinculado ao Instituto de Ciências Econômicas, Administrativas e Contábeis (ICEAC) da Universidade Federal do Rio Grande (FURG). Na área macroeconômica, as análises e boletins publicados são focados em nível de atividade, inflação, mercado de trabalho, economia internacional, política fiscal e monetária. Na área ambiental, são abordados temas como agricultura orgânica, agrotóxicos, biodiversidade, pesca, energia, florestas, unidades de conservação, saneamento e poluição.
-
-
-
-
-#### **Autor**
-Fernando da Silva é graduado em Economia pela FURG, escreve sobre política monetária para o GECE, tem interesses em macroeconomic research, data analysis e linguagem de programação em R. Atualmente reside em Florianópolis/SC.
-Contato: <fernando@gecefurg.com.br>
-LinkedIn: <https://www.linkedin.com/in/schoulten/>
-
-
-
-
-#### **Dúvidas/sugestões/correções**
-E-mail: <contato@gecefurg.com.br>
-
-
-
+### About
