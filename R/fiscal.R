@@ -86,25 +86,25 @@ api_bcb <- list(
 # Central Government Fiscal Balance (accounts)
 balance_accounts <- tibble(
   group_1 = c(
-    rep("Total Revenue", 21),
+    rep("Total Revenue", 20),
     rep("Transfers by Revenue Sharing", 7),
-    rep("Total Expenditure", 29)
+    rep("Total Expenditure", 24)
     ),
 
   group_2 = c(
     rep("Revenues Collected by the Federal Revenue Office", 10),
     "Fiscal Incentives",
     "Net Social Security Revenues",
-    rep("Revenues Not Collected by the Federal Revenue Office", 9),
+    rep("Revenues Not Collected by the Federal Revenue Office", 8),
     "FPM / FPE / IPI-EE",
     rep("Constitutional Funds", 2),
     "Education-Salary (social contribution for education)",
     "Exploitation of Natural Reosurces",
     "CIDE - Fuels",
-    "Other",
+    "Others",
     "Social Security Benefits",
     "Payroll",
-    rep("Other Compulsory Expenses", 25),
+    rep("Other Compulsory Expenses", 20),
     rep("Executive Branch Expenses Subject to Financial Programming", 2)
     ),
 
@@ -128,7 +128,6 @@ balance_accounts <- tibble(
     "Own Revenues and from agreements",
     "Education-Salary (social contribution for education)",
     "FGTS Complement (LC nº 110/01)",
-    "Assets Operations",
     "Other Revenues",
     "FPM / FPE / IPI-EE",
     "Total Transfer",
@@ -142,30 +141,32 @@ balance_accounts <- tibble(
     "Salary Allowance and Unemployment Benefit",
     "Amnestied Workers",
     "Financial support to states and Municipalities",
-    "Financial aid to Energy Development Account (CDE)",
     "Reparations and Special Legislation Benefits",
     "Assistance Benefits (LOAS/RMV)",
     "FGTS Complement (LC nº 110/01)",
     "Extraordinary credits (excluding PAC)",
     "Compensation to the Social Security Fund (RGPS) due to the payroll tax reduction",
-    "Covenants",
-    "Donations",
     "Bills and Coins Manufacturing",
-    "Fundef/Fundeb (Federal Complementation)",
+    "Fundeb (Federal Complementation)",
     "Federal District (DF) Contitucional Fund (Current and Capital)",
-    "Regional Development Funds for the Amazon (FDA) and the Northeast (FDNE)",
     "Legislative/Judiciary/Public Prosecutor/Public Defendant (Current and Capital)",
     "Kandir Law (LC nº 87/96 e 102/00) and FEX",
-    "Contingency Reserve",
-    "Reimbursement States/Municipalities Fossil Fuels",
     "Judicial Remedies (Current and Capital)",
-    "Subsidies and Grants",
+    "Subsidies, Grants and Proagro",
     "ANA (National Water Agency) Transfers",
     "ANEEL (Electric Energy National Agency) Transfers and Fines",
     "FIES primary impact (Student Funding)",
     "Electoral Campaign Funding",
+    "Others",
     "Compulsory Expenses with Cash Control",
     "Discretionary"
+
+    # "Regional Development Funds for the Amazon (FDA) and the Northeast (FDNE)",
+    # "Contingency Reserve",
+    # "Reimbursement States/Municipalities Fossil Fuels",
+    #
+    # "Covenants",
+    # "Donations"
     )
   )
 
@@ -188,7 +189,7 @@ raw_treasury <- readxl::read_xlsx(
   sheet     = "1.1-A",
   col_names = FALSE,
   skip      = 5,
-  n_max     = 74
+  n_max     = 68
   ) %>%
   t() %>%
   as_tibble() %>%
@@ -255,6 +256,7 @@ treasury <- raw_treasury %>%
     row_number = 1,
     remove_row = TRUE
     ) %>%
+  janitor::clean_names() %>%
   mutate(
     across(where(is.character), as.numeric),
     date = seq(
@@ -282,13 +284,13 @@ treasury_accum_12m <- treasury %>%
 # Central Government Primary Balance accumulated in 12 months (% GDP)
 treasury_accum_12m_gdp <- treasury_accum_12m %>%
   mutate(
-    across(!c(75:76), ~(. / gdp_accum_12m*100))
+    across(!c(69:70), ~(. / gdp_accum_12m * 100))
     )
 
 
 # Primary Deficit accumulated in 12 months (% GDP)
 primary_deficit <- treasury_accum_12m_gdp %>%
-  select(date, value = 68) %>%
+  select(date, value = 66) %>%
   mutate(
     value = round(value, 2),
     variable = "Primary Deficit"
@@ -299,8 +301,8 @@ primary_deficit <- treasury_accum_12m_gdp %>%
 revenue_spending <- treasury_accum_12m_gdp %>%
   select(
     date,
-    `Net Revenue`       = 34,
-    `Total Expenditure` = 35
+    `Net Revenue`       = 33,
+    `Total Expenditure` = 34
     ) %>%
   pivot_longer(
     cols      = -date,
@@ -313,7 +315,7 @@ revenue_spending <- treasury_accum_12m_gdp %>%
 # Detailed revenues and spending for the last period
 revenue_spending_detail <- treasury_accum_12m %>%
   slice_tail(n = 1) %>%
-  select(-c(1,2,15,25,27,34,35,38,64,67:74,76)) %>%
+  select(-c(1:2,15,24,26,33:34,37,58,61:68,70)) %>%
   pivot_longer(
     cols      = -date,
     names_to  = "variable",
@@ -321,7 +323,10 @@ revenue_spending_detail <- treasury_accum_12m %>%
     ) %>%
   select(-variable) %>%
   bind_cols(balance_accounts) %>%
-  mutate(date = format(lubridate::ymd(date), "%B, %Y"))
+  mutate(
+    date = format(lubridate::ymd(date), "%B, %Y"),
+    value = round(value, 2)
+    )
 
 
 # General government net and gross debt
