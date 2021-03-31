@@ -162,7 +162,7 @@ raw_currency <- purrr::map_dfr(
   .id = "symbol"
   )
 
-# EMBI+ Risco-Brasil
+# EMBI+ Risk-Brazil
 raw_embi <- ipeadatar::ipeadata(api_ipeadata$api_embi)
 
 # Swaps - DI fixed rate - 360 days
@@ -384,17 +384,8 @@ ibovespa <- raw_ibovespa %>%
 
 # EMBI+ Risk-Brasil - daily - JP Morgan
 embi <- raw_embi %>%
-  timetk::condense_period(
-    .date_var = date,
-    .period   = "1 month",
-    .side     = "end"
-    ) %>%
-  mutate(
-    date_my  = format(date, "%b %Y"),
-    date     = format(date, "%Y/%m/01"),
-    variable = "EMBI+ Risk-Brasil"
-    ) %>%
-  select(date, date_my, variable, value)
+  mutate(variable = "EMBI+ Risk-Brasil") %>%
+  select(date, variable, value)
 
 
 

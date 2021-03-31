@@ -1041,7 +1041,23 @@ highchart(type = "stock") %>%
     )
 ```
 
-### 
+### EMBI+
+
+```{r section5_embi}
+embi %>%
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[1], fillOpacity = 0.1
+    ) %>%
+  ftplot(
+    title     = "EMBI+ Risk-Brasil",
+    subtitle  = "Daily index (base point)",
+    source    = "JP Morgan"
+    ) %>%
+  hc_yAxis(labels = list(format = "{value:,.0f}")) %>%
+  hc_tooltip(xDateFormat = "%B %d, %Y")
+```
+
 
 About {data-icon="fa-file-alt"}
 =====================================
