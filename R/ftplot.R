@@ -1,16 +1,16 @@
 #' Easy plot highcharter personal theme
 #'
-#' @param hc
-#' @param title
-#' @param subtitle
-#' @param source
-#' @param range_n
-#' @param navigator
+#' @param hc highchart object
+#' @param title title to the plot
+#' @param subtitle subtitle to the plot
+#' @param source source of data
+#' @param range logical, display range options?
+#' @param navigator logical, display navigator zoom?
+#' @import highcharter
 #'
-#' @return
+#' @return plot
 #' @export
 #'
-#' @examples
 ftplot <- function(
   hc,
   title,

@@ -2,8 +2,10 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr
+#' @import tidyselect
 #' @importFrom purrr map_dfr
 #' @importFrom utils lsf.str
+#' @importFrom stats na.omit update
 #' @return RDATA
 #' @export
 #'

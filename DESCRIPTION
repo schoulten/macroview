@@ -44,6 +44,11 @@ Imports:
     readr,
     forcats,
     rbcb (>= 0.1.6),
-    xml2
+    xml2,
+    highcharter,
+    gt,
+    quantmod,
+    sparkline,
+    tidyselect
 Remotes: 
     wilsonfreitas/rbcb

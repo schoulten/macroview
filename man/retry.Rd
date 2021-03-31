@@ -4,7 +4,7 @@
 \alias{retry}
 \title{Retry an expression}
 \usage{
-retry(foo, tries)
+retry(foo, tries = 5)
 }
 \arguments{
 \item{foo}{The expression}

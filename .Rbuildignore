@@ -1,3 +1,5 @@
 ^macroview\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+index.Rmd
+index.html

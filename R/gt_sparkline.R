@@ -1,10 +1,10 @@
 #' Create sparkline in gt object
 #'
-#' @param table_data
-#' @param plot_col
-#' @param data_col
+#' @param table_data tibble
+#' @param plot_col plot_col
+#' @param data_col data_col
 #'
-#' @return
+#' @return spartline col
 #' @export
 gt_sparkline <- function(table_data, plot_col, data_col){
 
