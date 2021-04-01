@@ -9,15 +9,36 @@ output:
     social: menu
 ---
 
-
 <style>                     
 .navbar {
   background-color:#282f6b;
 }
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  color: #ffffff;
+  background-color: #ffffff21;
+}
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  color: #ffffff;
+  background-color: #ffffff21;
+}
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+  background-color: #ffffff21;
+}
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+  background-color: #ffffff21;
+  color: #ffffff;
+}
 </style> 
 
-
 ```{r setup, include=FALSE}
+# Set the default language of date in R
+Sys.setlocale("LC_TIME", "English")
 
 # Setup and load packages
 knitr::opts_knit$set(progress = TRUE)
@@ -38,34 +59,41 @@ pacman::p_load(
   "sparkline"
   )
 
-# Set the default language of date in R
-Sys.setlocale("LC_TIME", "English")
-
 # Colors for the plots
-colors <- c("#282f6b", "#b22200", "#eace3f", "#224f20", "#5f487c", "#b35c1e")
-colors10 <- c(colors, "#419391", "#549e9c", "#839c56",  "#3b89bc")
+colors <- c(
+  blue   = "#282f6b",
+  red    = "#b22200",
+  yellow = "#eace3f",
+  green  = "#224f20",
+  purple = "#5f487c",
+  orange = "#b35c1e"
+  )
+colors_extra <- c(
+  colors,
+  turquoise  = "#419391",
+  green_two  = "#839c56",
+  light_blue = "#3b89bc"
+  )
+
+# Load funcitons
+c("hc_plot_ft", "hc_theme_ft", "gt_sparkline", "utils") %>%
+  paste0("./R/", ., ".R") %>% 
+  purrr::walk(~source(.x))
 ```
 
 ```{r data, include=FALSE}
-
 # Load RDATA files
-
 c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") %>%
   paste0("./inst/extdata/", ., ".Rdata") %>% 
   purrr::map( ~ load(.x, .GlobalEnv))
-
-
-source("./R/hc_plot_ft.R")
-source("./R/hc_theme_ft.R")
-source("./R/gt_sparkline.R")
-source("./R/utils.R")
 ```
 
 
 <!-- Icons by Freepik -->
 <!-- Overview section -->
 
-Economic activity {data-navmenu="Sections" data-icon="fa-chart-line"}
+
+Economic activity {data-icon="fa-chart-line"}
 =====================================
 
 Column {data-width=375}
@@ -253,7 +281,7 @@ pim %>%
 ```
 
 
-Inflation {data-navmenu="Sections" data-icon="fa-hand-holding-usd"}
+Inflation {data-icon="fa-hand-holding-usd"}
 =====================================
 
 Column {data-width=350}
@@ -401,7 +429,7 @@ igp %>%
 ```
 
 
-Labor market {data-navmenu="Sections" data-icon="fa-users"}
+Labor market {data-icon="fa-users"}
 =====================================
 
 Column {data-width=375}
@@ -597,7 +625,7 @@ gini %>%
 ```
 
 
-Fiscal policy {data-navmenu="Sections" data-icon="fa-gavel"}
+Fiscal policy {data-icon="fa-gavel"}
 =====================================
 
 Column {data-width=450}
@@ -660,19 +688,19 @@ highchart() %>%
           id = unique(revenue_spending_detail$group_1)[1] %>%
             stringr::str_replace_all("[[:blank:]]", "_") %>% stringr::str_to_lower(),
           name = unique(revenue_spending_detail$group_1)[1],
-          color = colors[1]
+          color = unname(colors[1])
           ),
         list(
           id = unique(revenue_spending_detail$group_1)[2] %>%
             stringr::str_replace_all("[[:blank:]]", "_") %>% stringr::str_to_lower(),
           name = unique(revenue_spending_detail$group_1)[2],
-          color = colors[2]
+          color = unname(colors[2])
           ),
         list(
           id = unique(revenue_spending_detail$group_1)[3] %>%
             stringr::str_replace_all("[[:blank:]]", "_") %>% stringr::str_to_lower(),
           name = unique(revenue_spending_detail$group_1)[3],
-          color = colors[3]
+          color = unname(colors[3])
           )
         )
       ) %>%
@@ -683,7 +711,7 @@ highchart() %>%
             mutate(parent = stringr::str_replace_all(parent, "[[:blank:]]", "_") %>%
                      stringr::str_to_lower()) %>%
             group_by(name, parent) %>%
-            summarise(value = sum(value)) %>%
+            summarise(value = sum(value), .groups = "drop") %>%
             mutate(id = stringr::str_replace_all(name, "[[:blank:]]", "_") %>%
                      stringr::str_to_lower()) %>%
             transpose()
@@ -750,7 +778,7 @@ debt_stock %>%
 ```{r section4_gov_portfolio}
 gov_portfolio %>% 
   hchart(
-    "pie", hcaes(y = value, name = variable, color = colors10[1:8]),
+    "pie", hcaes(y = value, name = variable, color = colors_extra[1:8]),
     name = "Government Securities") %>%
   hc_plot_ft(
     title     = "Details of the National Treasury Securities portfolio",
@@ -825,7 +853,7 @@ htmltools::div(
 ```
 
 
-Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
+Monetary policy {data-icon="fa-percentage"}
 =====================================
 
 Column {data-width=325}
@@ -1037,8 +1065,8 @@ highchart(type = "stock") %>%
   hc_add_theme(theme_fortietwo) %>%
   hc_plotOptions(
     candlestick = list(
-      color   = colors[2],
-      upColor = colors[4]
+      color   = unname(colors[2]),
+      upColor = unname(colors[4])
       )
     )
 ```
