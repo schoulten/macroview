@@ -92,6 +92,66 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
 <!-- Icons by Freepik -->
 <!-- Overview section -->
 
+Overview {data-orientation=rows}
+=====================================
+
+Row {data-height=350}
+-------------------------------------
+
+### GDP growth in 4 quarters (`r gdp_growth$date` - IBGE)
+
+```{r section0_gdp_growth}
+gdp_growth %>%
+  pull(value) %>%
+  valueBox(
+    value = .,
+    icon  = "fa-chart-line",
+    color =  ifelse(. < 0, "#b22200", "#282f6b")
+    )
+```
+
+### Inflation over 12 months (`r format(ipca_yoy$date, "%B, %Y")` - IPCA/IBGE)
+
+```{r section0_inflation_12m}
+ipca_yoy %>%
+  pull(value) %>%
+  valueBox(
+    value = .,
+    icon  = "fa-chart-bar",
+    color =  ifelse(. > inflation_target$value, "#b22200", "#282f6b")
+    )
+```
+
+### Unemployment rate (`r tail(unemployment$date, 1)` - IBGE)
+
+```{r section0_unemployment_rate}
+unemployment %>%
+  slice_tail() %>%
+  mutate(unemployment_rate = paste0(unemployment_rate, "%")) %>%
+  pull(unemployment_rate) %>% 
+  valueBox(
+    value = .,
+    icon = "fa-users",
+    color = "#282f6b"
+    )
+```
+
+### Central Government Primary Deficit (`r tail(primary_deficit$date, 1)` - IBGE)
+
+```{r section0_primary_deficit}
+primary_deficit %>%
+  filter(date == max(date)) %>%
+  mutate(value = paste0(value, "%")) %>%
+  pull(value) %>% 
+  valueBox(
+    value = .,
+    icon = "fa-banks",
+    color = "#282f6b"
+    )
+```
+
+### Interest rate
+
 
 Economic activity {data-icon="fa-chart-line"}
 =====================================
