@@ -20,9 +20,7 @@ output:
 ```{r setup, include=FALSE}
 
 # Setup and load packages
-
 knitr::opts_knit$set(progress = TRUE)
-
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   "rmarkdown",
@@ -43,6 +41,9 @@ pacman::p_load(
 # Set the default language of date in R
 Sys.setlocale("LC_TIME", "English")
 
+# Colors for the plots
+colors <- c("#282f6b", "#b22200", "#eace3f", "#224f20", "#5f487c", "#b35c1e")
+colors10 <- c(colors, "#419391", "#549e9c", "#839c56",  "#3b89bc")
 ```
 
 ```{r data, include=FALSE}
@@ -53,10 +54,11 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
   paste0("./inst/extdata/", ., ".Rdata") %>% 
   purrr::map( ~ load(.x, .GlobalEnv))
 
-source("./R/hc_theme.R")
-source("./R/ftplot.R")
-source("./R/utils.R")
+
+source("./R/hc_plot_ft.R")
+source("./R/hc_theme_ft.R")
 source("./R/gt_sparkline.R")
+source("./R/utils.R")
 ```
 
 
@@ -146,7 +148,7 @@ Column {data-width=575}
 ```{r section1_gdp_trend}
 gdp_growth_sector %>%
   hchart("column", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "GDP growth by sectors",
     subtitle  = "Accumulated growth rate in 4 quarters",
     source    = "IBGE",
@@ -160,7 +162,7 @@ gdp_growth_sector %>%
 ```{r section1_ibcbr_trend}
 ibc_growth %>%
   hchart("line", hcaes(x = date, y = yoy, group = variable), color = colors) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "IBC-Br growth by region",
     subtitle  = "Accumulated growth rate in 12 months",
     source    = "BCB",
@@ -219,7 +221,7 @@ gdp_measures %>%
 ```{r section1_pmc}
 pmc %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:4]) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Retail trade index: PMC/IBGE",
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
@@ -231,7 +233,7 @@ pmc %>%
 ```{r section1_pms}
 pms %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:2]) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Revenue and volume of services index: PMS/IBGE",
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
@@ -243,7 +245,7 @@ pms %>%
 ```{r section1_pim}
 pim %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:4]) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Industrial production: PIM-PF/IBGE",
     subtitle = "Monthly percentage change (compared to the same month in the previous year)",
     source   = "IBGE"
@@ -290,7 +292,7 @@ ipca_diffusion %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[1], fillOpacity = 0.1) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Diffusion index - IPCA",
     subtitle = "",
     source   = "BCB"
@@ -313,7 +315,7 @@ hchart(
     ipca_trend, "line", hcaes(x = date, y = `Year over Year (%)`),
     color = colors[2], name = "Year over Year", showInLegend = TRUE
   ) %>% 
-  ftplot(
+  hc_plot_ft(
     title     = "Inflation trend (IPCA)",
     subtitle  = "Monthly and accumulated variation in 12 months (%)",
     source    = "IBGE",
@@ -326,7 +328,7 @@ hchart(
 ```{r section2_ipca_region}
 ipca_region %>%
   hchart("column", hcaes(x = date, y = value, group = region), color = colors) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Inflation by metropolitan region - IPCA",
     subtitle = "Monthly percentage change",
     source   = "IBGE",
@@ -379,7 +381,7 @@ ipca_groups %>%
 ```{r section2_ipca_cores}
 ipca_cores %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:5]) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "CPI cores (IPCA)",
     subtitle = "Monthly percentage change",
     source   = "BCB"
@@ -391,7 +393,7 @@ ipca_cores %>%
 ```{r section2_igp}
 igp %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:3]) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "General Price Index (IGP)",
     subtitle = "Monthly percentage change",
     source   = "FGV"
@@ -472,7 +474,7 @@ unemployment %>%
   hchart(
     "area", hcaes(x = date, y = unemployment_rate), color = colors[1],
     name = "Unemployment rate", fillOpacity = 0.1) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Unemployment rate",
     subtitle  = "Quarterly data (PNADC-T)",
     source    = "IBGE",
@@ -486,7 +488,7 @@ unemployment %>%
 ```{r section3_unemployment_gender_color}
 unemployment_gender_color %>%
   hchart("column", hcaes(x = color, y = unemployment_rate, group = gender), color = colors[1:2]) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Unemployment rate by gender and color",
     subtitle  = paste0(
       "Quarterly data, updated until ", unemployment_gender_color$date[1], " (PNADC-T)"
@@ -536,7 +538,7 @@ hcmap(
 occupation_level %>%
   hchart(
     "line", hcaes(x = date, y = value, group = gender), color = colors[1:3]) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Labor force occupation level",
     subtitle  = "Quarterly data (PNADC-T)",
     source    = "IBGE",
@@ -551,7 +553,7 @@ occupation_level %>%
 participation_rate %>%
   hchart(
     "line", hcaes(x = date, y = value, group = gender), color = colors[1:3]) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Labor force participation rate",
     subtitle  = "Quarterly data (PNADC-T)",
     source    = "IBGE",
@@ -566,7 +568,7 @@ participation_rate %>%
 income %>%
   hchart(
     "line", hcaes(x = date, y = value, group = age), color = colors) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Average real income from work, by age group",
     subtitle  = "Quarterly data (PNADC-T)",
     source    = "IBGE",
@@ -582,7 +584,7 @@ income %>%
 gini %>%
   hchart(
     "bar", hcaes(x = states, y = value), color = colors[1], name = "Gini") %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Gini index by states",
     subtitle  = paste0(
       "Quarterly data, updated until ", gini$date[1], " (PNADC-T)"
@@ -609,7 +611,7 @@ primary_deficit %>%
     "area", hcaes(x = date, y = value), color = colors[1],
     name = "Primary Deficit", fillOpacity = 0.1
     ) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Central Government Primary Deficit",
     subtitle  = "Accumulated in 12 months (% GDP)",
     source    = "STN and IBGE",
@@ -622,7 +624,7 @@ primary_deficit %>%
 ```{r section4_revenue_spending}
 revenue_spending %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:2]) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Central Government Net Revenue and Total Expenditure",
     subtitle = "Accumulated in 12 months and deflated by the IPCA index (% GDP)",
     source   = "STN and IBGE",
@@ -696,7 +698,7 @@ highchart() %>%
       ) %>%
       flatten()
     ) %>% 
-   ftplot(
+   hc_plot_ft(
     title     = "Detailed Central Government Accounts",
     subtitle  = sprintf(
       "Accumulated in 12 months and deflated by the IPCA index, R$ million (%s)",
@@ -715,7 +717,7 @@ single_account %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[4], fillOpacity = 0.1) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Single Account balance",
     subtitle = "Deflated by the IPCA index, R$ million",
     source    = "BCB and IBGE",
@@ -735,7 +737,7 @@ debt_stock %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[2], fillOpacity = 0.1) %>%
-  ftplot(
+  hc_plot_ft(
     title    = "Federal Public Debt Stock",
     subtitle = "Deflated by the IPCA index, R$ billion",
     source   = "BCB and IBGE"
@@ -750,7 +752,7 @@ gov_portfolio %>%
   hchart(
     "pie", hcaes(y = value, name = variable, color = colors10[1:8]),
     name = "Government Securities") %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Details of the National Treasury Securities portfolio",
     subtitle  = sprintf("R$ billion (%s)", gov_portfolio$date_my[1]),
     source    = "BCB",
@@ -861,7 +863,7 @@ inflation_expec %>%
   hchart(
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[1], fillOpacity = 0.1) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Market inflation expectations for the next 12 months",
     subtitle  = "For the IPCA index, end of the month",
     source    = "BCB"
@@ -878,7 +880,7 @@ Column {data-width=500}
 ```{r section5_interest_rates_trend}
 interest_rate %>%
   hchart("line", hcaes(x = date, y = value, group = variable), color = colors[1:3]) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Short-term interest rates",
     subtitle  = "Nominal rates, end of the month, in % p.a.",
     source    = "BCB",
@@ -894,7 +896,7 @@ real_interest_rate %>%
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[1:2], fillOpacity = 0.1
     ) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Real interest rates",
     subtitle  = "In % p.a.",
     source    = "B3, BCB and IBGE",
@@ -991,7 +993,7 @@ selic_expec %>%
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[1], fillOpacity = 0.1
     ) %>%
-  ftplot(
+  hc_plot_ft(
     title     = glue::glue("Interest rate expectations for {selic_expec$reference_date[1]}"),
     subtitle  = "SELIC target rate expectations of the last business day of the month, for the end of the year",
     source    = "BCB"
@@ -1007,7 +1009,7 @@ ettj %>%
     "area", hcaes(x = date_ref, y = value, group = variable),
     color = colors[1], fillOpacity = 0.1
     ) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "Yield curve (ETTJ IPCA)",
     subtitle  = glue::glue("Term Structure of the Interest Rate, consulted on {ettj$date_query[1]} (% p.a./252)"),
     source    = "Anbima",
@@ -1049,7 +1051,7 @@ embi %>%
     "area", hcaes(x = date, y = value, group = variable),
     color = colors[1], fillOpacity = 0.1
     ) %>%
-  ftplot(
+  hc_plot_ft(
     title     = "EMBI+ Risk-Brasil",
     subtitle  = "Daily index (base point)",
     source    = "JP Morgan"
