@@ -113,7 +113,7 @@ big_number_gdp <- gdp_growth %>%
 big_number_gdp
 ```
 
-### Inflation over 12 months (`r format(ipca_yoy$date, "%b '%y")` - IPCA/IBGE)
+### Inflation 12-months (`r format(ipca_yoy$date, "%b '%y")` - IBGE)
 
 ```{r section0_inflation_12m}
 big_number_inflation <- ipca_yoy %>%
@@ -148,7 +148,7 @@ unemployment %>%
     )
 ```
 
-### Primary Deficit (`r format(tail(primary_deficit$date, 1), "%b '%y")` - IBGE)
+### Primary Deficit (`r format(tail(primary_deficit$date, 1), "%b '%y")` - STN)
 
 ```{r section0_primary_deficit}
 primary_deficit %>%
@@ -216,7 +216,7 @@ inflation_trend <- hchart(
 inflation_trend
 ```
 
-### Unemployment rate trend
+### Unemployment rate
 
 ```{r section0_unemployment_trend}
 unemployment_trend <- unemployment %>%
@@ -263,7 +263,7 @@ unemployment_map <- hcmap(
 unemployment_map
 ```
 
-### Primary Deficit trend
+### Primary deficit trend
 
 ```{r section0_primary_deficit_trend}
 primary_deficit_trend <- primary_deficit %>%
