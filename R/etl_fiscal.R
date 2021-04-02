@@ -271,7 +271,7 @@ treasury <- raw_treasury %>%
 # Central Government Primary Balance (accumulated in 12 months + GDP)
 treasury_accum_12m <- treasury %>%
   mutate(
-    across(!date, ~accum_k(., k = 12)) # function from /R/utils.R
+    across(!date, ~rolling(., sum, k = 12)) # function from /R/utils.R
     ) %>%
   left_join(
     raw_gdp_monthly %>%

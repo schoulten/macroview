@@ -363,7 +363,9 @@ ibc_growth <- raw_ibc %>%
     ) %>%
   group_by(variable) %>%
   mutate(
-    yoy = yoy_growth_rate(col = value, round = 2) # function from /R/utils.R
+    yoy =
+      (((rolling(value, sum, 12) / rolling(dplyr::lag(value, 12), sum, 12)) - 1) * 100) %>%
+      round(2)
     ) %>%
   tidyr::drop_na()
 

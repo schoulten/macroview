@@ -317,7 +317,7 @@ currencies <- raw_currency %>%
   mutate(
     mom  = (value / dplyr::lag(value) - 1) * 100,
     ytd  = (value / dplyr::lag(value, as.numeric(format(Sys.Date(), "%m"))-1) - 1) * 100,
-    yoy  = (roll_sum_k(value, 12) / roll_sum_k(dplyr::lag(value, 12), 12) - 1) * 100,
+    yoy  = (rolling(value, mean, 12) / rolling(dplyr::lag(value, 12), mean, 12) - 1) * 100,
     across(where(is.numeric), ~round(., 2)),
     spark = list(value)
     ) %>%

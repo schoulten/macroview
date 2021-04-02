@@ -30,14 +30,13 @@ pacman::p_load(
   "tidyverse",
   "flexdashboard",
   "htmlwidgets",
-  "kableExtra",
   "gt",
   "scales",
   "colorspace",
   "magrittr",
-  "rlist",
   "htmltools",
-  "sparkline"
+  "sparkline",
+  "rlist"
   )
 
 # Colors for the plots
@@ -914,7 +913,7 @@ highchart() %>%
           )
         )
       ) %>%
-      list.append(
+      rlist::list.append(
         # LEVEL II
         {revenue_spending_detail %>%
             select("name" = group_2, "parent" = group_1, value) %>%
