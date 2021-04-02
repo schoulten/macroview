@@ -4,37 +4,14 @@ output:
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
+    css: inst/css/styles.css
     source_code: NULL
     logo: inst/imgs/logo.png
     social: menu
 ---
 
-<style>                     
-.navbar {
-  background-color:#282f6b;
-}
-.navbar-inverse .navbar-nav > li > a:hover,
-.navbar-inverse .navbar-nav > li > a:focus {
-  color: #ffffff;
-  background-color: #ffffff21;
-}
-.navbar-inverse .navbar-nav > .active > a,
-.navbar-inverse .navbar-nav > .active > a:hover,
-.navbar-inverse .navbar-nav > .active > a:focus {
-  color: #ffffff;
-  background-color: #ffffff21;
-}
-.navbar-inverse .navbar-toggle:hover,
-.navbar-inverse .navbar-toggle:focus {
-  background-color: #ffffff21;
-}
-.navbar-inverse .navbar-nav > .open > a,
-.navbar-inverse .navbar-nav > .open > a:hover,
-.navbar-inverse .navbar-nav > .open > a:focus {
-  background-color: #ffffff21;
-  color: #ffffff;
-}
-</style> 
+<!-- Icons by Freepik -->
+
 
 ```{r setup, include=FALSE}
 # Set the default language of date in R
@@ -89,8 +66,7 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
 ```
 
 
-<!-- Icons by Freepik -->
-<!-- Overview section -->
+
 
 Overview {data-orientation=rows data-icon="fa-signal"}
 =====================================
