@@ -1,5 +1,11 @@
-# Painel Macro
+# macroview
 
-Painel de indicadores macroeconômicos do Grupo de Estudos de Conjuntura Econômica da Universidade Federal do Rio Grande (GECE/FURG).
+This dashboard aims to facilitate the monitoring of macroeconomic data on the Brazilian economy, including the main indicators of:
 
-**Em desenvolvimento!**
+- Economic activity
+- Inflation
+- Labor market
+- Fiscal policy
+- Monetary policy
+
+The indicators are updated daily using GH Actions and come from public data sources. 
