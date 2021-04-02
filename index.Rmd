@@ -92,10 +92,10 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
 <!-- Icons by Freepik -->
 <!-- Overview section -->
 
-Overview {data-orientation=rows}
+Overview {data-orientation=rows data-icon="fa-signal"}
 =====================================
 
-Row {data-height=350}
+Row
 -------------------------------------
 
 ### GDP growth (`r gdp_growth$date` - IBGE)
@@ -163,7 +163,7 @@ primary_deficit %>%
     )
 ```
 
-### SELIC Target rate `r format(selic$date, "%b, '%y")` (COPOM/BCB)
+### SELIC target rate (`r format(selic$date, "%b '%y")` - COPOM/BCB)
 
 ```{r section0_target_selic}
 selic %>%
@@ -175,9 +175,26 @@ selic %>%
     )
 ```
 
+Row
+-------------------------------------
+
+### GDP trend {.tabset}
+
+```{r section0_gdp_trend}
+gdp_trend <- gdp_growth_sector %>%
+  hchart("column", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
+  hc_plot_ft(
+    title     = "GDP growth by sectors",
+    subtitle  = "Accumulated growth rate in 4 quarters",
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
+    )
+gdp_trend
+```
 
 
-Economic activity {data-icon="fa-chart-line"}
+Economic activity {data-navmenu="Sections" data-icon="fa-chart-line"}
 =====================================
 
 Column {data-width=375}
@@ -258,15 +275,7 @@ Column {data-width=575}
 ### GDP trend {.no-title}
 
 ```{r section1_gdp_trend}
-gdp_growth_sector %>%
-  hchart("column", hcaes(x = date, y = value, group = sector), color = colors[1:4]) %>%
-  hc_plot_ft(
-    title     = "GDP growth by sectors",
-    subtitle  = "Accumulated growth rate in 4 quarters",
-    source    = "IBGE",
-    range     = FALSE,
-    navigator = FALSE
-    )
+gdp_trend
 ```
 
 ### IBC-Br trend {.no-title}
@@ -365,7 +374,7 @@ pim %>%
 ```
 
 
-Inflation {data-icon="fa-hand-holding-usd"}
+Inflation {data-navmenu="Sections" data-icon="fa-hand-holding-usd"}
 =====================================
 
 Column {data-width=350}
@@ -513,7 +522,7 @@ igp %>%
 ```
 
 
-Labor market {data-icon="fa-users"}
+Labor market {data-navmenu="Sections" data-icon="fa-users"}
 =====================================
 
 Column {data-width=375}
@@ -709,7 +718,7 @@ gini %>%
 ```
 
 
-Fiscal policy {data-icon="fa-gavel"}
+Fiscal policy {data-navmenu="Sections" data-icon="fa-gavel"}
 =====================================
 
 Column {data-width=450}
@@ -937,7 +946,7 @@ htmltools::div(
 ```
 
 
-Monetary policy {data-icon="fa-percentage"}
+Monetary policy {data-navmenu="Sections" data-icon="fa-percentage"}
 =====================================
 
 Column {data-width=325}
