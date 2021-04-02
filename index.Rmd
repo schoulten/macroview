@@ -10,8 +10,11 @@ output:
     social: menu
 ---
 
-<!-- Icons by Freepik -->
+<script>
+$('.navbar-logo').wrap('<a href="https://fortietwo.com/" target=_blank>');
+</script>
 
+<!-- Icons by Freepik -->
 
 ```{r setup, include=FALSE}
 # Set the default language of date in R
@@ -64,9 +67,6 @@ c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") 
   paste0("./inst/extdata/", ., ".Rdata") %>% 
   purrr::map( ~ load(.x, .GlobalEnv))
 ```
-
-
-
 
 Overview {data-orientation=rows data-icon="fa-signal"}
 =====================================
