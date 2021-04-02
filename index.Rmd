@@ -101,7 +101,7 @@ Row
 ### GDP growth (`r gdp_growth$date` - IBGE)
 
 ```{r section0_gdp_growth}
-gdp_growth %>%
+big_number_gdp <- gdp_growth %>%
   pull(value) %>%
   valueBox(
     value = .,
@@ -110,12 +110,13 @@ gdp_growth %>%
       gdp_growth$value <= 0 ~ colors[2],
       gdp_growth$value > 0 ~ colors[1])
     )
+big_number_gdp
 ```
 
 ### Inflation over 12 months (`r format(ipca_yoy$date, "%b '%y")` - IPCA/IBGE)
 
 ```{r section0_inflation_12m}
-ipca_yoy %>%
+big_number_inflation <- ipca_yoy %>%
   pull(value) %>%
   valueBox(
     value = .,
@@ -126,6 +127,7 @@ ipca_yoy %>%
       ipca_yoy$value < inflation_target$value ~ colors[1],
       ipca_yoy$value == inflation_target$value ~ colors[5])
     )
+big_number_inflation
 ```
 
 ### Unemployment rate (`r tail(unemployment$date, 1)` - IBGE)
@@ -166,19 +168,20 @@ primary_deficit %>%
 ### SELIC target rate (`r format(selic$date, "%b '%y")` - COPOM/BCB)
 
 ```{r section0_target_selic}
-selic %>%
+big_number_selic <- selic %>%
   pull(value) %>%
   valueBox(
     value = .,
     icon  = "fa-percentage",
     color = colors[5]
     )
+big_number_selic
 ```
 
-Row
+Row {.tabset}
 -------------------------------------
 
-### GDP trend {.tabset}
+### GDP growth
 
 ```{r section0_gdp_trend}
 gdp_trend <- gdp_growth_sector %>%
@@ -193,6 +196,211 @@ gdp_trend <- gdp_growth_sector %>%
 gdp_trend
 ```
 
+### Inflation trend
+
+```{r section0_ipca_trend}
+inflation_trend <- hchart(
+  ipca_trend, "column", hcaes(x = date, y = `Month over Month (%)`),
+       color = colors[1], name = "Month over Month", showInLegend = TRUE
+  ) %>%
+  hc_add_series(
+    ipca_trend, "line", hcaes(x = date, y = `Year over Year (%)`),
+    color = colors[2], name = "Year over Year", showInLegend = TRUE
+  ) %>% 
+  hc_plot_ft(
+    title     = "Inflation trend (IPCA)",
+    subtitle  = "Monthly and accumulated variation in 12 months (%)",
+    source    = "IBGE",
+    navigator = FALSE
+    )
+inflation_trend
+```
+
+### Unemployment rate trend
+
+```{r section0_unemployment_trend}
+unemployment_trend <- unemployment %>%
+  hchart(
+    "area", hcaes(x = date, y = unemployment_rate), color = colors[1],
+    name = "Unemployment rate", fillOpacity = 0.1) %>%
+  hc_plot_ft(
+    title     = "Unemployment rate",
+    subtitle  = "Quarterly data (PNADC-T)",
+    source    = "IBGE",
+    range     = FALSE,
+    navigator = FALSE
+    )
+unemployment_trend
+```
+
+### Unemployment by states
+
+```{r section0_unemployment_states}
+unemployment_map <- hcmap(
+  map               = "countries/br/br-all",
+  data              = unemployment_states,
+  joinBy            = "woe-name",
+  value             = "unemployment_rate",
+  name              = "Unemployment rate",
+  download_map_data = TRUE,
+  dataLabels        = list(
+    enabled = TRUE,
+    format  = "{point.name}"
+    ),
+  mapNavigation = list(
+    enabled       = TRUE,
+    buttonOptions = list(
+      verticalAlign = "bottom"
+      )
+    )
+  ) %>% 
+  hc_title(text = "Unemployment rate by states") %>% 
+  hc_subtitle(text = paste0(
+      "Quarterly data, updated until ", unemployment_states$date[1], " (PNADC-T)"
+      )
+      ) %>%
+  hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px"))
+unemployment_map
+```
+
+### Primary Deficit trend
+
+```{r section0_primary_deficit_trend}
+primary_deficit_trend <- primary_deficit %>%
+  hchart(
+    "area", hcaes(x = date, y = value), color = colors[1],
+    name = "Primary Deficit", fillOpacity = 0.1
+    ) %>%
+  hc_plot_ft(
+    title     = "Central Government Primary Deficit",
+    subtitle  = "Accumulated in 12 months (% GDP)",
+    source    = "STN and IBGE",
+    navigator = FALSE
+    )
+primary_deficit_trend
+```
+
+### Real interest rates
+
+```{r section0_real_interest_rates}
+real_interest_rate_trend <- real_interest_rate %>%
+  hchart(
+    "area", hcaes(x = date, y = value, group = variable),
+    color = colors[1:2], fillOpacity = 0.1
+    ) %>%
+  hc_plot_ft(
+    title     = "Real interest rates",
+    subtitle  = "In % p.a.",
+    source    = "B3, BCB and IBGE",
+    navigator = FALSE
+    )
+real_interest_rate_trend
+```
+
+### Exchange rate
+
+```{r section0_currency}
+exchange_rate <- currencies %>%
+  gt() %>%
+  tab_header(
+    title = gt::html("<b>Exchange rate performance</b>")
+    ) %>%
+  tab_source_note(
+    gt::html("Source: BCB")) %>%
+  tab_footnote(
+    footnote = footnote_currency,
+    locations = cells_column_labels(columns = vars(value))
+    ) %>%
+  tab_footnote(
+    footnote = "MoM: monthly percentage change",
+    locations = cells_column_labels(columns = vars(mom))
+    ) %>%
+  tab_footnote(
+    footnote = "YTD: percentage change in the year",
+    locations = cells_column_labels(columns = vars(ytd))
+    ) %>% 
+  tab_footnote(
+    footnote = "YoY: accumulated in 12 months percentage change against the same period of the previous year",
+    locations = cells_column_labels(columns = vars(yoy))
+    ) %>%
+  tab_options(
+    data_row.padding = px(2)
+    ) %>%
+  text_transform(
+    locations = cells_body(columns = vars(flag)),
+    fn = function(x){
+      map_chr(x, ~ gt::local_image(
+        filename = .x,
+        height = 25
+      ))
+    }
+    ) %>%
+  fmt_currency(
+    columns = vars(value),
+    currency = "BRL",
+    incl_space = TRUE
+    ) %>%
+  fmt_percent(
+    columns = vars(mom, ytd, yoy),
+    scale_values = FALSE
+    ) %>%
+  cols_align(
+    align = "center",
+    columns = vars(flag)
+    ) %>%
+  cols_label(
+    flag     = "",
+    currency = "Currency",
+    value    = "CUR/BRL",
+    mom      = "MoM",
+    ytd      = "YTD",
+    yoy      = "YoY",
+    spark    = "Trend"
+    ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(TRUE)
+    ) %>%
+  data_color(
+    columns = 5:7,
+    colors = scales::col_numeric(
+      colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
+      reverse = TRUE,
+      domain = c(-max_abs(currencies[5:7]), max_abs(currencies[5:7]))
+      )
+    ) %>%
+  gt_sparkline(spark, "spark") %>%
+  gt:::as.tags.gt_tbl() %>% 
+  htmltools::attachDependencies(htmlwidgets::getDependency("sparkline"))
+exchange_rate
+```
+
+### Ibovespa index
+
+```{r section0_ibovespa}
+ibovespa_candle <- highchart(type = "stock") %>%
+  hc_yAxis_multiples(create_yaxis(2, height = c(2, 1), turnopposite = TRUE)) %>%
+  hc_add_series(ibovespa, yAxis = 0, name = "Ibovespa") %>%
+  hc_add_series(
+    ibovespa$BVSP.Volume,
+    color = "gray",
+    yAxis = 1,
+    name  = "Volume",
+    type  = "column"
+    ) %>%
+  hc_title(text = "Ibovespa index") %>%
+  hc_credits(enabled = TRUE, text = "Source: B3", style = list(fontSize = "12px")) %>%
+  hc_rangeSelector(selected = 1, inputEnabled = FALSE) %>%
+  hc_add_theme(theme_fortietwo) %>%
+  hc_plotOptions(
+    candlestick = list(
+      color   = unname(colors[2]),
+      upColor = unname(colors[4])
+      )
+    )
+ibovespa_candle
+```
+
 
 Economic activity {data-navmenu="Sections" data-icon="fa-chart-line"}
 =====================================
@@ -204,13 +412,7 @@ Column {data-width=375}
 ### GDP growth in 4 quarters (`r gdp_growth$date` - IBGE)
 
 ```{r section1_gdp_growth}
-gdp_growth %>%
-  pull(value) %>%
-  valueBox(
-    value = .,
-    icon  = "fa-chart-line",
-    color =  ifelse(. < 0, "#b22200", "#282f6b")
-    )
+big_number_gdp
 ```
 
 ### GDP at current prices in 4 quarters (`r gdp_cur_prices$date` - IBGE)
@@ -384,13 +586,7 @@ Column {data-width=350}
 ### Inflation over 12 months (`r format(ipca_yoy$date, "%B, %Y")` - IPCA/IBGE)
 
 ```{r section2_inflation_12m}
-ipca_yoy %>%
-  pull(value) %>%
-  valueBox(
-    value = .,
-    icon  = "fa-chart-bar",
-    color =  ifelse(. > inflation_target$value, "#b22200", "#282f6b")
-    )
+big_number_inflation
 ```
 
 ### Inflation target for (`r inflation_target$date` - CMN/BCB)
@@ -428,20 +624,7 @@ Column {data-width=550}
 ### Inflation trend {.no-title}
 
 ```{r section2_ipca_trend}
-hchart(
-  ipca_trend, "column", hcaes(x = date, y = `Month over Month (%)`),
-       color = colors[1], name = "Month over Month", showInLegend = TRUE
-  ) %>%
-  hc_add_series(
-    ipca_trend, "line", hcaes(x = date, y = `Year over Year (%)`),
-    color = colors[2], name = "Year over Year", showInLegend = TRUE
-  ) %>% 
-  hc_plot_ft(
-    title     = "Inflation trend (IPCA)",
-    subtitle  = "Monthly and accumulated variation in 12 months (%)",
-    source    = "IBGE",
-    navigator = FALSE
-    )
+inflation_trend
 ```
 
 ### Inflation by metropolitan region {.no-title}
@@ -591,17 +774,7 @@ Column {data-width=500}
 ### Unemployment rate {.no-title}
 
 ```{r section3_unemployment}
-unemployment %>%
-  hchart(
-    "area", hcaes(x = date, y = unemployment_rate), color = colors[1],
-    name = "Unemployment rate", fillOpacity = 0.1) %>%
-  hc_plot_ft(
-    title     = "Unemployment rate",
-    subtitle  = "Quarterly data (PNADC-T)",
-    source    = "IBGE",
-    range     = FALSE,
-    navigator = FALSE
-    )
+unemployment_trend
 ```
 
 ### Unemployment rate by gender and color {.no-title}
@@ -627,30 +800,7 @@ Column {data-width=500 .tabset}
 ### Unemployment by states
 
 ```{r section3_unemployment_states}
-hcmap(
-  map               = "countries/br/br-all",
-  data              = unemployment_states,
-  joinBy            = "woe-name",
-  value             = "unemployment_rate",
-  name              = "Unemployment rate",
-  download_map_data = TRUE,
-  dataLabels        = list(
-    enabled = TRUE,
-    format  = "{point.name}"
-    ),
-  mapNavigation = list(
-    enabled       = TRUE,
-    buttonOptions = list(
-      verticalAlign = "bottom"
-      )
-    )
-  ) %>% 
-  hc_title(text = "Unemployment rate by states") %>% 
-  hc_subtitle(text = paste0(
-      "Quarterly data, updated until ", unemployment_states$date[1], " (PNADC-T)"
-      )
-      ) %>%
-  hc_credits(enabled = TRUE, text = "Source: IBGE", style = list(fontSize = "12px"))
+unemployment_map
 ```
 
 ### Occupation
@@ -727,17 +877,7 @@ Column {data-width=450}
 ### Central Government Primary Deficit {.no-title}
 
 ```{r section4_primary_deficit}
-primary_deficit %>%
-  hchart(
-    "area", hcaes(x = date, y = value), color = colors[1],
-    name = "Primary Deficit", fillOpacity = 0.1
-    ) %>%
-  hc_plot_ft(
-    title     = "Central Government Primary Deficit",
-    subtitle  = "Accumulated in 12 months (% GDP)",
-    source    = "STN and IBGE",
-    navigator = FALSE
-    )
+primary_deficit_trend
 ```
 
 ### Central Government Net Revenue and Total Expenditure {.no-title}
@@ -955,13 +1095,7 @@ Column {data-width=325}
 ### SELIC Target rate in `r format(selic$date, "%B, %Y")` (COPOM/BCB)
 
 ```{r section5_target_selic}
-selic %>%
-  pull(value) %>%
-  valueBox(
-    value = .,
-    icon  = "fa-percentage",
-    color = "#5f487c"
-    )
+big_number_selic
 ```
 
 ### Inflation target for `r inflation_target$date` (CMN)
@@ -1012,17 +1146,7 @@ interest_rate %>%
 ### Real interest rates {.no-title}
 
 ```{r section5_real_interest_rates}
-real_interest_rate %>%
-  hchart(
-    "area", hcaes(x = date, y = value, group = variable),
-    color = colors[1:2], fillOpacity = 0.1
-    ) %>%
-  hc_plot_ft(
-    title     = "Real interest rates",
-    subtitle  = "In % p.a.",
-    source    = "B3, BCB and IBGE",
-    navigator = FALSE
-    )
+real_interest_rate_trend
 ```
 
 
@@ -1032,78 +1156,7 @@ Column {data-width=500 .tabset}
 ### Exchange rate
 
 ```{r section5_currency}
-currencies %>%
-  gt() %>%
-  tab_header(
-    title = gt::html("<b>Exchange rate performance</b>")
-    ) %>%
-  tab_source_note(
-    gt::html("Source: BCB")) %>%
-  tab_footnote(
-    footnote = footnote_currency,
-    locations = cells_column_labels(columns = vars(value))
-    ) %>%
-  tab_footnote(
-    footnote = "MoM: monthly percentage change",
-    locations = cells_column_labels(columns = vars(mom))
-    ) %>%
-  tab_footnote(
-    footnote = "YTD: percentage change in the year",
-    locations = cells_column_labels(columns = vars(ytd))
-    ) %>% 
-  tab_footnote(
-    footnote = "YoY: accumulated in 12 months percentage change against the same period of the previous year",
-    locations = cells_column_labels(columns = vars(yoy))
-    ) %>%
-  tab_options(
-    data_row.padding = px(2)
-    ) %>%
-  text_transform(
-    locations = cells_body(columns = vars(flag)),
-    fn = function(x){
-      map_chr(x, ~ gt::local_image(
-        filename = .x,
-        height = 25
-      ))
-    }
-    ) %>%
-  fmt_currency(
-    columns = vars(value),
-    currency = "BRL",
-    incl_space = TRUE
-    ) %>%
-  fmt_percent(
-    columns = vars(mom, ytd, yoy),
-    scale_values = FALSE
-    ) %>%
-  cols_align(
-    align = "center",
-    columns = vars(flag)
-    ) %>%
-  cols_label(
-    flag     = "",
-    currency = "Currency",
-    value    = "CUR/BRL",
-    mom      = "MoM",
-    ytd      = "YTD",
-    yoy      = "YoY",
-    spark    = "Trend"
-    ) %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels(TRUE)
-    ) %>%
-  data_color(
-    columns = 5:7,
-    colors = scales::col_numeric(
-      colorspace::diverge_hcl(n = 20, palette = "Blue-Red 3"),
-      reverse = TRUE,
-      domain = c(-max_abs(currencies[5:7]), max_abs(currencies[5:7]))
-      )
-    ) %>%
-  gt_sparkline(spark, "spark") %>%
-  gt:::as.tags.gt_tbl() %>% 
-  htmltools::attachDependencies(htmlwidgets::getDependency("sparkline"))
+exchange_rate
 ```
 
 ### Interest rate expectations
@@ -1142,26 +1195,7 @@ ettj %>%
 ### Ibovespa
 
 ```{r section5_ibovespa}
-highchart(type = "stock") %>%
-  hc_yAxis_multiples(create_yaxis(2, height = c(2, 1), turnopposite = TRUE)) %>%
-  hc_add_series(ibovespa, yAxis = 0, name = "Ibovespa") %>%
-  hc_add_series(
-    ibovespa$BVSP.Volume,
-    color = "gray",
-    yAxis = 1,
-    name  = "Volume",
-    type  = "column"
-    ) %>%
-  hc_title(text = "Ibovespa index") %>%
-  hc_credits(enabled = TRUE, text = "Source: B3", style = list(fontSize = "12px")) %>%
-  hc_rangeSelector(selected = 1, inputEnabled = FALSE) %>%
-  hc_add_theme(theme_fortietwo) %>%
-  hc_plotOptions(
-    candlestick = list(
-      color   = unname(colors[2]),
-      upColor = unname(colors[4])
-      )
-    )
+ibovespa_candle
 ```
 
 ### EMBI+
