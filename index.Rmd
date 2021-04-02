@@ -7,6 +7,7 @@ output:
     css: inst/css/styles.css
     source_code: NULL
     logo: inst/imgs/logo.png
+    favicon: inst/imgs/favicon.png
     social: menu
 ---
 
