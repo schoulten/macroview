@@ -98,7 +98,7 @@ Overview {data-orientation=rows}
 Row {data-height=350}
 -------------------------------------
 
-### GDP growth in 4 quarters (`r gdp_growth$date` - IBGE)
+### GDP growth (`r gdp_growth$date` - IBGE)
 
 ```{r section0_gdp_growth}
 gdp_growth %>%
@@ -106,19 +106,25 @@ gdp_growth %>%
   valueBox(
     value = .,
     icon  = "fa-chart-line",
-    color =  ifelse(. < 0, "#b22200", "#282f6b")
+    color =  dplyr::case_when(
+      gdp_growth$value <= 0 ~ colors[2],
+      gdp_growth$value > 0 ~ colors[1])
     )
 ```
 
-### Inflation over 12 months (`r format(ipca_yoy$date, "%B, %Y")` - IPCA/IBGE)
+### Inflation over 12 months (`r format(ipca_yoy$date, "%b '%y")` - IPCA/IBGE)
 
 ```{r section0_inflation_12m}
 ipca_yoy %>%
   pull(value) %>%
   valueBox(
     value = .,
-    icon  = "fa-chart-bar",
-    color =  ifelse(. > inflation_target$value, "#b22200", "#282f6b")
+    icon  = "fa-usd",
+    color =  dplyr::case_when(
+      ipca_yoy$value > inflation_target$value ~ colors[2],
+      ipca_yoy$value < 0 ~ colors[3],
+      ipca_yoy$value < inflation_target$value ~ colors[1],
+      ipca_yoy$value == inflation_target$value ~ colors[5])
     )
 ```
 
@@ -132,11 +138,15 @@ unemployment %>%
   valueBox(
     value = .,
     icon = "fa-users",
-    color = "#282f6b"
+    color = dplyr::case_when(
+      mean(unemployment$unemployment_rate) < tail(unemployment$unemployment_rate, 1) ~ colors[2],
+      mean(unemployment$unemployment_rate) > tail(unemployment$unemployment_rate, 1) ~ colors[4],
+      TRUE ~ colors[5]
+      )
     )
 ```
 
-### Central Government Primary Deficit (`r tail(primary_deficit$date, 1)` - IBGE)
+### Primary Deficit (`r format(tail(primary_deficit$date, 1), "%b '%y")` - IBGE)
 
 ```{r section0_primary_deficit}
 primary_deficit %>%
@@ -145,12 +155,26 @@ primary_deficit %>%
   pull(value) %>% 
   valueBox(
     value = .,
-    icon = "fa-banks",
-    color = "#282f6b"
+    icon = "fa-area-chart",
+    color = dplyr::case_when(
+      tail(primary_deficit$value, 1) < 0 ~ colors[2],
+      tail(primary_deficit$value, 1) > 0 ~ colors[1],
+      tail(primary_deficit$value, 1) == 0 ~ colors[5])
     )
 ```
 
-### Interest rate
+### SELIC Target rate `r format(selic$date, "%b, '%y")` (COPOM/BCB)
+
+```{r section0_target_selic}
+selic %>%
+  pull(value) %>%
+  valueBox(
+    value = .,
+    icon  = "fa-percentage",
+    color = colors[5]
+    )
+```
+
 
 
 Economic activity {data-icon="fa-chart-line"}
