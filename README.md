@@ -8,6 +8,4 @@ This dashboard aims to facilitate the monitoring of macroeconomic data on the Br
 - Fiscal policy
 - Monetary policy
 
-The indicators are updated daily using GH Actions and come from public data sources. 
-
-testing commit and push
+The indicators are updated daily using GH Actions and come from public data sources.
