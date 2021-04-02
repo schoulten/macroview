@@ -1196,4 +1196,32 @@ embi %>%
 About {data-icon="fa-file-alt"}
 =====================================
 
-### About
+### About {.no-title}
+
+This dashboard aims to facilitate the monitoring of macroeconomic data on the Brazilian economy, including the main indicators of:
+
+- Economic activity
+- Inflation
+- Labor market
+- Fiscal policy
+- Monetary policy
+
+The indicators are updated daily and come from public data sources. I hope this tool can be useful for you!
+
+If you find any errors or have any suggestions, feel free to contact me: <fernando@fortietwo.com>
+
+<br>
+**Last update**: `r format(Sys.Date(), "%B %d, %Y")`.<br>
+**GitHub repo**: <https://github.com/schoulten/macroview>
+
+
+<br>
+**Author**:
+<br>
+I am an economist passionate about macroeconomics with 3 years of experience in analyzing the economic scenario. I do data analysis with time series and microdata using the power of R for automation. My work helps people to understand the economic scenario and make decisions.<br>
+<br>
+**Website**: <https://fortietwo.com/><br>
+**GitHub**: <https://www.github.com/schoulten><br>
+**LinkedIn**: <https://www.linkedin.com/in/schoulten/><br>
+<br>
+<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="schoulten" data-color="#40DCA5" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
