@@ -1,0 +1,124 @@
+name: "Macroview Update and Deploy"
+
+on:
+  schedule:
+    - cron: '30 10 * * *'
+
+jobs:
+  macroview:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        r-version: ['4.0.3']
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      uses: actions/checkout@master
+      uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: '4.0.3'
+
+      name: Setting up pandoc for Rmd docs
+        uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Cache R packages
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-flexdashboard
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          install.packages(c(
+            "pacman",
+            "sidrar",
+            "readxl",
+            "lubridate",
+            "GetBCBData",
+            "zoo",
+            "mgsub",
+            "janitor",
+            "rio",
+            "deflateBR",
+            "OECD",
+            "PNADcIBGE",
+            "survey",
+            "convey",
+            "rvest",
+            "here",
+            "tibbletime",
+            "GetTDData",
+            "meedr",
+            "ipeadatar",
+            "tidyquant",
+            "timetk",
+            "purrr",
+            "tibble",
+            "dplyr",
+            "tidyr",
+            "stringr",
+            "readr",
+            "forcats",
+            "xml2",
+            "highcharter",
+            "gt",
+            "quantmod",
+            "sparkline",
+            "tidyselect",
+            "devtools",
+            "rmarkdown",
+            "flexdashboard",
+            "htmlwidgets",
+            "scales",
+            "colorspace",
+            "magrittr",
+            "htmltools",
+            "rlist",
+            "sessioninfo"
+            ))
+          devtools::install_github("wilsonfreitas/rbcb")
+        shell: Rscript {0}
+
+      - name: Load macroview functions
+        run: |
+          devtools::load_all()
+        shell: Rscript {0}
+
+      - name: Updating data and cleaning
+        run: |
+          retry(etl_econ_activity())
+          retry(etl_fiscal())
+          retry(etl_inflation())
+          retry(etl_international())
+          retry(etl_labor())
+          retry(etl_monetary())
+        shell: Rscript {0}
+
+      - name: Render R Markdown Flexdashboard
+        run: |
+          retry(rmarkdown::render("index.Rmd"))
+        shell: Rscript {0}
+
+      - name: Commit and push
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add --all
+          git commit -am "data update $(date)"
+          git push
+
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+
+
