@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - {os: ubuntu-latest,   r: '4.0.3'}
+          - {os: ubuntu-latest, r: '4.0.3'}
 
     steps:
       - uses: actions/checkout@v2
