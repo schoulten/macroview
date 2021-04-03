@@ -2,7 +2,7 @@ name: "Macroview Update and Deploy"
 
 on:
   schedule:
-    - cron: '30 10 * * *'
+    - cron: '0 13 * * *'
 
 jobs:
   macroview:
@@ -84,6 +84,7 @@ jobs:
             "sessioninfo"
             ))
           devtools::install_github("wilsonfreitas/rbcb")
+          install.packages("devtools")
         shell: Rscript {0}
 
       - name: Load macroview functions

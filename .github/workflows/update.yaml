@@ -2,7 +2,7 @@ name: MacroView-Update
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0 13 * * *"
   push:
     branches: [ master ]
 
@@ -93,13 +93,27 @@ jobs:
             "sessioninfo"
             ))
           remotes::install_github("wilsonfreitas/rbcb")
+          install.packages("devtools")
+        shell: Rscript {0}
+
+      - name: Load macroview functions
+        run: |
+          devtools::load_all()
         shell: Rscript {0}
 
       - name: ETL
         run: |
-          print("Hello world!")
-          testing <- tibble::tibble(a = "a")
-          save(list  = ls(), file  = file.path(file.path("./inst/extdata"), "testing.Rdata"), envir = environment())
+          retry(etl_econ_activity())
+          retry(etl_fiscal())
+          retry(etl_inflation())
+          retry(etl_international())
+          retry(etl_labor())
+          retry(etl_monetary())
+        shell: Rscript {0}
+
+      - name: Render R MarkDown
+        run: |
+          retry(rmarkdown::render("index.Rmd"))
         shell: Rscript {0}
 
       - name: Commit and push
