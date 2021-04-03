@@ -27,7 +27,7 @@ jobs:
             "tibble", "dplyr", "tidyr", "stringr", "readr", "forcats", "xml2",
             "highcharter", "gt", "quantmod", "sparkline", "tidyselect", "remotes",
             "rmarkdown", "flexdashboard", "htmlwidgets", "scales", "colorspace",
-            "magrittr", "htmltools", "rlist", "sessioninfo"))
+            "magrittr", "htmltools", "rlist", "sessioninfo", "devtools"))
           remotes::install_github("wilsonfreitas/rbcb")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
@@ -38,20 +38,14 @@ jobs:
         shell: Rscript {0}
       - name: ETL
         run: |
-          source("./R/retry.R")
-          source("./R/etl_econ_activity.R")
-          source("./R/etl_fiscal.R")
-          source("./R/etl_inflation.R")
-          source("./R/etl_labor.R")
-          source("./R/etl_monetary.R")
-          source("./R/utils.R")
+          devtools::load_all()
           retry(etl_econ_activity())
           retry(etl_fiscal())
           retry(etl_inflation())
           retry(etl_labor())
           retry(etl_monetary())
         shell: Rscript {0}
-      - name: Render R MarkDown
+      - name: Render R Markdown
         run: |
           source("./R/retry.R")
           retry(rmarkdown::render("index.Rmd"))
