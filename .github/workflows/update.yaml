@@ -47,9 +47,9 @@ jobs:
         run: |
           install.packages(c("pacman",
             "sidrar",
-            "devtools"
+            "remotes"
             ))
-          devtools::install_github("wilsonfreitas/rbcb")
+          remotes::install_github("wilsonfreitas/rbcb")
         shell: Rscript {0}
 
       - name: ETL
