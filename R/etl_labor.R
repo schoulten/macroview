@@ -367,23 +367,30 @@ gini <- survey::svyby(~VD4020, by = ~UF, raw_pnadct_svy, convey::svygini, na.rm 
 # Save data ---------------------------------------------------------------
 
 
-# Aggregate data
-rm(raw_pnadct_svy, envir = environment())
-imported_data_labor <- mget(ls(pattern = "raw_|api_"))
+if (0L %in% purrr::map_dbl(mget(ls()), length)) {
+
+  stop("Some objects are zero in length.", call. = FALSE)
+
+  } else
+    {
+    # Aggregate data
+    rm(raw_pnadct_svy, envir = environment())
+    imported_data_labor <- mget(ls(pattern = "raw_|api_"))
 
 
-# Remove unnecessary objects
-rm(
-  list  = c(lsf.str(), ls(pattern = "raw_|api_")),
-  envir = environment()
-  )
+    # Remove unnecessary objects
+    rm(
+      list  = c(lsf.str(), ls(pattern = "raw_|api_")),
+      envir = environment()
+      )
 
 
-# Save RDATA file
-save(
-  list  = ls(),
-  file  = file.path(file.path("./inst/extdata"), "labor.Rdata"),
-  envir = environment()
-  )
+    # Save RDATA file
+    save(
+      list  = ls(),
+      file  = file.path(file.path("./inst/extdata"), "labor.Rdata"),
+      envir = environment()
+      )
+    }
 
 }

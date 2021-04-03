@@ -375,7 +375,7 @@ debt_stock <- as_tibble(
   t(raw_debt_stock[c(1,3),-1])
   ) %>%
   mutate(
-    date     = myd(paste0(V1, "/01"), locale = "Portuguese_Brazil.1252"),
+    date     = lubridate::myd(paste0(V1, "/01"), locale = "Portuguese_Brazil.1252"),
     value    = as.numeric(V2),
     variable = "Debt Stock",
     across(
@@ -411,7 +411,7 @@ gov_portfolio <- t(raw_debt_stock) %>%
     "Others"           = "Demais"
     ) %>%
   mutate(
-    date = myd(paste0(date, "/01"), locale = "Portuguese_Brazil.1252"),
+    date = lubridate::myd(paste0(date, "/01"), locale = "Portuguese_Brazil.1252"),
     date_my = format(date, "%B, %Y"),
     across(2:9, as.numeric) %>% round(2)
     ) %>%
@@ -428,22 +428,29 @@ gov_portfolio <- t(raw_debt_stock) %>%
 # Save data ---------------------------------------------------------------
 
 
-# Aggregate data
-imported_data_fiscal <- mget(ls(pattern = "raw_|api_|url_"))
+if (0L %in% purrr::map_dbl(mget(ls()), length)) {
+
+  stop("Some objects are zero in length.", call. = FALSE)
+
+  } else
+    {
+    # Aggregate data
+    imported_data_fiscal <- mget(ls(pattern = "raw_|api_|url_"))
 
 
-# Remove unnecessary objects
-rm(
-  list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),
-  envir = environment()
-  )
+    # Remove unnecessary objects
+    rm(
+      list  = c(lsf.str(), ls(pattern = "raw_|api_|url_")),
+      envir = environment()
+      )
 
 
-# Save RDATA file
-save(
-  list  = ls(),
-  file  = file.path(file.path("./inst/extdata"), "fiscal.Rdata"),
-  envir = environment()
-  )
+    # Save RDATA file
+    save(
+      list  = ls(),
+      file  = file.path(file.path("./inst/extdata"), "fiscal.Rdata"),
+      envir = environment()
+      )
+    }
 
 }

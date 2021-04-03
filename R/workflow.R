@@ -11,4 +11,5 @@
 # retry(rmarkdown::render("index.Rmd"))
 #
 #
-# devtools::check()
+# git commit -m "data update"
+# git push

@@ -63,10 +63,11 @@ c("hc_plot_ft", "hc_theme_ft", "gt_sparkline", "utils") %>%
 
 ```{r data, include=FALSE}
 # Load RDATA files
-c("econ_activity", "fiscal", "inflation", "international", "monetary", "labor") %>%
+c("econ_activity", "fiscal", "inflation", "monetary", "labor") %>%
   paste0("./inst/extdata/", ., ".Rdata") %>% 
   purrr::map( ~ load(.x, .GlobalEnv))
 ```
+
 
 Overview {data-orientation=rows data-icon="fa-signal"}
 =====================================

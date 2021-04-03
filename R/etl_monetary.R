@@ -395,22 +395,29 @@ embi <- raw_embi %>%
 # Save data ---------------------------------------------------------------
 
 
-# Aggregate data
-imported_data_monetary <- mget(ls(pattern = "raw_|api_"))
+if (0L %in% purrr::map_dbl(mget(ls()), length)) {
+
+  stop("Some objects are zero in length.", call. = FALSE)
+
+  } else
+    {
+    # Aggregate data
+    imported_data_monetary <- mget(ls(pattern = "raw_|api_"))
 
 
-# Remove unnecessary objects
-rm(
-  list  = c(lsf.str(), ls(pattern = "raw_|api_")),
-  envir = environment()
-  )
+    # Remove unnecessary objects
+    rm(
+      list  = c(lsf.str(), ls(pattern = "raw_|api_")),
+      envir = environment()
+      )
 
 
-# Save RDATA file
-save(
-  list  = ls(),
-  file  = file.path(file.path("./inst/extdata"), "monetary.Rdata"),
-  envir = environment()
-  )
+    # Save RDATA file
+    save(
+      list  = ls(),
+      file  = file.path(file.path("./inst/extdata"), "monetary.Rdata"),
+      envir = environment()
+      )
+    }
 
 }
