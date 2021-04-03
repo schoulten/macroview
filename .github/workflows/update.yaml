@@ -45,11 +45,28 @@ jobs:
           retry(etl_labor())
           retry(etl_monetary())
         shell: Rscript {0}
-      - name: Render R Markdown
+
+      - name: Install pandoc
         run: |
-          source("./R/retry.R")
+          brew install pandoc
+
+      - name: Cache Renv packages
+        uses: actions/cache@v2
+        with:
+          path: $HOME/.local/share/renv
+          key: r-${{ hashFiles('renv.lock') }}
+          restore-keys: r-
+
+      - name: Install packages
+        run: |
+          R -e 'install.packages("renv")'
+          R -e 'renv::restore()'
+
+      - name: Render Rmarkdown
+        run: |
           retry(rmarkdown::render("index.Rmd"))
         shell: Rscript {0}
+
       - name: Commit and push
         run: |
           git config --local user.email "actions@github.com"
