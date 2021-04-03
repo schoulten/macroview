@@ -1,19 +1,15 @@
-name: test
+name: Macroview-Update
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
   schedule:
-    - cron: '0 12 */3 * *'
+    - cron: '0 13 * * *'
 
 jobs:
-  testing:
-    runs-on: macos-10.15 # macOS Catalina
+  macroview:
+    runs-on: windows-latest
     strategy:
       matrix:
-        r-version: [4.0.2]
+        r-version: [4.0.3]
 
     steps:
       - uses: actions/checkout@v2
@@ -37,10 +33,56 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          install.packages(c("rmarkdown"))
+          install.packages(c(
+          "pacman",
+            "sidrar",
+            "readxl",
+            "lubridate",
+            "GetBCBData",
+            "zoo",
+            "mgsub",
+            "janitor",
+            "rio",
+            "deflateBR",
+            "OECD",
+            "PNADcIBGE",
+            "survey",
+            "convey",
+            "rvest",
+            "here",
+            "tibbletime",
+            "GetTDData",
+            "meedr",
+            "ipeadatar",
+            "tidyquant",
+            "timetk",
+            "purrr",
+            "tibble",
+            "dplyr",
+            "tidyr",
+            "stringr",
+            "readr",
+            "forcats",
+            "xml2",
+            "highcharter",
+            "gt",
+            "quantmod",
+            "sparkline",
+            "tidyselect",
+            "devtools",
+            "rmarkdown",
+            "flexdashboard",
+            "htmlwidgets",
+            "scales",
+            "colorspace",
+            "magrittr",
+            "htmltools",
+            "rlist",
+            "sessioninfo"
+          ))
         shell: Rscript {0}
 
-      - name: Updating data and cleaning
+      - name: Testing R Console
         run: |
           print("Hello world!")
         shell: Rscript {0}
