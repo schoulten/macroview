@@ -3,6 +3,8 @@ name: Macroview-Update
 on:
   schedule:
     - cron: '0 13 * * *'
+  push:
+    branches: [ master ]
 
 jobs:
   macroview:
