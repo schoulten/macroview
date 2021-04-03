@@ -98,7 +98,7 @@ jobs:
       - name: ETL
         run: |
           print("Hello world!")
-          testing <- tibble(a = "a")
+          testing <- tibble::tibble(a = "a")
           save(list  = ls(), file  = file.path(file.path("./inst/extdata"), "testing.Rdata"), envir = environment())
         shell: Rscript {0}
 
