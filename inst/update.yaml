@@ -28,9 +28,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-shinydoc
+          key: ${{ runner.os }}-macroview
           restore-keys: |
-            ${{ runner.os }}-
+            ${{ runner.os }}-macroview-
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
