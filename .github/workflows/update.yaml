@@ -9,16 +9,15 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        r-version: [4.0.3]
+        r-version: ['4.0.3']
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up R ${{ matrix.r-version }}
+      - uses: actions/checkout@master
+      - name: Set up R
       - uses: r-lib/actions/setup-r@v1
       with:
-        r-version: ${{ matrix.r-version }}
+        r-version: '4.0.3'
 
       - name: Setting up pandoc for Rmd docs
         uses: r-lib/actions/setup-pandoc@v1
