@@ -1,15 +1,46 @@
+name: test
+
 on:
   push:
-    branches:
-      - master
-
-name: GH-R-CMD-check
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 12 */3 * *'
 
 jobs:
-  test:
-   runs-on: windows-latest
+  testing:
+    runs-on: macos-10.15 # macOS Catalina
+    strategy:
+      matrix:
+        r-version: [4.0.2]
 
-  steps:
-    - uses: actions/checkout@master
-    - uses: r-lib/actions/setup-r@v1
-      - run: Rscript -e 'print("hello")'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-R@v1
+        with:
+          r-version: ${{ matrix.r-version }}
+
+      - name: Setting up pandoc for Rmd docs
+        uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Cache R packages
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-shinydoc
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          install.packages(c("rmarkdown"))
+        shell: Rscript {0}
+
+      - name: Updating data and cleaning
+        run: |
+          print("Hello world!")
+        shell: Rscript {0}
