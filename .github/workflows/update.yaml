@@ -33,11 +33,6 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
-      - name: Install devtools
-        run: |
-          install.packages("devtools")
-        shell: Rscript {0}
-
       - name: Cache R packages
         id: cache
         uses: actions/cache@v2
@@ -102,7 +97,7 @@ jobs:
 
       - name: Load macroview functions
         run: |
-          devtools::load_all()
+          purrr::walk(paste0("./R/", list.files("./R/")), source)
         shell: Rscript {0}
 
       - name: ETL
@@ -125,7 +120,7 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add --all
-          git commit -am "add data"
+          git commit -am "data update"
           git push
       - name: Session info
         run: |
