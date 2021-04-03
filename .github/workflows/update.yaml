@@ -33,6 +33,11 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
+      - name: Install devtools
+        run: |
+          install.packages("devtools")
+        shell: Rscript {0}
+
       - name: Cache R packages
         id: cache
         uses: actions/cache@v2
@@ -93,7 +98,6 @@ jobs:
             "sessioninfo"
             ))
           remotes::install_github("wilsonfreitas/rbcb")
-          install.packages("devtools")
         shell: Rscript {0}
 
       - name: Load macroview functions
