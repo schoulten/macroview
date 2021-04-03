@@ -1,0 +1,71 @@
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+name: MacroView-Update
+
+jobs:
+  Data-Update:
+    runs-on: windows-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes", "rcmdcheck", "sidrar", "readxl", "lubridate",
+            "GetBCBData", "zoo", "mgsub", "janitor", "rio", "deflateBR", "OECD",
+            "PNADcIBGE", "survey", "convey", "rvest", "here", "tibbletime",
+            "GetTDData", "meedr", "ipeadatar", "tidyquant", "timetk", "purrr",
+            "tibble", "dplyr", "tidyr", "stringr", "readr", "forcats", "xml2",
+            "highcharter", "gt", "quantmod", "sparkline", "tidyselect", "remotes",
+            "rmarkdown", "flexdashboard", "htmlwidgets", "scales", "colorspace",
+            "magrittr", "htmltools", "rlist", "sessioninfo"))
+          remotes::install_github("wilsonfreitas/rbcb")
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+      - name: R-CMD-check
+        run: |
+          options(crayon.enabled = TRUE)
+          rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        shell: Rscript {0}
+      - name: ETL
+        run: |
+          source("./R/retry.R")
+          source("./R/etl_econ_activity.R")
+          source("./R/etl_fiscal.R")
+          source("./R/etl_inflation.R")
+          source("./R/etl_labor.R")
+          source("./R/etl_monetary.R")
+          source("./R/utils.R")
+          retry(etl_econ_activity())
+          retry(etl_fiscal())
+          retry(etl_inflation())
+          retry(etl_labor())
+          retry(etl_monetary())
+        shell: Rscript {0}
+      - name: Render R MarkDown
+        run: |
+          source("./R/retry.R")
+          retry(rmarkdown::render("index.Rmd"))
+        shell: Rscript {0}
+      - name: Commit and push
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add --all
+          git commit -am "data update"
+          git push
+      - name: Session info
+        run: |
+          options(width = 500)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
