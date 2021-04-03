@@ -57,10 +57,11 @@ jobs:
           key: r-${{ hashFiles('renv.lock') }}
           restore-keys: r-
 
-      - name: Install packages
+      - name: Install Renv
         run: |
-          R -e 'install.packages("renv")'
-          R -e 'renv::restore()'
+          install.packages("renv")
+          renv::restore()
+        shell: Rscript {0}
 
       - name: Render Rmarkdown
         run: |
