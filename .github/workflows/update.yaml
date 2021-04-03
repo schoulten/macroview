@@ -1,3 +1,5 @@
+name: MacroView-Update
+
 on:
   schedule:
     - cron: "0 * * * *"
@@ -5,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  generate-data:
+  macroview:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
@@ -31,24 +33,65 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          install.packages('sessioninfo')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
       - name: Cache R packages
-        uses: actions/cache@v1
+        id: cache
+        uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+          key: ${{ runner.os }}-macroview
+          restore-keys: |
+            ${{ runner.os }}-
 
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          remotes::install_deps(dependencies = TRUE)
+          install.packages(c("pacman",
+            "sidrar",
+            "readxl",
+            "lubridate",
+            "GetBCBData",
+            "zoo",
+            "mgsub",
+            "janitor",
+            "rio",
+            "deflateBR",
+            "OECD",
+            "PNADcIBGE",
+            "survey",
+            "convey",
+            "rvest",
+            "here",
+            "tibbletime",
+            "GetTDData",
+            "meedr",
+            "ipeadatar",
+            "tidyquant",
+            "timetk",
+            "purrr",
+            "tibble",
+            "dplyr",
+            "tidyr",
+            "stringr",
+            "readr",
+            "forcats",
+            "xml2",
+            "highcharter",
+            "gt",
+            "quantmod",
+            "sparkline",
+            "tidyselect",
+            "devtools",
+            "rmarkdown",
+            "flexdashboard",
+            "htmlwidgets",
+            "scales",
+            "colorspace",
+            "magrittr",
+            "htmltools",
+            "rlist",
+            "sessioninfo"
+            ))
+          devtools::install_github("wilsonfreitas/rbcb")
         shell: Rscript {0}
 
       - name: Generate data
