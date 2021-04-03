@@ -89,6 +89,13 @@ jobs:
       - name: Load macroview functions
         run: |
           purrr::walk(paste0("./R/", list.files("./R/")), source)
+          source("./R/retry.R")
+          source("./R/etl_econ_activity.R")
+          source("./R/etl_fiscal.R")
+          source("./R/etl_inflation.R")
+          source("./R/etl_labor.R")
+          source("./R/etl_monetary.R")
+          source("./R/utils.R")
         shell: Rscript {0}
 
       - name: ETL
@@ -96,7 +103,6 @@ jobs:
           retry(etl_econ_activity())
           retry(etl_fiscal())
           retry(etl_inflation())
-          retry(etl_international())
           retry(etl_labor())
           retry(etl_monetary())
         shell: Rscript {0}
