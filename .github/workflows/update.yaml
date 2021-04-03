@@ -1,6 +1,17 @@
-steps:
-- uses: actions/checkout@master
-- uses: r-lib/actions/setup-r@v1
-  with:
-    r-version: '3.5.3' # The R version to download (if necessary) and use.
-- run: Rscript -e 'print("hello")'
+on:
+  push:
+    branches:
+      - master
+
+name: GH-R-CMD-check
+
+jobs:
+  test:
+   runs-on: windows-latest
+
+  steps:
+    - uses: actions/checkout@master
+    - uses: r-lib/actions/setup-r@v1
+        with:
+        r-version: '4.0.3' # The R version to download (if necessary) and use.
+        - run: Rscript -e 'print("hello")'
