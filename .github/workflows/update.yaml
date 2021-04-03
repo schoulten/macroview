@@ -45,9 +45,52 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          install.packages(c("pacman",
+          install.packages(c(
+            "pacman",
             "sidrar",
-            "remotes"
+            "readxl",
+            "lubridate",
+            "GetBCBData",
+            "zoo",
+            "mgsub",
+            "janitor",
+            "rio",
+            "deflateBR",
+            "OECD",
+            "PNADcIBGE",
+            "survey",
+            "convey",
+            "rvest",
+            "here",
+            "tibbletime",
+            "GetTDData",
+            "meedr",
+            "ipeadatar",
+            "tidyquant",
+            "timetk",
+            "purrr",
+            "tibble",
+            "dplyr",
+            "tidyr",
+            "stringr",
+            "readr",
+            "forcats",
+            "xml2",
+            "highcharter",
+            "gt",
+            "quantmod",
+            "sparkline",
+            "tidyselect",
+            "remotes",
+            "rmarkdown",
+            "flexdashboard",
+            "htmlwidgets",
+            "scales",
+            "colorspace",
+            "magrittr",
+            "htmltools",
+            "rlist",
+            "sessioninfo"
             ))
           remotes::install_github("wilsonfreitas/rbcb")
         shell: Rscript {0}
@@ -55,6 +98,8 @@ jobs:
       - name: ETL
         run: |
           print("Hello world!")
+          testing <- tibble(a = "a")
+          save(list  = ls(), file  = file.path(file.path("./inst/extdata"), "testing.Rdata"), envir = environment())
         shell: Rscript {0}
 
       - name: Commit and push
