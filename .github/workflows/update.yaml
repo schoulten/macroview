@@ -65,6 +65,7 @@ jobs:
 
       - name: Render Rmarkdown
         run: |
+          devtools::load_all()
           retry(rmarkdown::render("index.Rmd"))
         shell: Rscript {0}
 
