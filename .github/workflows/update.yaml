@@ -47,59 +47,17 @@ jobs:
         run: |
           install.packages(c("pacman",
             "sidrar",
-            "readxl",
-            "lubridate",
-            "GetBCBData",
-            "zoo",
-            "mgsub",
-            "janitor",
-            "rio",
-            "deflateBR",
-            "OECD",
-            "PNADcIBGE",
-            "survey",
-            "convey",
-            "rvest",
-            "here",
-            "tibbletime",
-            "GetTDData",
-            "meedr",
-            "ipeadatar",
-            "tidyquant",
-            "timetk",
-            "purrr",
-            "tibble",
-            "dplyr",
-            "tidyr",
-            "stringr",
-            "readr",
-            "forcats",
-            "xml2",
-            "highcharter",
-            "gt",
-            "quantmod",
-            "sparkline",
-            "tidyselect",
-            "devtools",
-            "rmarkdown",
-            "flexdashboard",
-            "htmlwidgets",
-            "scales",
-            "colorspace",
-            "magrittr",
-            "htmltools",
-            "rlist",
-            "sessioninfo"
+            "devtools"
             ))
           devtools::install_github("wilsonfreitas/rbcb")
         shell: Rscript {0}
 
-      - name: Generate data
+      - name: ETL
         run: |
           print("Hello world!")
         shell: Rscript {0}
 
-      - name: Commit files
+      - name: Commit and push
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
