@@ -78,8 +78,8 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add --all
-          git commit -am "data update `date`"
+          git add .
+          git commit -m "Updated: `date +'%Y-%m-%d %H:%M:%S'`"
           git push
 
       - name: Session info
