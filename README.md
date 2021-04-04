@@ -1,5 +1,10 @@
 # macroview <img src='inst/imgs/macroview.png' align="right" height="150" />
 
+[![R build status](https://github.com/schoulten/macroview/workflows/R-CMD-check/badge.svg)](https://github.com/schoulten/macroview/actions)
+[![](https://img.shields.io/github/last-commit/schoulten/macroview.svg)](https://github.com/schoulten/macroview/commits/master)
+[![](https://img.shields.io/badge/devel%20version-0.0.0.9000-blue.svg)](https://github.com/schoulten/macroview)
+
+
 A dashboard of **Brazilian macroeconomic data**, using interactive charts and updated daily. The data comes from several public data sources, and covers the following topics:
 
 - Economic activity
