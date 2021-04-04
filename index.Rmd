@@ -1216,7 +1216,7 @@ If you find any errors or have any suggestions, feel free to contact me: <fernan
 
 
 <br>
-**Author**:
+**Author**: *Fernando da Silva*
 <br>
 I am an economist passionate about macroeconomics with 3 years of experience in analyzing the economic scenario. I do data analysis with time series and microdata using the power of R for automation. My work helps people to understand the economic scenario and make decisions.<br>
 <br>
