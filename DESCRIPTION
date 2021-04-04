@@ -1,13 +1,13 @@
 Package: macroview
-Title: What the Package Does (One Line, Title Case)
+Title: Dashboard: Macroeconomic Data of Brazil
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Fernando",
+           family = "da Silva",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "fernando@fortietwo.com",
+           comment = c(ORCID = "0000-0002-7491-6930"))
+Description: A dashboard of Brazilian macroeconomic data, using interactive charts and updated daily.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
