@@ -9,7 +9,7 @@ A dashboard of **Brazilian macroeconomic data**, using interactive charts and up
 
 - Economic activity
 - Inflation
-- Job market
+- Labor market
 - Fiscal policy
 - Monetary policy
 
