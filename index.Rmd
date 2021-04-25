@@ -9,6 +9,10 @@ output:
     logo: inst/imgs/logo.png
     favicon: inst/imgs/favicon.png
     social: menu
+    navbar:
+        - { icon: "fa-github", href: "https://github.com/schoulten/ipcaforecasting", align: right }
+        - { icon: "fa-linkedin", href: "https://www.linkedin.com/in/schoulten/", align: right }
+        - { icon: "fa-at", href: "mailto:fernando@fortietwo.com", align: right }
 ---
 
 <script>
