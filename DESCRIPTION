@@ -33,7 +33,7 @@ Imports:
     tibbletime,
     GetTDData,
     meedr,
-    ipeadatar,
+    ipeadatar (>= 0.1.1),
     tidyquant,
     timetk,
     purrr,

@@ -33,7 +33,7 @@ jobs:
             "magrittr", "htmltools", "rlist", "sessioninfo", "devtools"))
           remotes::install_github("wilsonfreitas/rbcb")
           remotes::install_deps(dependencies = TRUE)
-          devtools::("ipeadatar", version = "0.1.1", repos = "http://cran.r-project.org")
+          devtools::install_version("ipeadatar", version = "0.1.1", repos = "http://cran.r-project.org")
         shell: Rscript {0}
 
       - name: R-CMD-check
