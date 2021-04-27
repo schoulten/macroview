@@ -48,8 +48,7 @@ Imports:
     gt,
     quantmod,
     sparkline,
-    tidyselect
+    tidyselect,
+    ipeadatar (== 0.1.1)
 Remotes: 
     wilsonfreitas/rbcb
-Suggests:
-    ipeadatar (>= 0.1.1)
