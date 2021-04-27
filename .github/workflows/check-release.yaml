@@ -18,8 +18,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v1
-        with:
-          r-version: '3.5.0'
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
