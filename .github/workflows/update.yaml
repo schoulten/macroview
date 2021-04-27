@@ -26,13 +26,14 @@ jobs:
           install.packages(c("remotes", "rcmdcheck", "sidrar", "readxl", "lubridate",
             "GetBCBData", "zoo", "mgsub", "janitor", "rio", "deflateBR", "OECD",
             "PNADcIBGE", "survey", "convey", "rvest", "here", "tibbletime",
-            "GetTDData", "meedr", "ipeadatar", "tidyquant", "timetk", "purrr",
+            "GetTDData", "meedr", "tidyquant", "timetk", "purrr",
             "tibble", "dplyr", "tidyr", "stringr", "readr", "forcats", "xml2",
             "highcharter", "gt", "quantmod", "sparkline", "tidyselect", "remotes",
             "rmarkdown", "flexdashboard", "htmlwidgets", "scales", "colorspace",
             "magrittr", "htmltools", "rlist", "sessioninfo", "devtools"))
           remotes::install_github("wilsonfreitas/rbcb")
           remotes::install_deps(dependencies = TRUE)
+          devtools::("ipeadatar", version = "0.1.1", repos = "http://cran.r-project.org")
         shell: Rscript {0}
 
       - name: R-CMD-check
