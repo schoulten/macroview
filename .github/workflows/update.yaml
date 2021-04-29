@@ -10,11 +10,11 @@ on:
   schedule:
     - cron: "0 13 * * *"
 
-name: MacroView-Update
+name: Dashboard Update
 
 jobs:
-  Data-Update:
-    runs-on: windows-latest
+  Dashboard-Update:
+    runs-on: macos-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -22,7 +22,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
 
       - name: Cache packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~\AppData\Local\renv
           key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
@@ -39,7 +39,6 @@ jobs:
         run: |
           install.packages(c("rcmdcheck", "sessioninfo", "devtools"))
         shell: Rscript {0}
-
 
       - name: ETL
         run: |
