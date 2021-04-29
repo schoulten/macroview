@@ -17,23 +17,23 @@ jobs:
     runs-on: windows-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RENV_PATHS_ROOT: %LOCALAPPDATA%/renv
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v1
 
-      - name: Install dependencies
+      - name: Cache packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.RENV_PATHS_ROOT }}
+          key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-renv-
+
+      - name: Restore packages
         run: |
-          install.packages(c("remotes", "rcmdcheck", "sidrar", "readxl", "lubridate",
-            "GetBCBData", "zoo", "mgsub", "janitor", "rio", "deflateBR", "OECD",
-            "PNADcIBGE", "survey", "convey", "rvest", "here", "tibbletime",
-            "GetTDData", "meedr", "tidyquant", "timetk", "purrr",
-            "tibble", "dplyr", "tidyr", "stringr", "readr", "forcats", "xml2",
-            "highcharter", "gt", "quantmod", "sparkline", "tidyselect", "remotes",
-            "rmarkdown", "flexdashboard", "htmlwidgets", "scales", "colorspace",
-            "magrittr", "htmltools", "rlist", "sessioninfo", "devtools"))
-          remotes::install_github("wilsonfreitas/rbcb")
-          remotes::install_deps(dependencies = TRUE)
-          devtools::install_version("ipeadatar", version = "0.1.1", repos = "http://cran.r-project.org")
+          if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+          renv::restore()
         shell: Rscript {0}
 
       - name: R-CMD-check
@@ -55,19 +55,6 @@ jobs:
       - name: Install pandoc
         run: |
           choco install pandoc
-
-      - name: Cache Renv packages
-        uses: actions/cache@v2
-        with:
-          path: $HOME/.local/share/renv
-          key: r-${{ hashFiles('renv.lock') }}
-          restore-keys: r-
-
-      - name: Install Renv
-        run: |
-          install.packages("renv")
-          renv::restore()
-        shell: Rscript {0}
 
       - name: Render Rmarkdown
         run: |
