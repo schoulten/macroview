@@ -36,6 +36,11 @@ jobs:
           renv::restore()
         shell: Rscript {0}
 
+      - name: Install workflow dependencies
+        run: |
+          install.packages(c("rcmdcheck", "sessioninfo"))
+        shell: Rscript {0}
+
       - name: R-CMD-check
         run: |
           options(crayon.enabled = TRUE)
