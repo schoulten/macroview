@@ -40,12 +40,6 @@ jobs:
           install.packages(c("rcmdcheck", "sessioninfo", "devtools"))
         shell: Rscript {0}
 
-      - name: R-CMD-check
-        run: |
-          options(crayon.enabled = TRUE)
-          devtools::load_all()
-          rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
 
       - name: ETL
         run: |
