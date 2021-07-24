@@ -146,7 +146,7 @@ employment_category <- raw_employment %>%
       variable,
       "Empregado no setor privado, exclusive trabalhador dom\u00e9stico" = "Employee in the private sector",
       "Trabalhador dom\u00e9stico"         = "Domestic worker",
-      "Empregado no setor público"    = "Employee in the public sector",
+      "Empregado no setor p\u00fablico"    = "Employee in the public sector",
       "Trabalhador familiar auxiliar" = "Auxiliary family worker",
       "Empregador"                    = "Employer",
       "Conta pr\u00f3pria"                 = "Own account",
@@ -230,7 +230,7 @@ gender_attr <- data.frame(
 # Create list of Brazilian states for the map plot
 states <- tibble(
   states = c(
-    "Rondônia", "Acre", "Amazonas", "Roraima", "Par\u00e1", "Amap\u00e1",
+    "Rond\u00f4nia", "Acre", "Amazonas", "Roraima", "Par\u00e1", "Amap\u00e1",
     "Tocantins", "Maranh\u00e3o", "Piau\u00ed", "Cear\u00e1", "Rio Grande do Norte",
     "Para\u00edba", "Pernambuco", "Alagoas", "Sergipe", "Bahia",
     "Minas Gerais", "Esp\u00edrito Santo", "Rio de Janeiro", "S\u00e3o Paulo",

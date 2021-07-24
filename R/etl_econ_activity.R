@@ -225,11 +225,11 @@ gdp <- raw_gdp %>%
     sector = recode(
       sector,
       "Agropecu\u00e1ria - total"                        = "Agriculture",
-      "Indústria - total"                           = "Industry",
+      "Ind\u00fastria - total"                           = "Industry",
       "Servi\u00e7os - total"                            = "Services",
       "PIB a pre\u00e7os de mercado"                     = "GDP",
       "Despesa de consumo das fam\u00edlias"             = "Consumption",
-      "Despesa de consumo da administra\u00e7\u00e3o pública" = "Government",
+      "Despesa de consumo da administra\u00e7\u00e3o p\u00fablica" = "Government",
       "Forma\u00e7\u00e3o bruta de capital fixo"              = "Investment",
       "Exporta\u00e7\u00e3o de bens e servi\u00e7os"               = "Exports",
       "Importa\u00e7\u00e3o de bens e servi\u00e7os (-)"           = "Imports"
@@ -403,9 +403,9 @@ pim <- raw_pim %>%
   mutate(
     variable = recode(
       variable,
-      "1 Indústria geral"                                               = "General industry",
-      "2 Indústrias extrativas"                                         = "Extractive industries",
-      "3 Indústrias de transforma\u00e7\u00e3o"                                   = "Manufacturing industries",
+      "1 Ind\u00fastria geral"                                               = "General industry",
+      "2 Ind\u00fastrias extrativas"                                         = "Extractive industries",
+      "3 Ind\u00fastrias de transforma\u00e7\u00e3o"                                   = "Manufacturing industries",
       "3.29 Fabrica\u00e7\u00e3o de ve\u00edculos automotores, reboques e carrocerias" = "Manufacture of motor vehicles"
       ),
     date = lubridate::ym(date),
