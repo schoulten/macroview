@@ -49,6 +49,7 @@ Imports:
     quantmod,
     sparkline,
     tidyselect,
-    ipeadatar (>= 0.1.1)
+    ipeadatar (>= 0.1.1),
+    jsonlite
 Remotes: 
     wilsonfreitas/rbcb

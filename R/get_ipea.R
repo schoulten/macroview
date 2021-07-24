@@ -13,12 +13,12 @@ get_ipea <- function(code, silent = FALSE) {
     silent
   )
 
-  raw_data <- httr::GET(
-    sprintf("http://ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='%s')", code)
-  )
+  raw_data <- jsonlite::fromJSON(
+    sprintf("http://ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='%s')", code),
+    flatten = TRUE
+  )[[2]]
 
-  tbl_data <- httr::content(raw_data)[[2]] %>%
-    dplyr::bind_rows() %>%
+  tbl_data <- raw_data %>%
     dplyr::rename(
       "code" = `SERCODIGO`,
       "date" = `VALDATA`,
