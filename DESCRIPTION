@@ -51,4 +51,5 @@ Imports:
     tidyselect,
     jsonlite
 Remotes: 
+    wilsonfreitas/rbcb,
     schoulten/meedr
