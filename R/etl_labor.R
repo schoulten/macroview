@@ -61,7 +61,7 @@ api_ibge <- dplyr::lst(
   api_pnadc_dates = xml2::read_html("https://sidra.ibge.gov.br/home/pnadct/brasil") %>%
     rvest::html_nodes(".titulo-aba") %>%
     rvest::html_text() %>%
-    stringr::str_extract("(Divulga\u00e7\u00e3o Trimestral) - \\d{1}. trimestre \\d{4}") %>%
+    stringr::str_extract(" - \\d{1}. trimestre \\d{4}") %>%
     dplyr::lst(
       quarter = stringr::str_extract(., "\\d{1}") %>% as.numeric(),
       year = stringr::str_extract(., "\\d{4}") %>% as.numeric()
