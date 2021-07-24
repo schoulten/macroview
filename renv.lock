@@ -67,10 +67,10 @@
     },
     "PNADcIBGE": {
       "Package": "PNADcIBGE",
-      "Version": "0.6.3",
+      "Version": "0.6.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "94995b655938c6960e85947e8fd4139e"
+      "Hash": "a9df1ccd82f5bfae949637dcf36e5fcc"
     },
     "PerformanceAnalytics": {
       "Package": "PerformanceAnalytics",
@@ -575,20 +575,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "6154ec2223172bce8162d4153cda21f7"
-    },
-    "insight": {
-      "Package": "insight",
-      "Version": "0.13.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "b83ce8d0ff3ae0cb853f662f20e2f6c3"
-    },
-    "ipeadatar": {
-      "Package": "ipeadatar",
-      "Version": "0.1.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "43594ca10a9f38092ba77104c6df5ea7"
     },
     "ipred": {
       "Package": "ipred",
@@ -1105,13 +1091,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "d21ef288f0c1465058b5cbcee8849292"
-    },
-    "sjlabelled": {
-      "Package": "sjlabelled",
-      "Version": "1.1.7",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "b60c3daa2a30df836c12a8e903cca595"
     },
     "slider": {
       "Package": "slider",
