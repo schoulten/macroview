@@ -113,8 +113,8 @@ raw_ipca <- sidrar::get_sidra(api = api_sidra$api_ipca)
 # Consumer Price Index by groups - IPCA
 raw_ipca_groups <- sidrar::get_sidra(api = api_sidra$api_ipca_groups) %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Variável",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     group    = "Geral, grupo, subgrupo, item e subitem",
     value    = "Valor"
     )
@@ -123,9 +123,9 @@ raw_ipca_groups <- sidrar::get_sidra(api = api_sidra$api_ipca_groups) %>%
 # Consumer Price Index by Metropolitan Region - IPCA
 raw_ipca_region <- sidrar::get_sidra(api = api_sidra$api_ipca_region) %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Variável",
-    region   = "Região Metropolitana",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
+    region   = "Regi\u00e3o Metropolitana",
     value    = "Valor"
     )
 
@@ -164,18 +164,18 @@ raw_igp <- GetBCBData::gbcbd_get_series(
 # Consumer Price Index - IPCA
 ipca <- raw_ipca %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Variável",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     value    = "Valor"
     ) %>%
   mutate(
     variable = recode(
       variable,
-      "IPCA - Variação mensal"                = "Month over Month (%)",
-      "IPCA - Variação acumulada em 12 meses" = "Year over Year (%)",
-      "IPCA - Variação acumulada no ano"      = "Year to Date (%)",
-      "IPCA - Variação acumulada em 3 meses"  = "Quarter to Date (%)",
-      "IPCA - Variação acumulada em 6 meses"  = "Semester to Date (%)"
+      "IPCA - Varia\u00e7\u00e3o mensal"                = "Month over Month (%)",
+      "IPCA - Varia\u00e7\u00e3o acumulada em 12 meses" = "Year over Year (%)",
+      "IPCA - Varia\u00e7\u00e3o acumulada no ano"      = "Year to Date (%)",
+      "IPCA - Varia\u00e7\u00e3o acumulada em 3 meses"  = "Quarter to Date (%)",
+      "IPCA - Varia\u00e7\u00e3o acumulada em 6 meses"  = "Semester to Date (%)"
       ),
     date = lubridate::ym(date)
     ) %>%
@@ -188,21 +188,21 @@ ipca_groups <- raw_ipca_groups %>%
   mutate(
     Group = recode(
       group,
-      "Índice geral"                = "CPI (IPCA)",
-      "1.Alimentação e bebidas"     = "Food and drink",
-      "2.Habitação"                 = "Housing",
-      "3.Artigos de residência"     = "Residence articles",
-      "4.Vestuário"                 = "Clothing",
+      "\u00cdndice geral"           = "CPI (IPCA)",
+      "1.Alimenta\u00e7\u00e3o e bebidas"     = "Food and drink",
+      "2.Habita\u00e7\u00e3o"                 = "Housing",
+      "3.Artigos de resid\u00eancia"     = "Residence articles",
+      "4.Vestu\u00e1rio"                 = "Clothing",
       "5.Transportes"               = "Transportation",
       "6.Saúde e cuidados pessoais" = "Health care",
       "7.Despesas pessoais"         = "Personal expenses",
-      "8.Educação"                  = "Education",
-      "9.Comunicação"               = "Communication"
+      "8.Educa\u00e7\u00e3o"                  = "Education",
+      "9.Comunica\u00e7\u00e3o"               = "Communication"
       ),
     variable = recode(
       variable,
-      "IPCA - Variação mensal"           = "MoM",
-      "IPCA - Variação acumulada no ano" = "YTD"
+      "IPCA - Varia\u00e7\u00e3o mensal"           = "MoM",
+      "IPCA - Varia\u00e7\u00e3o acumulada no ano" = "YTD"
       )
     ) %>%
   select(-date) %>%
@@ -233,12 +233,12 @@ ipca_region <- raw_ipca_region %>%
     date = lubridate::ym(date),
     variable = recode(
       variable,
-      "IPCA - Variação mensal" = "Monthly percentage change"
+      "IPCA - Varia\u00e7\u00e3o mensal" = "Monthly percentage change"
       )
     ) %>%
   filter(region %in% c(
-    "Belém - PA", "Fortaleza - CE", "Rio de Janeiro - RJ",
-    "São Paulo - SP", "Curitiba - PR", "Porto Alegre - RS")
+    "Bel\u00e9m - PA", "Fortaleza - CE", "Rio de Janeiro - RJ",
+    "S\u00e3o Paulo - SP", "Curitiba - PR", "Porto Alegre - RS")
     )
 
 

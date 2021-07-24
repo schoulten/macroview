@@ -110,8 +110,8 @@ api_bcb <- list(
 # GDP growth (rate of change of the quarterly volume index from IBGE)
 raw_gdp <- sidrar::get_sidra(api = api_sidra$api_gdp) %>%
   select(
-    date     = "Trimestre (Código)",
-    variable = "Variável",
+    date     = "Trimestre (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     sector   = "Setores e subsetores",
     measure  = "Unidade de Medida",
     value    = "Valor"
@@ -121,7 +121,7 @@ raw_gdp <- sidrar::get_sidra(api = api_sidra$api_gdp) %>%
 # GDP (values at current prices from IBGE)
 raw_gdp_cur_prices <- sidrar::get_sidra(api = api_sidra$api_gdp_brl) %>%
   select(
-    date    = "Trimestre (Código)",
+    date    = "Trimestre (C\u00f3digo)",
     sector  = "Setores e subsetores",
     measure = "Unidade de Medida",
     value   = "Valor"
@@ -131,8 +131,8 @@ raw_gdp_cur_prices <- sidrar::get_sidra(api = api_sidra$api_gdp_brl) %>%
 # PMC (retail trade from IBGE)
 raw_pmc <- sidrar::get_sidra(api = api_sidra$api_pmc) %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Variável",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     measure  = "Unidade de Medida",
     value    = "Valor"
   )
@@ -141,8 +141,8 @@ raw_pmc <- sidrar::get_sidra(api = api_sidra$api_pmc) %>%
 # PMC (expanded retail trade from IBGE)
 raw_pmc_expanded <- sidrar::get_sidra(api = api_sidra$api_pmc_expanded) %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Variável",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     measure  = "Unidade de Medida",
     value    = "Valor"
   )
@@ -151,8 +151,8 @@ raw_pmc_expanded <- sidrar::get_sidra(api = api_sidra$api_pmc_expanded) %>%
 # PMS (Monthly Service Survey from IBGE)
 raw_pms <- sidrar::get_sidra(api = api_sidra$api_pms) %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Variável",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     measure  = "Unidade de Medida",
     value    = "Valor"
   )
@@ -161,8 +161,8 @@ raw_pms <- sidrar::get_sidra(api = api_sidra$api_pms) %>%
 # PIM (Monthly Industrial Survey from IBGE - YoY rate of change)
 raw_pim <- sidrar::get_sidra(api = api_sidra$api_pim) %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Seções e atividades industriais (CNAE 2.0)",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Se\u00e7\u00f5es e atividades industriais (CNAE 2.0)",
     measure  = "Unidade de Medida",
     value    = "Valor"
   )
@@ -217,22 +217,22 @@ gdp <- raw_gdp %>%
   mutate(
     variable = recode(
       variable,
-      "Taxa trimestral (em relação ao mesmo período do ano anterior)" = "Year over Year (%)",
-      "Taxa acumulada em quatro trimestres (em relação ao mesmo período do ano anterior)" = "Accumulated in 4 Quarters (%)",
-      "Taxa acumulada ao longo do ano (em relação ao mesmo período do ano anterior)" = "Year to Date (%)",
+      "Taxa trimestral (em rela\u00e7\u00e3o ao mesmo per\u00edodo do ano anterior)" = "Year over Year (%)",
+      "Taxa acumulada em quatro trimestres (em rela\u00e7\u00e3o ao mesmo per\u00edodo do ano anterior)" = "Accumulated in 4 Quarters (%)",
+      "Taxa acumulada ao longo do ano (em rela\u00e7\u00e3o ao mesmo per\u00edodo do ano anterior)" = "Year to Date (%)",
       "Taxa trimestre contra trimestre imediatamente anterior" = "Quarter over Quarter (%)"
     ),
     sector = recode(
       sector,
-      "Agropecuária - total"                        = "Agriculture",
+      "Agropecu\u00e1ria - total"                        = "Agriculture",
       "Indústria - total"                           = "Industry",
-      "Serviços - total"                            = "Services",
-      "PIB a preços de mercado"                     = "GDP",
-      "Despesa de consumo das famílias"             = "Consumption",
-      "Despesa de consumo da administração pública" = "Government",
-      "Formação bruta de capital fixo"              = "Investment",
-      "Exportação de bens e serviços"               = "Exports",
-      "Importação de bens e serviços (-)"           = "Imports"
+      "Servi\u00e7os - total"                            = "Services",
+      "PIB a pre\u00e7os de mercado"                     = "GDP",
+      "Despesa de consumo das fam\u00edlias"             = "Consumption",
+      "Despesa de consumo da administra\u00e7\u00e3o pública" = "Government",
+      "Forma\u00e7\u00e3o bruta de capital fixo"              = "Investment",
+      "Exporta\u00e7\u00e3o de bens e servi\u00e7os"               = "Exports",
+      "Importa\u00e7\u00e3o de bens e servi\u00e7os (-)"           = "Imports"
     ),
     date = stringr::str_replace(date, "(\\d{4})0(\\d{1})", "\\1 Q\\2")
   ) %>%
@@ -251,7 +251,7 @@ gdp_growth <- gdp %>%
 
 # GDP, Current Prices (R$ trillions)
 gdp_cur_prices <- raw_gdp_cur_prices %>%
-  filter(sector == "PIB a preços de mercado") %>%
+  filter(sector == "PIB a pre\u00e7os de mercado") %>%
   arrange(date) %>%
   slice_tail(n = 4) %>%
   summarise(
@@ -376,10 +376,10 @@ pmc <- bind_rows(raw_pmc_expanded, raw_pmc) %>%
     date     = lubridate::ym(date),
     variable = recode(
       variable,
-      "Índice de volume de vendas no comércio varejista ampliado"          = "Retail sales volume expanded",
-      "Índice de receita nominal de vendas no comércio varejista ampliado" = "Retail sales revenue expanded",
-      "Índice de volume de vendas no comércio varejista"                   = "Retail sales volume",
-      "Índice de receita nominal de vendas no comércio varejista"          = "Retail sales revenue"
+      "\u00cdndice de volume de vendas no com\u00e9rcio varejista ampliado"          = "Retail sales volume expanded",
+      "\u00cdndice de receita nominal de vendas no com\u00e9rcio varejista ampliado" = "Retail sales revenue expanded",
+      "\u00cdndice de volume de vendas no com\u00e9rcio varejista"                   = "Retail sales volume",
+      "\u00cdndice de receita nominal de vendas no com\u00e9rcio varejista"          = "Retail sales revenue"
       )
     ) %>%
   tidyr::drop_na()
@@ -390,8 +390,8 @@ pms <- raw_pms %>%
   mutate(
     variable = recode(
       variable,
-      "Índice de receita nominal de serviços" = "Revenue",
-      "Índice de volume de serviços"          = "Volume"
+      "\u00cdndice de receita nominal de servi\u00e7os" = "Revenue",
+      "\u00cdndice de volume de servi\u00e7os"          = "Volume"
       ),
     date     = lubridate::ym(date),
     ) %>%
@@ -405,8 +405,8 @@ pim <- raw_pim %>%
       variable,
       "1 Indústria geral"                                               = "General industry",
       "2 Indústrias extrativas"                                         = "Extractive industries",
-      "3 Indústrias de transformação"                                   = "Manufacturing industries",
-      "3.29 Fabricação de veículos automotores, reboques e carrocerias" = "Manufacture of motor vehicles"
+      "3 Indústrias de transforma\u00e7\u00e3o"                                   = "Manufacturing industries",
+      "3.29 Fabrica\u00e7\u00e3o de ve\u00edculos automotores, reboques e carrocerias" = "Manufacture of motor vehicles"
       ),
     date = lubridate::ym(date),
   ) %>%

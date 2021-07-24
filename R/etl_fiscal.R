@@ -212,7 +212,7 @@ download.file(
   )
 raw_debt <- readxl::read_excel(
   path      = "./inst/extdata/debt.xls",
-  sheet     = "R$ milhões",
+  sheet     = "R$ milh\u00f5es",
   skip      = 8,
   col_names = FALSE,
   n_max     = 48
@@ -407,7 +407,7 @@ gov_portfolio <- t(raw_debt_stock) %>%
   janitor::row_to_names(row_number = 1) %>%
   rename(
     "date"             = 1,
-    "Securitized Debt" = "Dívida Securitizada",
+    "Securitized Debt" = "D\u00edvida Securitizada",
     "Others"           = "Demais"
     ) %>%
   mutate(

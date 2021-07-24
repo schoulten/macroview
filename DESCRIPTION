@@ -8,7 +8,7 @@ Authors@R:
            email = "fernando@fortietwo.com",
            comment = c(ORCID = "0000-0002-7491-6930"))
 Description: A dashboard of Brazilian macroeconomic data, using interactive charts and updated daily.
-License: CC BY 4.0
+License: CC BY 4.0 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

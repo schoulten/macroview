@@ -61,7 +61,7 @@ api_ibge <- dplyr::lst(
   api_pnadc_dates = xml2::read_html("https://sidra.ibge.gov.br/home/pnadct/brasil") %>%
     rvest::html_nodes(".titulo-aba") %>%
     rvest::html_text() %>%
-    stringr::str_extract("(Divulgação Trimestral) - \\d{1}. trimestre \\d{4}") %>%
+    stringr::str_extract("(Divulga\u00e7\u00e3o Trimestral) - \\d{1}. trimestre \\d{4}") %>%
     dplyr::lst(
       quarter = stringr::str_extract(., "\\d{1}") %>% as.numeric(),
       year = stringr::str_extract(., "\\d{4}") %>% as.numeric()
@@ -135,8 +135,8 @@ big_numbers <- raw_pnadct %>%
 # Employment by category in the main job
 employment_category <- raw_employment %>%
   select(
-    date     = "Trimestre (Código)",
-    variable = "Posição na ocupação e categoria do emprego no trabalho principal",
+    date     = "Trimestre (C\u00f3digo)",
+    variable = "Posi\u00e7\u00e3o na ocupa\u00e7\u00e3o e categoria do emprego no trabalho principal",
     value    = "Valor"
     ) %>%
   filter(date == max(as.numeric(date))) %>%
@@ -144,12 +144,12 @@ employment_category <- raw_employment %>%
     date     = stringr::str_replace(date, "(\\d{4})0(\\d{1}$)", "\\1 Q\\2"),
     variable = recode(
       variable,
-      "Empregado no setor privado, exclusive trabalhador doméstico" = "Employee in the private sector",
-      "Trabalhador doméstico"         = "Domestic worker",
+      "Empregado no setor privado, exclusive trabalhador dom\u00e9stico" = "Employee in the private sector",
+      "Trabalhador dom\u00e9stico"         = "Domestic worker",
       "Empregado no setor público"    = "Employee in the public sector",
       "Trabalhador familiar auxiliar" = "Auxiliary family worker",
       "Empregador"                    = "Employer",
-      "Conta própria"                 = "Own account",
+      "Conta pr\u00f3pria"                 = "Own account",
       ),
     value    = (value / 1e3) %>% round(2)
     ) %>%
@@ -160,8 +160,8 @@ employment_category <- raw_employment %>%
 # Unemployment rate
 unemployment <- raw_unemployment %>%
   select(
-    date     = "Trimestre (Código)",
-    variable = "Variável",
+    date     = "Trimestre (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     value    = "Valor"
     ) %>%
   mutate(
@@ -169,9 +169,9 @@ unemployment <- raw_unemployment %>%
     region   = "Brazil",
     variable = recode(
       variable,
-      "Pessoas de 14 anos ou mais de idade, ocupadas na semana de referência" = "employed",
-      "Pessoas de 14 anos ou mais de idade, desocupadas na semana de referência" = "unemployed",
-      "Taxa de desocupação, na semana de referência, das pessoas de 14 anos ou mais de idade" = "unemployment_rate"
+      "Pessoas de 14 anos ou mais de idade, ocupadas na semana de refer\u00eancia" = "employed",
+      "Pessoas de 14 anos ou mais de idade, desocupadas na semana de refer\u00eancia" = "unemployed",
+      "Taxa de desocupa\u00e7\u00e3o, na semana de refer\u00eancia, das pessoas de 14 anos ou mais de idade" = "unemployment_rate"
       )
     ) %>%
   pivot_wider(
@@ -210,7 +210,7 @@ unemployment_gender_color <- raw_pnadct %>%
       "Preta" = "Black",
       "Amarela" = "Yellow",
       "Parda" = "Brown",
-      "Indígena" = "Indian"
+      "Ind\u00edgena" = "Indian"
       )
     ) %>%
   filter(color != "Ignorado")
@@ -230,12 +230,12 @@ gender_attr <- data.frame(
 # Create list of Brazilian states for the map plot
 states <- tibble(
   states = c(
-    "Rondônia", "Acre", "Amazonas", "Roraima", "Pará", "Amapá",
-    "Tocantins", "Maranhão", "Piauí", "Ceará", "Rio Grande do Norte",
-    "Paraíba", "Pernambuco", "Alagoas", "Sergipe", "Bahia",
-    "Minas Gerais", "Espírito Santo", "Rio de Janeiro", "São Paulo",
-    "Paraná", "Santa Catarina", "Rio Grande do Sul",
-    "Mato Grosso do Sul", "Mato Grosso", "Goiás", "Distrito Federal"
+    "Rondônia", "Acre", "Amazonas", "Roraima", "Par\u00e1", "Amap\u00e1",
+    "Tocantins", "Maranh\u00e3o", "Piau\u00ed", "Cear\u00e1", "Rio Grande do Norte",
+    "Para\u00edba", "Pernambuco", "Alagoas", "Sergipe", "Bahia",
+    "Minas Gerais", "Esp\u00edrito Santo", "Rio de Janeiro", "S\u00e3o Paulo",
+    "Paran\u00e1", "Santa Catarina", "Rio Grande do Sul",
+    "Mato Grosso do Sul", "Mato Grosso", "Goi\u00e1s", "Distrito Federal"
     ),
   code = c(
     "RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI",
@@ -272,13 +272,13 @@ unemployment_states <- raw_pnadct %>%
 # Labor force occupation level
 occupation_level <- raw_labor_force %>%
   select(
-    date     = "Trimestre (Código)",
-    variable = "Variável",
+    date     = "Trimestre (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     gender   = "Sexo",
     value    = "Valor"
     ) %>%
   filter(
-    variable == "Nível de ocupação, na semana de referência, das pessoas de 14 anos ou mais de idade"
+    variable == "N\u00edvel de ocupa\u00e7\u00e3o, na semana de refer\u00eancia, das pessoas de 14 anos ou mais de idade"
     ) %>%
   slice_tail(n = 48) %>%
   mutate(
@@ -295,13 +295,13 @@ occupation_level <- raw_labor_force %>%
 # Labor force participation rate
 participation_rate <- raw_labor_force %>%
   select(
-    date     = "Trimestre (Código)",
-    variable = "Variável",
+    date     = "Trimestre (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     gender   = "Sexo",
     value    = "Valor"
     ) %>%
   filter(
-    variable == "Taxa de participação na força de trabalho, na semana de referência, das pessoas de 14 anos ou mais de idade"
+    variable == "Taxa de participa\u00e7\u00e3o na for\u00e7a de trabalho, na semana de refer\u00eancia, das pessoas de 14 anos ou mais de idade"
     ) %>%
   slice_tail(n = 48) %>%
   mutate(
@@ -318,8 +318,8 @@ participation_rate <- raw_labor_force %>%
 # Average real income from work, by age group
 income <- raw_income %>%
   select(
-    date     = "Trimestre (Código)",
-    variable = "Variável",
+    date     = "Trimestre (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     age      = "Grupo de idade",
     value    = "Valor"
     ) %>%

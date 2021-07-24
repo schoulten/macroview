@@ -186,8 +186,8 @@ raw_ibovespa <- quantmod::getSymbols(
 # Consumer Price Index - IPCA (accumulated variation in 12 months)
 raw_ipca_12m <- sidrar::get_sidra(api = api_sidra$api_ipca) %>%
   select(
-    date     = "Mês (Código)",
-    variable = "Variável",
+    date     = "M\u00eas (C\u00f3digo)",
+    variable = "Vari\u00e1vel",
     value    = "Valor"
     )
 
