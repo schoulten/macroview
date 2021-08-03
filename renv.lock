@@ -1087,10 +1087,15 @@
     },
     "sidrar": {
       "Package": "sidrar",
-      "Version": "0.2.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "d21ef288f0c1465058b5cbcee8849292"
+      "Version": "0.2.6",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "sidrar",
+      "RemoteUsername": "rpradosiqueira",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "1bb2eb5b2c9dc3ea5f32af249183291fd859caee",
+      "Hash": "12e02b6a2d0a29780bfd86fd105faec9"
     },
     "slider": {
       "Package": "slider",
