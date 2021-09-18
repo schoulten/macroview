@@ -68,7 +68,7 @@ api_bcb <- dplyr::lst(
   api_inflation_expec = "IPCA",
 
   # SELIC annual market expectations
-  api_selic_expec = "Meta para taxa over-selic",
+  api_selic_expec = "Selic",
 
   # Currency rates
   symbol = c("USD", "EUR", "ARS", "MXN", "CNY", "TRY", "RUB", "INR", "SAR", "ZAR") %>%
@@ -152,7 +152,7 @@ raw_inflation_expec <- meedr::get_inflation_12m(
 raw_selic_expec <- meedr::get_annual(
   indicator      = api_bcb$api_selic_expec,
   first_date     = NULL,
-  detail         = "Fim do ano",
+  # detail         = "Fim do ano", DEPRECATED
   reference_date = format(Sys.Date(), "%Y"),
   use_memoise    = FALSE
   )
@@ -216,7 +216,7 @@ selic <- raw_interest_rate %>%
 
 # Inflation expectations (IPCA)
 inflation_expec <- raw_inflation_expec %>%
-  filter(basis == "0") %>%
+  filter(basis == 0) %>%
   select(
     date,
     "variable" = indicator,
@@ -257,15 +257,14 @@ real_interest_rate <- bind_rows(
   # Ex-ante
   {
     inner_join(
-      raw_swaps,
-      raw_inflation_next_12m,
+      raw_swaps %>%
+        dplyr::select("date", "swaps" = "value"),
+      raw_inflation_expec %>%
+        filter(basis == 0) %>%
+        dplyr::group_by(date = lubridate::floor_date(`date`, unit = "months")) %>%
+        dplyr::summarise(inflation_next_12m = mean(`median`)),
       by = "date"
       ) %>%
-      select(
-        date,
-        swaps              = value.x,
-        inflation_next_12m = value.y
-        ) %>%
       mutate(
         value    = (((1 + (swaps / 100)) / (1 + (inflation_next_12m / 100))) - 1) * 100, # Fisher Equation
         variable = "Ex-ante"
@@ -346,7 +345,6 @@ selic_expec <- raw_selic_expec %>%
   select(
     date,
     variable = indicator,
-    detail,
     reference_date,
     value = mean
     ) %>%
@@ -358,7 +356,6 @@ selic_expec <- raw_selic_expec %>%
   mutate(
     date     = format(date, "%Y-%m-01") %>% lubridate::ymd(),
     variable = recode(variable, "Meta para taxa over-selic" = "SELIC Target rate"),
-    detail   = recode(detail, "Fim do ano" = "End of the year")
     )
 
 
