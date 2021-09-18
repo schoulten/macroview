@@ -1,6 +1,6 @@
 Package: macroview
 Title: Dashboard: Macroeconomic Data of Brazil
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person(given = "Fernando",
            family = "da Silva",
@@ -8,7 +8,7 @@ Authors@R:
            email = "fernando@fortietwo.com",
            comment = c(ORCID = "0000-0002-7491-6930"))
 Description: A dashboard of Brazilian macroeconomic data, using interactive charts and updated daily.
-License: CC BY 4.0 + file LICENSE
+License: CC BY 4.0
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
