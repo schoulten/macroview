@@ -169,12 +169,13 @@ raw_pim <- sidrar::get_sidra(api = api_sidra$api_pim) %>%
 
 
 # ICVA (Cielo)
-download.file(
-  url      = url_list$url_icva,
-  destfile = "./inst/extdata/icva.xlsx",
-  mode     = "wb"
+raw_icva <- rio::import(
+  file  = url_list$url_icva,
+  sheet = "\u00cdndice Mensal",
+  skip  = 6,
+  n_max = 4,
+  na    = "-"
   )
-raw_icva <- readxl::read_excel("./inst/extdata/icva.xlsx")
 
 
 # Vehicle Production (ANFAVEA)
@@ -266,13 +267,16 @@ gdp_cur_prices <- raw_gdp_cur_prices %>%
 
 # Cielo Retail Index
 icva <- raw_icva %>%
-  rename_with(~c("date", "nominal", "nominal_sa", "real", "real_sa")) %>%
-  mutate(
-    value = paste0(real_sa * 100, "%"), # convert to % format
-    date  = lubridate::as_date(date),
+  dplyr::as_tibble() %>%
+  dplyr::select(-c("Setor", "Localidade")) %>%
+  tidyr::pivot_longer(cols = -1, names_to = "date") %>%
+  dplyr::filter(`Visão` == "Deflacionado - Com Ajuste Calend\u00e1rio") %>%
+  dplyr::select(`date`, `value`) %>%
+  dplyr::mutate(
+    value = paste0(value * 100, "%"), # convert to % format
+    date  = janitor::excel_numeric_to_date(as.numeric(date)),
     ) %>%
-  filter(date == last(date)) %>%
-  select(date, value)
+  dplyr::filter(date == dplyr::last(date))
 
 
 # Vehicle Production
