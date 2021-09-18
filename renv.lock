@@ -690,10 +690,15 @@
     },
     "meedr": {
       "Package": "meedr",
-      "Version": "0.0.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "9ede870235dcff1a59fc4e4d2f640f3c"
+      "Version": "0.0.3",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "meedr",
+      "RemoteUsername": "schoulten",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "be75586a461af9983ded33760ca5043c4d3b98ac",
+      "Hash": "d047544235c98ee45de58ab10d385a86"
     },
     "memoise": {
       "Package": "memoise",
