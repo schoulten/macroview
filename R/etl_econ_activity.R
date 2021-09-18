@@ -6,6 +6,12 @@
 #' @return RDATA
 #' @export
 #'
+#' @examples
+#' \dontrun{
+#' etl_econ_activity()
+#' }
+#'
+#'
 etl_econ_activity <- function(){
 
 ### Economic activity ###
@@ -270,7 +276,8 @@ icva <- raw_icva %>%
   dplyr::as_tibble() %>%
   dplyr::select(-c("Setor", "Localidade")) %>%
   tidyr::pivot_longer(cols = -1, names_to = "date") %>%
-  dplyr::filter(`Visão` == "Deflacionado - Com Ajuste Calend\u00e1rio") %>%
+  dplyr::rename("variable" = 1) %>%
+  dplyr::filter(`variable` == "Deflacionado - Com Ajuste Calend\u00e1rio") %>%
   dplyr::select(`date`, `value`) %>%
   dplyr::mutate(
     value = paste0(value * 100, "%"), # convert to % format
