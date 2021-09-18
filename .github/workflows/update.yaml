@@ -59,7 +59,7 @@ jobs:
       - name: Render Rmarkdown
         run: |
           devtools::load_all()
-          retry(rmarkdown::render("index.Rmd"))
+          retry(rmarkdown::render(input = "index.Rmd", output_file = "index", output_dir = "docs"))
         shell: Rscript {0}
 
       - name: Commit and push
