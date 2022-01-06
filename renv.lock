@@ -515,10 +515,10 @@
     },
     "highcharter": {
       "Package": "highcharter",
-      "Version": "0.8.2",
+      "Version": "0.9.4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "0058e6db360b4131c268f8148df229c9"
+      "Hash": "e9851999ff5a7d33d6b17a68b2cb7f59"
     },
     "highr": {
       "Package": "highr",
