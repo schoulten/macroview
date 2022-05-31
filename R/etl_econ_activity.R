@@ -176,11 +176,12 @@ raw_pim <- sidrar::get_sidra(api = api_sidra$api_pim) %>%
 
 # ICVA (Cielo)
 raw_icva <- rio::import(
-  file  = url_list$url_icva,
-  sheet = "\u00cdndice Mensal",
-  skip  = 6,
-  n_max = 4,
-  na    = "-"
+  file   = url_list$url_icva,
+  format = "xlsx",
+  sheet  = "\u00cdndice Mensal",
+  skip   = 6,
+  n_max  = 4,
+  na     = "-"
   )
 
 
