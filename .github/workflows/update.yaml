@@ -47,11 +47,11 @@ jobs:
       - name: ETL
         run: |
           devtools::load_all()
-          retry(etl_econ_activity())
-          retry(etl_fiscal())
-          retry(etl_inflation())
-          retry(etl_labor())
-          retry(etl_monetary())
+          etl_econ_activity()
+          etl_fiscal()
+          etl_inflation()
+          etl_labor()
+          etl_monetary()
         shell: Rscript {0}
 
       - name: Render R Markdown
