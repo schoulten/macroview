@@ -44,9 +44,21 @@ jobs:
           install.packages(c("rcmdcheck", "sessioninfo", "devtools"))
         shell: Rscript {0}
 
+      - name: Set locale
+        run: |
+          sudo apt-get update && sudo apt-get install tzdata locales -y && sudo locale-gen pt_BR.UTF-8
+          sudo localectl set-locale LANG="pt_BR.UTF-8"
+          export LANG="pt_BR.UTF-8"
+          sudo update-locale
+          locale -a
+          locale
+          locale -c -k LC_NUMERIC
+          localectl status
+
       - name: ETL
         run: |
           devtools::load_all()
+          withr::local_locale(c("LC_TIME" = "pt_BR.utf8"))
           etl_econ_activity()
           etl_fiscal()
           etl_inflation()
