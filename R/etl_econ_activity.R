@@ -2,7 +2,7 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr tidyr
-#' @importFrom utils download.file lsf.str
+#' @importFrom utils lsf.str
 #' @return RDATA
 #' @export
 #'
@@ -186,14 +186,10 @@ raw_icva <- rio::import(
 
 
 # Vehicle Production (ANFAVEA)
-download.file(
-  url      = url_list$url_anfavea,
-  destfile = file.path("./inst/extdata", basename(url_list$url_anfavea)),
-  mode     = "wb"
-  )
-raw_vehicle <- readxl::read_excel(
-  path = file.path("./inst/extdata", basename(url_list$url_anfavea)),
-  skip = 4
+raw_vehicle <- rio::import(
+  file   = url_list$url_anfavea,
+  format = "xlsx",
+  skip   = 4
   )
 
 

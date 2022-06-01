@@ -2,7 +2,7 @@
 #'
 #' @encoding UTF-8
 #' @import dplyr
-#' @importFrom utils download.file lsf.str
+#' @importFrom utils lsf.str
 #' @return RDATA
 #' @export
 #'
@@ -64,8 +64,10 @@ url_list <- list(
 
 
   # Federal Public Debt stock (URL to download spreadsheet data from National Treasury)
-  url_debt_stock = "https://www.tesourotransparente.gov.br/ckan/dataset/0998f610-bc25-4ce3-b32c-a873447500c2/
-resource/0402cb77-5e4c-4414-966f-0e87d802a29a/download/2.1.xlsx",
+  url_debt_stock = paste0(
+    "https://www.tesourotransparente.gov.br/ckan/dataset/0998f610-bc25-4ce3-b32c",
+    "-a873447500c2/resource/0402cb77-5e4c-4414-966f-0e87d802a29a/download/2.1.xlsx"
+    ),
 
 
   # Debt Risk Rating History (URL to download spreadsheet data from National Treasury)
@@ -179,20 +181,16 @@ balance_accounts <- tibble(
 
 
 # Central Government Primary Balance
-download.file(
-  url      = url_list$url_treasury,
-  destfile = "./inst/extdata/treasury.xlsx",
-  mode     = "wb"
-  )
-raw_treasury <- readxl::read_xlsx(
-  path      = "./inst/extdata/treasury.xlsx",
+raw_treasury <- rio::import(
+  file      = url_list$url_treasury,
+  format    = "xlsx",
   sheet     = "1.1-A",
   col_names = FALSE,
   skip      = 5,
   n_max     = 68
   ) %>%
   t() %>%
-  as_tibble() %>%
+  dplyr::as_tibble() %>%
   janitor::clean_names()
 
 
@@ -205,13 +203,9 @@ raw_gdp_monthly <- GetBCBData::gbcbd_get_series(
 
 
 # General government net and gross debt
-download.file(
-  url      = url_list$url_debt,
-  destfile = "./inst/extdata/debt.xls",
-  mode     = "wb"
-  )
-raw_debt <- readxl::read_excel(
-  path      = "./inst/extdata/debt.xls",
+raw_debt <- rio::import(
+  file      = url_list$url_debt,
+  format    = "xls",
   sheet     = "R$ milh\u00f5es",
   skip      = 8,
   col_names = FALSE,
@@ -221,25 +215,19 @@ raw_debt <- readxl::read_excel(
 
 
 # Federal Public Debt stock (R$ billion)
-download.file(
-  url      = url_list$url_debt_stock,
-  destfile = "./inst/extdata/dpf.xlsx",
-  mode     = "wb"
-  )
-raw_debt_stock <- readxl::read_excel(
-  path      = "./inst/extdata/dpf.xlsx",
+raw_debt_stock <- rio::import(
+  file      = url_list$url_debt_stock,
+  format    = "xlsx",
   skip      = 4,
   col_names = FALSE
   )
 
 
 # Debt Risk Rating History
-download.file(
-  url      = url_list$url_rating,
-  destfile = "./inst/extdata/rating.csv",
-  mode     = "wb"
+raw_rating <- rio::import(
+  file   = url_list$url_rating,
+  format = "csv",
   )
-raw_rating <- rio::import("./inst/extdata/rating.csv")
 
 
 
@@ -257,8 +245,8 @@ treasury <- raw_treasury %>%
     remove_row = TRUE
     ) %>%
   janitor::clean_names() %>%
-  mutate(
-    across(where(is.character), as.numeric),
+  dplyr::mutate(
+    dplyr::across(where(is.character), as.numeric),
     date = seq(
       from   = as.Date("1997-01-01"),
       length = nrow(raw_treasury)-1,
