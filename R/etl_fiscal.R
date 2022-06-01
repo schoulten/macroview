@@ -359,25 +359,25 @@ single_account <- public_debt_deflated[,c(31,49)] %>%
 
 
 # Federal Public Debt stock (R$ billion deflated)
-debt_stock <- as_tibble(
-  t(raw_debt_stock[c(1,3),-1])
-  ) %>%
-  mutate(
-    date     = lubridate::myd(paste0(V1, "/01"), locale = "Portuguese_Brazil.1252"),
-    value    = as.numeric(V2),
-    variable = "Debt Stock",
-    across(
-      value,
-      ~deflateBR::deflate(
-        nominal_values = .x,
-        nominal_dates  = date,
-        real_date      = format(last(date), "%m/%Y"),
-        index          = "ipca"
-        ) %>% round(2)
-      )
+debt_stock <- t(raw_debt_stock[c(1,3),-1]) %>%
+  dplyr::as_tibble() %>%
+  janitor::clean_names() %>%
+  dplyr::mutate(
+    date     = lubridate::myd(paste0(x1, "/01"), locale = "Portuguese_Brazil.1252"),
+    value    = as.numeric(x3),
+    variable = "Debt Stock"
     ) %>%
-  select(date, value, variable) %>%
-  filter(date >= "2006-12-01")
+  dplyr::arrange(date) %>%
+  dplyr::mutate(
+    value = deflateBR::deflate(
+      nominal_values = value,
+      nominal_dates  = date,
+      real_date      = format(dplyr::last(date) - months(1), "%m/%Y"),
+      index          = "ipca"
+      ) %>% round(2)
+    ) %>%
+    dplyr::select(date, value, variable) %>%
+    dplyr::filter(date >= "2006-12-01")
 
 
 # Debt Risk Rating History
