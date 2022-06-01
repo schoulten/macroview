@@ -165,13 +165,13 @@ raw_currency <- purrr::map_dfr(
   )
 
 # EMBI+ Risk-Brazil
-raw_embi <- get_ipea(api_ipeadata$api_embi)
+raw_embi <- ipeadatar::ipeadata(api_ipeadata$api_embi)
 
 # Swaps - DI fixed rate - 360 days
-raw_swaps <- get_ipea(api_ipeadata$api_swaps)
+raw_swaps <- ipeadatar::ipeadata(api_ipeadata$api_swaps)
 
 # Market expectations for inflation over the next 12 months - monthly mean
-raw_inflation_next_12m <- get_ipea(api_ipeadata$api_inflation)
+raw_inflation_next_12m <- ipeadatar::ipeadata(api_ipeadata$api_inflation)
 
 # Current yield curve (ETTJ/Anbima)
 raw_ettj <- GetTDData::get.yield.curve()
