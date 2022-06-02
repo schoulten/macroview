@@ -39,10 +39,6 @@ etl_monetary <- function(){
 #   )
 
 
-# Set the default language of date in R
-Sys.setlocale("LC_TIME", "English")
-
-
 
 # Parameters --------------------------------------------------------------
 
