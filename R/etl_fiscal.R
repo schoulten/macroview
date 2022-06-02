@@ -359,11 +359,12 @@ single_account <- public_debt_deflated[,c(31,49)] %>%
 
 
 # Federal Public Debt stock (R$ billion deflated)
+withr::local_locale(c("LC_TIME" = "pt_BR.utf8"))
 debt_stock <- t(raw_debt_stock[c(1,3),-1]) %>%
   dplyr::as_tibble() %>%
   janitor::clean_names() %>%
   dplyr::mutate(
-    date     = lubridate::myd(paste0(x1, "/01"), locale = "Portuguese_Brazil.1252"),
+    date     = lubridate::myd(paste0(x1, "/01")),
     value    = as.numeric(x3),
     variable = "Debt Stock"
     ) %>%
@@ -384,7 +385,7 @@ debt_stock <- t(raw_debt_stock[c(1,3),-1]) %>%
 rating  <- raw_rating %>%
   rename_with(~c("Last update", "Agency", "Foreign currency", "Local currency", "Action")) %>%
   mutate(
-    `Last update` = lubridate::dmy(`Last update`, locale = "Portuguese_Brazil.1252")
+    `Last update` = lubridate::dmy(`Last update`)
     )
 
 
@@ -399,7 +400,7 @@ gov_portfolio <- t(raw_debt_stock) %>%
     "Others"           = "Demais"
     ) %>%
   mutate(
-    date = lubridate::myd(paste0(date, "/01"), locale = "Portuguese_Brazil.1252"),
+    date = lubridate::myd(paste0(date, "/01")),
     date_my = format(date, "%B, %Y"),
     across(2:9, as.numeric) %>% round(2)
     ) %>%
