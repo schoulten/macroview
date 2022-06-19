@@ -69,6 +69,7 @@ jobs:
       - name: Render R Markdown
         run: |
           devtools::load_all()
+          withr::local_locale(c("LC_TIME" = "US")
           retry(rmarkdown::render(input = "index.Rmd", output_file = "index", output_dir = "docs"))
           labor_path <- "inst/extdata/labor.Rdata"
           if (file.info(labor_path)[, "size"] > 90000000) {file.remove(labor_path)}
