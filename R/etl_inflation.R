@@ -208,7 +208,8 @@ ipca_groups <- raw_ipca_groups %>%
     id_cols     = "Group"
     )
 
-
+curr_locale <- Sys.getlocale("LC_TIME")
+withr::local_locale(c("LC_TIME" = "US"))
 # Footnote for Consumer Price Index by groups - IPCA
 footnote_ipca_groups <- raw_ipca_groups %>%
   filter(date == max(date)) %>%
@@ -221,6 +222,8 @@ footnote_ipca_groups <- raw_ipca_groups %>%
       )
     ) %>%
   pull(date)
+
+withr::local_locale(c("LC_TIME" = curr_locale))
 
 
 # Consumer Price Index by Metropolitan Region - IPCA
