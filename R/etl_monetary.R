@@ -330,10 +330,13 @@ currencies <- raw_currency %>%
     )
 
 # Footnote
+curr_locale <- Sys.getlocale("LC_TIME")
+withr::local_locale(c("LC_TIME" = "US"))
 footnote_currency <- paste0(
   "Average monthly exchange rate, updated to ",
   format(max(raw_currency$date), "%B %d, %Y.")
   )
+withr::local_locale(c("LC_TIME" = curr_locale))
 
 
 # Annual market expectations for the current year's interest rate (Focus/BCB)

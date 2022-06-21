@@ -308,9 +308,15 @@ revenue_spending_detail <- treasury_accum_12m %>%
   select(-variable) %>%
   bind_cols(balance_accounts) %>%
   mutate(
-    date = format(lubridate::ymd(date), "%B, %Y"),
+    date = lubridate::ymd(date),
     value = round(value, 2)
     )
+
+curr_locale <- Sys.getlocale("LC_TIME")
+withr::local_locale(c("LC_TIME" = "US"))
+revenue_spending_detail <- revenue_spending_detail %>%
+  dplyr::mutate(date = format(date, "%B, %Y"))
+withr::local_locale(c("LC_TIME" = curr_locale))
 
 
 # General government net and gross debt
@@ -387,25 +393,32 @@ rating  <- raw_rating %>%
 
 # Government Securities Portfolio
 gov_portfolio <- t(raw_debt_stock) %>%
-  as_tibble() %>%
-  select(1, 7:10, 12:15) %>%
+  dplyr::as_tibble() %>%
+  dplyr::select(1, 7:10, 12:15) %>%
   janitor::row_to_names(row_number = 1) %>%
-  rename(
+  dplyr::rename(
     "date"             = 1,
     "Securitized Debt" = "D\u00edvida Securitizada",
     "Others"           = "Demais"
     ) %>%
-  mutate(
+  dplyr::mutate(
     date = lubridate::myd(paste0(date, "/01")),
-    date_my = format(date, "%B, %Y"),
-    across(2:9, as.numeric) %>% round(2)
+    dplyr::across(2:9, as.numeric) %>% round(2)
+    )
+
+curr_locale <- Sys.getlocale("LC_TIME")
+withr::local_locale(c("LC_TIME" = "US"))
+gov_portfolio <- gov_portfolio %>%
+  dplyr::mutate(
+    date_my = format(date, "%B, %Y")
     ) %>%
-  filter(date == max(date)) %>%
-  pivot_longer(
+  dplyr::filter(date == max(date)) %>%
+  dplyr::pivot_longer(
     cols      = -c(date, date_my),
     names_to  = "variable",
     values_to = "value"
     )
+withr::local_locale(c("LC_TIME" = curr_locale))
 
 
 
