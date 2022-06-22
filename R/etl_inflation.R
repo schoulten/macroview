@@ -210,7 +210,7 @@ ipca_groups <- raw_ipca_groups %>%
 
 # Footnote for Consumer Price Index by groups - IPCA
 curr_locale <- Sys.getlocale("LC_TIME")
-withr::local_locale(c("LC_TIME" = "US"))
+withr::local_locale(c("LC_TIME" = "en_US.UTF-8"))
 footnote_ipca_groups <- raw_ipca_groups %>%
   filter(date == max(date)) %>%
   slice_tail(n = 1) %>%

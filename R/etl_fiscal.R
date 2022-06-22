@@ -313,7 +313,7 @@ revenue_spending_detail <- treasury_accum_12m %>%
     )
 
 curr_locale <- Sys.getlocale("LC_TIME")
-withr::local_locale(c("LC_TIME" = "US"))
+withr::local_locale(c("LC_TIME" = "en_US.UTF-8"))
 revenue_spending_detail <- revenue_spending_detail %>%
   dplyr::mutate(date = format(date, "%B, %Y"))
 withr::local_locale(c("LC_TIME" = curr_locale))
@@ -407,7 +407,7 @@ gov_portfolio <- t(raw_debt_stock) %>%
     )
 
 curr_locale <- Sys.getlocale("LC_TIME")
-withr::local_locale(c("LC_TIME" = "US"))
+withr::local_locale(c("LC_TIME" = "en_US.UTF-8"))
 gov_portfolio <- gov_portfolio %>%
   dplyr::mutate(
     date_my = format(date, "%B, %Y")
