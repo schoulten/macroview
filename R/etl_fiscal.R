@@ -413,7 +413,7 @@ gov_portfolio <- gov_portfolio %>%
     date_my = format(date, "%B, %Y")
     ) %>%
   dplyr::filter(date == max(date)) %>%
-  dplyr::pivot_longer(
+  tidyr::pivot_longer(
     cols      = -c(date, date_my),
     names_to  = "variable",
     values_to = "value"
