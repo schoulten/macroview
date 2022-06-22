@@ -359,6 +359,8 @@ selic_expec <- raw_selic_expec %>%
 
 
 # Current yield curve (ETTJ/Anbima)
+curr_locale <- Sys.getlocale("LC_TIME")
+withr::local_locale(c("LC_TIME" = "en_US.UTF-8"))
 ettj <- raw_ettj %>%
   filter(type == "real_return") %>%
   mutate(
@@ -373,6 +375,7 @@ ettj <- raw_ettj %>%
     variable,
     value
     )
+withr::local_locale(c("LC_TIME" = curr_locale))
 
 
 # Ibovespa index (B3)
