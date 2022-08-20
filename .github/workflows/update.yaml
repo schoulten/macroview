@@ -31,6 +31,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-renv-
 
+      - name: Install R textshaping deps
+        run: sudo apt-get install libharfbuzz-dev libfribidi-dev
+
       - name: Restore packages
         run: |
           if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
