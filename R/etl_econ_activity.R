@@ -96,6 +96,7 @@ api_bcb <- list(
 
 
 # GDP growth (rate of change of the quarterly volume index from IBGE)
+message("Importing GDP % data...")
 raw_gdp <- sidrar::get_sidra(api = api_sidra$api_gdp) %>%
   select(
     date     = "Trimestre (C\u00f3digo)",
@@ -107,6 +108,7 @@ raw_gdp <- sidrar::get_sidra(api = api_sidra$api_gdp) %>%
 
 
 # GDP (values at current prices from IBGE)
+message("Importing GDP R$ data...")
 raw_gdp_cur_prices <- sidrar::get_sidra(api = api_sidra$api_gdp_brl) %>%
   select(
     date    = "Trimestre (C\u00f3digo)",
@@ -117,6 +119,7 @@ raw_gdp_cur_prices <- sidrar::get_sidra(api = api_sidra$api_gdp_brl) %>%
 
 
 # PMC (retail trade from IBGE)
+message("Importing PMC data...")
 raw_pmc <- sidrar::get_sidra(api = api_sidra$api_pmc) %>%
   select(
     date     = "M\u00eas (C\u00f3digo)",
