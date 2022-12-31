@@ -21,24 +21,6 @@ etl_econ_activity <- function(){
 # variables referring to the Brazilian economic activity.
 
 
-# Packages ----------------------------------------------------------------
-
-
-# Install/load packages
-# if (!require("pacman")) install.packages("pacman")
-# pacman::p_load(
-#   "tidyverse",
-#   "sidrar",
-#   "readxl",
-#   "lubridate",
-#   "GetBCBData",
-#   "zoo",
-#   "mgsub",
-#   "janitor"
-#   )
-
-
-
 # Parameters --------------------------------------------------------------
 
 
@@ -175,6 +157,7 @@ raw_pim <- sidrar::get_sidra(api = api_sidra$api_pim) %>%
 
 
 # ICVA (Cielo)
+message("Importing ICVA data...")
 raw_icva <- rio::import(
   file   = url_list$url_icva,
   format = "xlsx",
@@ -186,6 +169,7 @@ raw_icva <- rio::import(
 
 
 # Vehicle Production (ANFAVEA)
+message("Importing ANFAVEA data...")
 raw_vehicle <- rio::import(
   file   = url_list$url_anfavea,
   format = "xlsx",
